@@ -1,10 +1,10 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
-import { resend, verifyOtp } from '../../Api/provider';
+import { resend, verifyOtp } from '../../Api/Provider';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 
 
 const ProviderOtp: React.FC = () => {

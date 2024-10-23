@@ -3,7 +3,8 @@ const userRouter = {
     reSend: '/resend-otp',
     verifyOtp: '/verify-otp', 
     userLogin:"/login",
-    userLogout:"/logout"
+    userLogout:"/logout",
+    fetchCar:"/cars"
   };
   
   export default userRouter;

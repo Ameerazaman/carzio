@@ -2,18 +2,14 @@ import React from 'react';
 
 function ServicesCard() {
   return (
-    <div className="p-6 flex justify-center">
+    <div className="p-8 flex justify-center"> {/* Adjusted padding to p-8 for a better layout */}
       <div className="flex flex-col items-center max-w-5xl w-full">
         <h6 className="text-xl font-bold mb-2 text-red-600 text-center">See Our</h6>
         <h4 className="text-xl font-bold mb-6 text-gray-600 text-center">Latest Services</h4>
         
-        <div className="flex space-x-4 overflow-x-auto">
+        <div className="flex justify-between flex-wrap gap-6"> {/* Removed overflow and added gap for spacing */}
           {[
-            {
-              imgSrc: "/images/Gauto - Car Rental HTML Template Preview - ThemeForest_files/hospital-transport.png",
-              title: "Hospital Administration",
-              description: "Hospital administration requires efficient and reliable transportation solutions to manage daily operations"
-            },
+           
             {
               imgSrc: "/images/Gauto - Car Rental HTML Template Preview - ThemeForest_files/airport-transport.png",
               title: "Airport Services",
@@ -30,12 +26,12 @@ function ServicesCard() {
               description: "Our ceremony services offer efficient and reliable transportation for events and celebrations."
             }
           ].map((service, index) => (
-            <div key={index} className="max-w-xs w-full mx-2">
-              <div className="bg-white shadow-2xl rounded-lg p-4 flex flex-col items-center space-y-2 h-64 transition-transform duration-300 hover:scale-105"> {/* Added hover effect here */}
+            <div key={index} className="max-w-xs w-full">
+              <div className="bg-white shadow-2xl rounded-lg p-6 flex flex-col items-center space-y-4 h-64 transition-transform duration-300 hover:scale-105"> {/* Adjusted padding to p-6 and space-y to 4 */}
                 <img 
                   src={service.imgSrc} 
                   alt={service.title} 
-                  className="w-full h-16 object-cover rounded-t-lg" // Kept the height to h-16
+                  className="w-full h-16 object-cover rounded-t-lg" 
                   style={{ objectFit: 'contain' }} 
                 />
                 <h6 className="text-lg font-semibold text-gray-600">{service.title}</h6>
@@ -52,3 +48,4 @@ function ServicesCard() {
 }
 
 export default ServicesCard;
+

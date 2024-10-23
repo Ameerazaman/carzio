@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signup } from '../../Api/user';
+import { signup } from '../../Api/User';
 import { useDispatch } from 'react-redux';
-
-import { toast } from 'react-toastify';
+import { signupFormData } from '../../Interface/SignupFormInterface';
+import { toast } from 'react-hot-toast';
 
 interface Errors {
   userName?: string;
@@ -11,12 +11,12 @@ interface Errors {
   password?: string;
   confirmPassword?: string;
 }
-export interface FormData {
-  userName?: string;
-  email: string;
-  password: string;
-  confirmPassword?: string;
-}
+// export interface signupFormData {
+//   username?: string;
+//   email?: string;
+//   password?: string;
+//   confirmPassword?: string;
+// }
 
 function Signup() {
   let dispatch = useDispatch();
@@ -63,31 +63,31 @@ function Signup() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-   
 
-    const formData = { email, password, confirmPassword, username };
+    const formData = { email, password, confirmPassword, username }; // Ensure username is used
     const validationErrors = validate();
 
     if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
+        setErrors(validationErrors);
+        return;
     }
 
     try {
-      let result = await signup(formData);
-      console.log(result, 'signup result');
+        console.log(formData, "formData")
+        let result = await signup(formData);
+        console.log(result, 'signup result');
 
-      if (result.success) {
-        navigate('/otp'); // Navigate to OTP page on success
-      } else {
-        // Show specific error message returned by the server
-        toast.error(result.message);
-      }
+        if (result.success) {
+            navigate('/otp'); // Navigate to OTP page on success
+        } else {
+            toast.error(result.message);
+        }
     } catch (error) {
-      console.log(error);
-      toast.error('An error occurred during signup.');
+        console.log(error);
+        toast.error('An error occurred during signup.');
     }
-  };
+};
+
 
   return (
     <div className="flex h-screen items-center justify-center bg-gray-100">

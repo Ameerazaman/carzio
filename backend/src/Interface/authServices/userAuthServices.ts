@@ -1,10 +1,10 @@
 interface UserInterface {
     id?: string | undefined;
     name?: string;
-    email: string;
+    email?: string;
     phone?: number;
     password?: string | Promise<string>;
-    about?: string;
+
     isBlocked?: boolean;
 }
 
@@ -13,7 +13,7 @@ export interface UserAuthResponse {
     data: {
         success: boolean;
         message: string;
-        data?: UserInterface,
+        data?: UserInterface|UserInterface[]|undefined,
         userId?: string;
         token?: string;
         refreshToken?: string;

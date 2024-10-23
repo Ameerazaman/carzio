@@ -1,6 +1,6 @@
 import React from 'react';
-import { FaTachometerAlt, FaCar, FaUser, FaCog } from 'react-icons/fa';
-import { FaSignOutAlt } from 'react-icons/fa';
+import { FaTachometerAlt, FaCar, FaUser, FaCog, FaBell } from 'react-icons/fa';
+
 
 function Sidebar() {
   return (
@@ -8,35 +8,36 @@ function Sidebar() {
       <h2 className="text-lg font-bold mb-4">Admin Dashboard</h2>
       <ul className="space-y-2">
         <li>
-          <a href="/dashboard" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-300 transform hover:scale-105 shadow-md">
+          <a href="/admin/dashboard" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-300 transform hover:scale-105 shadow-md">
             <FaTachometerAlt className="mr-2" />
             Dashboard
           </a>
         </li>
         <li>
-          <a href="/cars" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-300 transform hover:scale-105 shadow-md">
+          <a href="/admin/cars" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-300 transform hover:scale-105 shadow-md">
             <FaCar className="mr-2" />
             Cars
           </a>
         </li>
         <li>
-          <a href="/users" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-300 transform hover:scale-105 shadow-md">
+          <a href="/admin/users" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-300 transform hover:scale-105 shadow-md">
             <FaUser className="mr-2" />
             Users
           </a>
         </li>
         <li>
-          <a href="/providers" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-300 transform hover:scale-105 shadow-md">
+          <a href="/admin/providers" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-300 transform hover:scale-105 shadow-md">
             <FaCog className="mr-2" />
             Providers
           </a>
         </li>
         <li>
-          <a href="/logout" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-300 transform hover:scale-105 shadow-md">
-            <FaSignOutAlt className="mr-2" />
-            Logout
+          <a href="/admin/notifications" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-300 transform hover:scale-105 shadow-md">
+            <FaBell className="mr-2" />
+            Notifications
           </a>
         </li>
+
       </ul>
     </div>
   );

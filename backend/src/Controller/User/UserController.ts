@@ -1,9 +1,11 @@
-import { Request, Response } from 'express';
-import { UserServices } from '../Services/userServices';
-
-import { generateAndSendOTP } from '../utlis/generateAndSendOtp';
-import { STATUS_CODES } from '../constants/httpStatusCode'
-import { Otp } from '../Model/user/otpModel';
+import { Request, Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
+import { UserServices } from '../../Services/User/UserServices';
+import { CreateJWT } from '../../Utlis/GenerateToken';
+import { generateAndSendOTP } from '../../Utlis/GenerateAndSendOtp';
+import { STATUS_CODES } from '../../Constants/HttpStatusCode'
+import { Otp } from '../../Model/User/OtpModel';
+import { verifyRefreshToken } from '../../Utlis/VerifyTokens';
 const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED, } = STATUS_CODES;
 
 export class UserController {
@@ -11,12 +13,51 @@ export class UserController {
 
     constructor(private userServices: UserServices) { }
     milliseconds = (h: number, m: number, s: number) => ((h * 60 * 60 + m * 60 + s) * 1000);
+ 
 
+    // ********************************refresh access token for user******************
 
+    
+    async refreshToken(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+
+        const refreshToken = req.cookies.refresh_token;
+        console.log("inside controllr for accesstoken", refreshToken);
+
+        if (!refreshToken)
+            res
+                .status(401)
+                .json({ success: false, message: "Refresh Token Expired" });
+
+        try {
+            const decoded = verifyRefreshToken(refreshToken);
+            console.log(decoded, "decoded data")
+            if (!decoded || !decoded.data) {
+                console.log("hai")
+                res.status(401).json({ success: false, message: "Refresh Token Expired" });
+            }
+
+            const result = await this.userServices.userGetById(decoded.data);
+            console.log(result, "result after create neew token")
+   
+            const accessTokenMaxAge = 5 * 60 * 1000;
+            const newAccessToken = result?.data?.token
+            console.log(newAccessToken, "new token")
+            res.cookie('access_token', newAccessToken, {
+                maxAge: accessTokenMaxAge,
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+            })
+            console.log(res.cookie, "cookie")
+            res.status(200).json({ success: true, message: "Token Updated" });
+        }
+        catch (error) {
+            next(error);
+        }
+    }
     async userSignup(req: Request, res: Response): Promise<void> {
         try {
+            console.log(req.body, "req.body")
             req.app.locals.userData = req.body;
-
 
             // Check if the user already exists
             const existingUser = await this.userServices.userSignup(req.app.locals.userData);
@@ -145,30 +186,34 @@ export class UserController {
         try {
             const { email, password }: { email: string; password: string } = req.body;
 
-            console.log("controllerresult");
             const result = await this.userServices.userSignIn({ email, password });
 
-            console.log("result", result);
+
             if (result?.data.success) {
                 const access_token = result.data.token;
                 const refresh_token = result.data.refreshToken;
+
                 const accessTokenMaxAge = 5 * 60 * 1000; // 5 minutes
                 const refreshTokenMaxAge = 48 * 60 * 60 * 1000; // 48 hours
-                console.log("login successfully");
-                return res.status(OK) // Change OK to 200 for clarity
+
+
+
+                // Set cookies with tokens
+                return res.status(200)
                     .cookie('access_token', access_token, {
                         maxAge: accessTokenMaxAge,
                         httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production'
+                        secure: process.env.NODE_ENV === 'production',
                     })
                     .cookie('refresh_token', refresh_token, {
                         maxAge: refreshTokenMaxAge,
                         httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production'
+                        secure: process.env.NODE_ENV === 'production',
                     })
                     .json({ success: true, user: result.data, message: result.data.message });
+
             } else {
-                console.log("login failed");
+
                 return res.status(BAD_REQUEST).json({ success: false, message: result?.data.message });
             }
         } catch (error) {
@@ -201,62 +246,48 @@ export class UserController {
         }
     }
 
+
+// ****************************fetch  car for card***************************
+async fetchCars(req: Request, res: Response): Promise<void> {
+    try {
+        const result = await this.userServices.fetchCars(); // Fetch users from service
+
+        if (result) {
+            // Respond with the service result, no need to return
+            res.status(result.status).json(result.data);
+        } else {
+            res.status(500).json({ message: "Internal server error" });
+        }
+    } catch (error) {
+        console.error("Error during fetch cars:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 }
-// }
 
-// async userLogin(req: Request, res: Response): Promise<void> {
-//     try {
-//         console.log("hai");
+// *********************************car details page********************
+async carDetails(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
+    try {
+        const id = req.params.id; // Extract 'id' from req.params
+        console.log(id, "edit car provider controller");
 
-//         const { email, password }: { email: string; password: string } = req.body;
-//         const loginStatus = await this.userServices.userSignIn({ email, password });
+        // Validate if ID is a string and a valid ObjectId
+        if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid ID parameter" });
+        }
 
-//         console.log(loginStatus);
+        const carExist = await this.userServices.carDetails(id);
 
-//         // Check if loginStatus is valid
-//         if (loginStatus && loginStatus.data && typeof loginStatus.data == 'object') {
-//             console.log(loginStatus.data.message, "failed");
+        console.log(carExist, "exist car");
 
-//             if (!loginStatus.data.success) {
-//                 // Return 400 for better clarity in error cases
-//                 console.log("hai failed");
-//                 res.status(BAD_REQUEST).json({ success: false, message: loginStatus.data.message });
-//                 return;  // Exit after sending the response
-//             }
+        if (!carExist) {
+            return res.status(404).json({ message: "Car not found" });
+        }
 
-//             // Login success case
-//             const access_token = loginStatus.data.token;
-//             const refresh_token = loginStatus.data.refreshToken;
-//             const accessTokenMaxAge = 5 * 60 * 1000; // 5 minutes
-//             const refreshTokenMaxAge = 48 * 60 * 60 * 1000; // 48 hours
+        return res.status(200).json(carExist);
+    } catch (error) {
+        console.error("Error during check Car exist:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
 
-//             res.status(OK) // Send 200 OK status
-//                 .cookie('access_token', access_token, {
-//                     maxAge: accessTokenMaxAge,
-//                     httpOnly: true,
-//                     secure: process.env.NODE_ENV === 'production'
-//                 })
-//                 .cookie('refresh_token', refresh_token, {
-//                     maxAge: refreshTokenMaxAge,
-//                     httpOnly: true,
-//                     secure: process.env.NODE_ENV === 'production'
-//                 })
-//                 .json({
-//                     success: true,
-//                     message: 'Login successful',
-//                     userId: loginStatus.data.userId
-//                 });
-//             return;  // Exit after sending the success response
-//         } else {
-//             res.status(BAD_REQUEST).json({ success: false, message: 'Authentication error' });
-//             return;  // Exit after sending the authentication error
-//         }
-//     } catch (error) {
-//         console.error('Error during login:', error);
-//         res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
-//         return;  // Exit after sending the internal server error
-//     }
-// }
-
-
-
+}

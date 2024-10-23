@@ -3,9 +3,10 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
-import { loginUser } from '../../Api/user';
-import { toast } from 'react-toastify';
-import { signInSuccess } from '../../app/slice/userSlice';
+import { loginUser } from '../../Api/User';
+import { toast } from 'react-hot-toast';
+
+import { signInSuccess } from '../../App/Slice/UserSlice';
 
 interface Errors {
   email?: string;

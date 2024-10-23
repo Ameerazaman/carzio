@@ -7,13 +7,13 @@ function Sidebar() {
       {/* <h2 className="text-lg font-bold mb-4 text-red-500">Provider Dashboard</h2> */}
       <ul className="space-y-4">
         <li>
-          <a href="/profile" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-200">
+          <a href="/provider/home" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-200">
             <FaUser className="mr-2" />
             Profile
           </a>
         </li>
         <li>
-          <a href="/cars" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-200">
+          <a href="/provider/cars" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-200">
             <FaCar className="mr-2" />
             My Cars
           </a>

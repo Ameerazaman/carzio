@@ -5,5 +5,7 @@ export interface UserInterface {
     id?: string | undefined;
     email: string; // Should always be a string
     password: string; // Should always be a string
-    data?: string; // Optional field if needed
+    data?: string;
+    username?:string ;
+    isBlocked?:boolean// Optional field if needed
 }

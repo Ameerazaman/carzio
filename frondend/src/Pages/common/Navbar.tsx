@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
 import { FaUser, FaUserPlus, FaPhone, FaMapMarkerAlt } from 'react-icons/fa'; // Import icons
-import { RootState } from '../../app/store';
+import { RootState } from '../../App/Store';
 import { useSelector } from 'react-redux';
-import { userLogout } from '../../Api/user';
+import { userLogout } from '../../Api/User';
 import Swal from 'sweetalert2';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
-import { signOut } from '../../app/slice/userSlice';
+import { signOut } from '../../App/Slice/UserSlice';
 import { useNavigate } from 'react-router-dom';
-import { providerLogout } from '../../Api/provider';
-import { signOutProvider } from '../../app/slice/providerSlice';
+import { providerLogout } from '../../Api/Provider';
+import { signOutProvider } from '../../App/Slice/ProviderSlice';
 
-interface User {
+export interface User {
   email: string;
   username: string;
+  _id: string;
   // other user fields
 }
 
+// 
 function Navbar() {
   let dispatch = useDispatch()
   let navigate = useNavigate()
   const user = useSelector((state: RootState) => state.user.currentUser) as User | null;
   const provider = useSelector((state: RootState) => state.provider.currentProvider) as User | null;
-
+  if (user?._id) {
+    localStorage.setItem('userId', user._id);
+  }
   const token = localStorage.getItem('token');
 
-  useEffect(() => {
-    if (user) {
-      console.log(user.email, "mount");
-    }
-  }, [user]);
+ 
 
   // Function to handle user logout
   // const logoutUser = async () => {
@@ -65,14 +66,14 @@ function Navbar() {
         confirmButtonText: "Yes"
       }).then((result) => {
         if (result.isConfirmed) {
-          if(user){
+          if (user) {
 
             userLogout().then(() => console.log(''))
             dispatch(signOut());
             toast.success("You are logged out!")
             navigate('/')
           }
-          else if(provider){
+          else if (provider) {
             providerLogout().then(() => console.log(''))
             dispatch(signOutProvider());
             toast.success("You are logged out!")
@@ -102,7 +103,7 @@ function Navbar() {
           </div>
 
           {/* Login/Signup Links */}
-          {! user && !provider ? ( // If user is null or undefined, show login/signup links
+          {!user && !provider ? ( // If user is null or undefined, show login/signup links
             <div className="relative z-10 space-x-6 flex items-center">
               <a href="/login" className="text-white hover:text-gray-300 transition duration-300 flex items-center">
                 <FaUser className="mr-2" /> {/* Login Icon */}
@@ -165,31 +166,33 @@ function Navbar() {
           </div>
 
           {/* Provider Signup Button */}
-          {!user &&
+          {!user && !provider ?
             <button className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition duration-300">
               <a href="/provider/login">Provider Signup</a>
-            </button>
+            </button> : ""
           }
         </div>
       </nav>
-
-      {/* Third Reduced Height Black Navigation Bar with Navigation Links */}
-      <div className="bg-black p-2">
-        <div className="container mx-auto flex justify-between items-center">
-          {/* Navigation Links */}
-          <div className="flex space-x-8">
-            <a href="#" className="text-white hover:text-red-400 transition duration-300 font-semibold">Home</a>
-            <a href="#" className="text-white hover:text-red-400 transition duration-300 font-semibold">About</a>
-            <a href="#" className="text-white hover:text-red-400 transition duration-300 font-semibold">Cars</a>
-            <a href="#" className="text-white hover:text-red-400 transition duration-300 font-semibold flex items-center">
-              <FaMapMarkerAlt className="mr-2" /> {/* Location Icon */}
-              Location
-            </a>
+      {user ? (
+        <div className="bg-black p-2">
+          <div className="container mx-auto flex justify-between items-center">
+            <div className="flex space-x-8">
+              <a href="#" className="text-white hover:text-red-400 transition duration-300 font-semibold">Home</a>
+              <a href="#" className="text-white hover:text-red-400 transition duration-300 font-semibold">About</a>
+              <a href="#" className="text-white hover:text-red-400 transition duration-300 font-semibold">Cars</a>
+              <a href="#" className="text-white hover:text-red-400 transition duration-300 font-semibold flex items-center">
+                <FaMapMarkerAlt className="mr-2" /> {/* Location Icon */}
+                Location
+              </a>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <hr style={{ backgroundColor: 'black', height: '2px' }} />
+      )}
     </header>
-  );
+  )
 }
 
 export default Navbar;
+

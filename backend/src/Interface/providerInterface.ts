@@ -5,5 +5,23 @@ export interface ProviderInterface {
     id?: string | undefined;
     email: string; // Should always be a string
     password: string; // Should always be a string
-    data?: string; // Optional field if needed
+    data?: string;
+    username?:string;
+    isBlocked?:boolean // Optional field if needed
+}
+
+
+
+
+
+export interface ProviderAdressInterface {
+    providerId?: string; // Use string to represent the _id
+    name: string; // Required
+    email: string; // Required
+    password?: string; // Required
+    phone: number | null; // Change to number
+    city: string; // Required
+    state: string; // Required
+    pinNumber: number | null; // Change to number
+    isBlocked?: boolean; // Optional
 }

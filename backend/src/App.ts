@@ -1,29 +1,45 @@
 import express, { Application, Request, Response, NextFunction, ErrorRequestHandler } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import userRouter from './Routes/userRouter';
+import userRouter from './Routes/UserRouter';
 import createHttpError from 'http-errors';
-import connectDB from './config/db';
+import connectDB from './Config/Db';
 import { Toaster } from 'react-hot-toast'; 
-import providerRouter from './Routes/providerRouter';
+import providerRouter from './Routes/ProviderRouter';
+import adminRouter from './Routes/AdminRouter';
+import cookieParser from 'cookie-parser';
+import path from 'path'
+import multer  from 'multer';
+import fs from 'fs'
+import morgan from 'morgan';
+
 
 dotenv.config();
 connectDB();
 
 const app: Application = express();
+// morgan
+app.use(morgan('dev')); 
+
+
+// app.use('/uploads', express.static(path.join(__dirname,(uploadDir))));
+
+app.use(cookieParser());
 const PORT = process.env.PORT || 3000;
 
 const corsOptions = {
     origin: 'http://localhost:3000',
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
 };
 
+app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use('/api/users', userRouter);
 app.use('/api/provider', providerRouter);
+app.use('/api/admin', adminRouter);
 
 // 404 Not Found middleware
 app.use((req: Request, res: Response, next: NextFunction) => {

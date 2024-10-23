@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { signup } from '../../Api/provider';
+import { toast } from 'react-hot-toast';
+import { signup } from '../../Api/Provider';
 
 
 interface Errors {

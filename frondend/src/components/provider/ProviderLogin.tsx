@@ -3,9 +3,10 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
-import { loginProvider } from '../../Api/provider'
-import { toast } from 'react-toastify';
-import { signInSuccess } from '../../app/slice/userSlice';
+import { loginProvider } from '../../Api/Provider'
+import { toast } from 'react-hot-toast';
+import { signInSuccessProvider } from '../../App/Slice/ProviderSlice';
+// import { signInSuccess } from '../../app/slice/userSlice';
 
 interface Errors {
   email?: string;
@@ -57,10 +58,10 @@ function ProviderLogin() {
       const response = await loginProvider(formData);
 
       if (response) {
-        console.log(response,"gaiha",response.data.user.data)
-        dispatch(signInSuccess(response.data.user.data))
+       
+        dispatch( signInSuccessProvider(response.data.user.data))
         localStorage.setItem('token', response.data.token); // Store the token
-        navigate('/provider/Home'); // Redirect to home page
+        navigate('/provider/home'); // Redirect to home page
       } else {
 
         navigate('/provider/login'); // Redirect back to login page if failed

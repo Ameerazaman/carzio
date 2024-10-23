@@ -1,4 +1,6 @@
-interface ProviderInterface {
+import { ProviderAdressInterface } from "../ProviderInterface";
+
+export interface ProviderInterface {
     id?: string | undefined;
     name?: string;
     email: string;
@@ -8,12 +10,17 @@ interface ProviderInterface {
     isBlocked?: boolean;
 }
 
+
+
+
+
 export interface ProviderAuthResponse {
     status: number;
     data: {
         success: boolean;
         message: string;
-        data?: ProviderInterface,
+        data?: ProviderInterface|ProviderAdressInterface|ProviderInterface[]|undefined,
+        
         providerId?: string;
         token?: string;
         refreshToken?: string;
