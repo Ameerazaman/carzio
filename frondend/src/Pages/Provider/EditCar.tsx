@@ -81,10 +81,14 @@ const EditCar: React.FC = () => {
 
     const [errors, setErrors] = useState<Errors>({});
     // Handle input changes
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
     };
+    
 
     // Handle image uploads
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -318,13 +322,11 @@ const EditCar: React.FC = () => {
                                             {errors.rcExpiry && <p className="text-red-500 text-sm mt-1">{errors.rcExpiry}</p>}
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
                         <div>
                             <div>
-
                                 {/* Car Details Card */}
                                 <div className="space-y-4">
                                     <div className="bg-gray-800 p-6 rounded-lg shadow-xl">
@@ -386,14 +388,18 @@ const EditCar: React.FC = () => {
                                             <label className="block text-gray-400 font-medium mb-2">Engine Type</label>
                                             <div className="flex items-center bg-gray-700 rounded-lg p-2">
                                                 <BsFuelPump className="text-white text-xl mr-2" />
-                                                <input
-                                                    type="text"
+                                                <select
                                                     name="engineType"
                                                     value={formData.engineType}
                                                     onChange={handleInputChange}
-                                                    placeholder="e.g., V6, Electric"
                                                     className={`bg-transparent text-white w-full outline-none ${errors.engineType ? 'border border-red-500' : ''}`}
-                                                />
+                                                >
+                                                    <option className=' text-black' value="" disabled>Select engine type</option>
+                                                    <option className=' text-black' value="V6">Manual</option>
+                                                    <option className=' text-black' value="V8">Automaic</option>
+                                                    <option className=' text-black' value="Electric">Electric</option>
+                                                    
+                                                </select>
                                             </div>
                                             {errors.engineType && <p className="text-red-500 text-sm mt-1">{errors.engineType}</p>}
                                         </div>
@@ -403,14 +409,18 @@ const EditCar: React.FC = () => {
                                             <label className="block text-gray-400 font-medium mb-2">Fuel Type</label>
                                             <div className="flex items-center bg-gray-700 rounded-lg p-2">
                                                 <BsFuelPump className="text-white text-xl mr-2" />
-                                                <input
-                                                    type="text"
+                                                <select
                                                     name="fuelType"
                                                     value={formData.fuelType}
                                                     onChange={handleInputChange}
-                                                    placeholder="e.g., Petrol, Diesel, Electric"
                                                     className={`bg-transparent text-white w-full outline-none ${errors.fuelType ? 'border border-red-500' : ''}`}
-                                                />
+                                                >
+                                                    <option className=' text-black' value="" disabled>Select fuel type</option>
+                                                    <option className=' text-black' value="Petrol">Petrol</option>
+                                                    <option className=' text-black' value="Diesel">Diesel</option>
+                                                    <option className=' text-black' value="Electric">Electric</option>
+                                                    <option className=' text-black' value="Hybrid">Hybrid</option>
+                                                </select>
                                             </div>
                                             {errors.fuelType && <p className="text-red-500 text-sm mt-1">{errors.fuelType}</p>}
                                         </div>

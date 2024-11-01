@@ -7,7 +7,8 @@ export interface ProviderInterface {
     password: string; // Should always be a string
     data?: string;
     username?:string;
-    isBlocked?:boolean // Optional field if needed
+    isBlocked?:boolean ;
+    image?:String// Optional field if needed
 }
 
 
@@ -23,5 +24,6 @@ export interface ProviderAdressInterface {
     city: string; // Required
     state: string; // Required
     pinNumber: number | null; // Change to number
-    isBlocked?: boolean; // Optional
+    isBlocked?: boolean; 
+    image?:string// Optional
 }

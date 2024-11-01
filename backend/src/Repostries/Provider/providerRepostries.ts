@@ -3,6 +3,7 @@ import { CarDataInterface } from "../../Interface/CarInterface";
 import { ProviderInterface, ProviderAdressInterface } from "../../Interface/ProviderInterface";
 import CarModel from "../../Model/Provider/CarModel";
 import CarNotification from "../../Model/Provider/CarNotification";
+import providerProfile from "../../Model/Provider/ProviderAddressModel";
 import providerAddress from "../../Model/Provider/ProviderAddressModel";
 import providerModel from "../../Model/Provider/ProviderModel";
 import { Otp, OtpDocument } from "../../Model/User/OtpModel"; // Assuming OtpDocument is defined for the Otp schema
@@ -92,11 +93,9 @@ export class ProviderRepository {
 
     async checkProviderAddress(providerId: string): Promise<ProviderAdressInterface | null> {
         try {
-          
 
-            // Find a provider address using the providerId field
-            const check = await providerAddress.findOne({ providerId });
-
+            const check = await providerProfile.findOne({ providerId });
+            console.log(check, "check profile")
             if (check) {
                 // Convert the Mongoose document to a plain object
                 return {
@@ -107,7 +106,7 @@ export class ProviderRepository {
                     city: check.city,
                     state: check.state,
                     pinNumber: check.pinNumber,
-
+                    image: check.image
                 } as ProviderAdressInterface;
             }
             return null;
@@ -122,7 +121,7 @@ export class ProviderRepository {
         try {
 
             // Create a new instance of your Mongoose model
-            const newUser = new providerAddress({
+            const newUser = new providerProfile({
                 name: providerData.name,
                 providerId: providerData.providerId, // Use providerData._id directly
                 email: providerData.email,
@@ -134,7 +133,7 @@ export class ProviderRepository {
 
             // Save the new user to the database
             const savedUser = await newUser.save();
-        // Log what was saved
+            // Log what was saved
 
             return {
                 _id: savedUser._id.toString(), // Convert ObjectId to string
@@ -153,8 +152,8 @@ export class ProviderRepository {
     }
     async editProfile(providerData: ProviderAdressInterface, id: string): Promise<ProviderAdressInterface | null> {
         try {
-         
-            const editAddress = await providerAddress.findByIdAndUpdate(
+
+            const editAddress = await providerProfile.findByIdAndUpdate(
                 { _id: id },
                 {
                     name: providerData.name,
@@ -175,20 +174,41 @@ export class ProviderRepository {
             return null; // Return null on error
         }
     }
+    // *********************************update Image**********************
+    async updateprofileImage(images: string, id: string): Promise<ProviderAdressInterface | null> {
+        try {
+            const profile = await providerProfile.findById(id);
+            if (!profile) {
+                console.error("profile not found");
+                return null;
+            }
 
+            // Update the car's images (array of strings)
+            const updatedProfile = await providerProfile.findByIdAndUpdate(
+                id,
+                { image: images }, // Assign the array of images
+                { new: true } // Return the updated car document
+            );
+            console.log(updatedProfile, "update profile")
+            return updatedProfile as ProviderAdressInterface;
+        } catch (error) {
+            console.error("Error updating car images:", error);
+            return null;
+        }
+    }
 
     // ************************add car details****************************
 
     async addCarDetails(carData: CarDataInterface): Promise<CarDataInterface | undefined> {
         try {
-          
+
             let carExist = await CarModel.findOne({
                 providerId: carData.providerId,
                 rcNumber: carData.rcNumber
             });
 
             if (carExist) {
-             
+
                 return undefined; // Return undefined instead of null
             }
 
@@ -314,7 +334,7 @@ export class ProviderRepository {
     // ******************************update car in car management*************************
     async updateCar(carData: CarDataInterface, id: string): Promise<CarDataInterface | null> {
         try {
-            
+
 
             const updateData: Partial<CarDataInterface> = {
                 car_name: carData.car_name,
@@ -336,39 +356,39 @@ export class ProviderRepository {
 
             const editCar = await CarModel.findByIdAndUpdate(id, updateData, { new: true }).lean();
 
-        
+
             return editCar as CarDataInterface;
         } catch (error) {
             console.error("Error saving provider:", error);
             return null; // Return null on error
         }
     }
-// **********************************update Car image*************************
-async updateCarImage(images: string[], id: string): Promise<CarDataInterface | null> {
-    try {
-        const car = await CarModel.findById(id);
-        if (!car) {
-            console.error("Car not found");
+    // **********************************update Car image*************************
+    async updateCarImage(images: string[], id: string): Promise<CarDataInterface | null> {
+        try {
+            const car = await CarModel.findById(id);
+            if (!car) {
+                console.error("Car not found");
+                return null;
+            }
+
+            // Update the car's images (array of strings)
+            const updatedCar = await CarModel.findByIdAndUpdate(
+                id,
+                { images: images }, // Assign the array of images
+                { new: true } // Return the updated car document
+            );
+
+            return updatedCar;
+        } catch (error) {
+            console.error("Error updating car images:", error);
             return null;
         }
-
-        // Update the car's images (array of strings)
-        const updatedCar = await CarModel.findByIdAndUpdate(
-            id,
-            { images: images }, // Assign the array of images
-            { new: true } // Return the updated car document
-        );
-
-        return updatedCar;
-    } catch (error) {
-        console.error("Error updating car images:", error);
-        return null;
     }
-}
 
 }
 
-    
+
 
 
 

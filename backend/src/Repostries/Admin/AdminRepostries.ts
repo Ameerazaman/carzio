@@ -2,12 +2,14 @@
 import { adminInterface } from "../../Interface/AdminInterface";
 import { UserInterface } from "../../Interface/UserInterface";
 import userModel from "../../Model/User/UserModel";
+import Offer from '../../Model/Admin/OfferModel'
 import adminModel from "../../Model/Admin/AdminModel";
 import providerModel from "../../Model/Provider/ProviderModel";
 import { ProviderInterface } from "../../Interface/ProviderInterface";
 import { CarDataInterface } from "../../Interface/CarInterface";
 import CarNotification from "../../Model/Provider/CarNotification";
 import CarModel from "../../Model/Provider/CarModel";
+import { OfferDataInterface, OfferReturnData } from "../../Interface/OfferInterface";
 // Assuming OtpDocument is defined for the Otp schema
 interface UserDocument extends Document {
   email: string;
@@ -392,6 +394,142 @@ export class AdminRepository {
       return null;
     }
   }
+  // *******************************Add Offer******************
+  async addOffer(offer: OfferDataInterface): Promise<OfferReturnData | null> {
+    try {
+      console.log(offer, "offer in repostry")
+      const newOffer = new Offer({
+        carName: offer.carName,
+        offerTitle: offer.offerTitle,
+        startDate: new Date(offer.startDate),
+        endDate: new Date(offer.endDate),
+        discountPercentage: offer.discountPercentage,
+      });
+      const savedOffer = (await newOffer.save()) as unknown as OfferDataInterface;
+      console.log(savedOffer)
+      return {
+        carName: savedOffer.carName,
+        offerTitle: savedOffer.offerTitle,
+        startDate: savedOffer.startDate,
+        endDate: savedOffer.endDate,
+        discountPercentage: savedOffer.discountPercentage,
+        id: savedOffer._id?.toString() || "", // Convert `_id` to string
+      };
+    } catch (error) {
+      console.error("Error adding offer in repository:", error);
+      return null;
+    }
+  }
+  // ********************************fetch offers*********************
+  async fetchOffer(): Promise<OfferReturnData[] | null> {
+    try {
+        // Fetch offers from the database, with type assertion
+        const data = await Offer.find() as OfferDataInterface[]; // Array of OfferDataInterface documents
+
+        console.log("Offers in management:", data);
+
+        // Map the documents to the OfferReturnData type
+        const offers: OfferReturnData[] = data.map((offer: OfferDataInterface) => ({
+            carName: offer.carName,
+            offerTitle: offer.offerTitle,
+            startDate: offer.startDate,
+            endDate: offer.endDate,
+            discountPercentage: offer.discountPercentage,
+            id: offer._id?.toString() || "", // Convert `_id` to string if present
+        }));
+
+        return offers;
+    } catch (error) {
+        console.error("Error fetching offers:", error);
+        return null;
+    }
+}
+// **************************edit Offer*************************8
+async editOffer(offerId: string): Promise<OfferReturnData | null> {
+  try {
+    // Log the providerId to ensure it's passed correctly
+    console.log(offerId, "offer in offer mgt");
+
+    // Pass userId directly to findById (no need for an object)
+    let check = await Offer.findById(offerId);
+
+    console.log(check, "check");
+
+    if (check) {
+      return {
+        carName: check.carName,
+        offerTitle: check.offerTitle,
+        startDate: check.startDate,
+        endDate: check.endDate,
+        discountPercentage: check.discountPercentage,
+        id: check._id?.toString() || "", // Convert `_id` to string
+      }
+    }
+    return null;
+  }
+  catch (error) {
+    console.error("Error fetching offer:", error);
+    return null;
+  }
+}
+
+
+async updateOffer(offerData: OfferDataInterface, id: string): Promise<OfferReturnData | null> {
+  try {
+      console.log("Updating offer data:", offerData);
+
+      // Update the offer using its ID
+      const updatedOffer = await Offer.findByIdAndUpdate(
+          id, // Pass the ID directly
+          {
+              carName: offerData.carName,
+              offerTitle: offerData.offerTitle,
+              startDate: offerData.startDate,
+              endDate: offerData.endDate,
+              discountPercentage: offerData.discountPercentage,
+          },
+          { new: true } // To return the updated document
+      ).lean<OfferReturnData>(); // Convert to plain JS object
+
+      console.log(updatedOffer, "Updated offer after saving");
+      return updatedOffer; // Return the updated offer as the correct type
+  } catch (error) {
+      console.error("Error updating offer:", error);
+      return null; // Return null on error
+  }
+}
+// ***********************deleet offer********************88
+async deleteOffer(offerId: string): Promise<OfferReturnData | null> {
+  try {
+ 
+      console.log(offerId, "offer in offer management");
+
+      const offerToDelete = await Offer.findById(offerId);
+
+      console.log(offerToDelete, "check");
+
+      if (offerToDelete) {
+
+          await Offer.deleteOne({ _id: offerId });
+          console.log("Offer deleted successfully:", offerId);
+
+          return {
+              carName: offerToDelete.carName,
+              offerTitle: offerToDelete.offerTitle,
+              startDate: offerToDelete.startDate,
+              endDate: offerToDelete.endDate,
+              discountPercentage: offerToDelete.discountPercentage,
+              id: offerToDelete.id.toString(),
+          };
+      }
+
+      return null;
+  } catch (error) {
+      console.error("Error deleting offer:", error);
+      return null;
+  }
+}
+
 }
 
 

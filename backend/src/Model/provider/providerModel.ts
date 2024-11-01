@@ -17,6 +17,9 @@ const providerSchema = new mongoose.Schema({
   },
   username:{
     type:String
+  },
+  image:{
+    type:String
   }
 
 });

@@ -1,5 +1,7 @@
 import { CarDataInterface } from '../../Interface/CarInterface';
+import { OfferDataInterface, OfferReturnData } from '../../Interface/OfferInterface';
 import { UserInterface } from '../../Interface/UserInterface';
+import Offer from '../../Model/Admin/OfferModel';
 import CarModel from '../../Model/Provider/CarModel';
 import { Otp } from '../../Model/User/OtpModel';
 import userModel from '../../Model/User/UserModel';
@@ -139,4 +141,88 @@ export class UserRepository {
             return null;
         }
     }
+    // ***************************filter************************
+    async carFilter(engineType?: string[], fuelType?: string[], sortPrice?: string): Promise<CarDataInterface[] | null> {
+        try {
+            // Create a filter object
+            const filters: any = {};
+
+        if (engineType && engineType.length > 0) {
+            filters.engineType = { $in: engineType.map(type => new RegExp(type, 'i')) }; // Case-insensitive filter
+        }
+        if (fuelType && fuelType.length > 0) {
+            filters.fuelType = { $in: fuelType.map(type => new RegExp(type, 'i')) }; // Case-insensitive filter
+        }
+
+        // Determine sorting order based on sortPrice parameter
+        const sortOrder = sortPrice === 'lowToHigh' ? 1 : sortPrice === 'highToLow' ? -1 : undefined;
+        console.log(filters, "filters");
+
+        // Execute the query with filters and optional sorting
+        const filteredCars = await CarModel.find(filters)
+            .sort(sortOrder ? { rentalPrice: sortOrder } : {}) // Sort only if sortOrder is defined
+            .exec() as CarDataInterface[]; // Make sure CarModel is defined and imported
+
+            const cars: CarDataInterface[] = filteredCars.map((car: CarDataInterface) => ({
+                car_name: car.car_name,
+                model: car.model,
+                rentalPrice: car.rentalPrice,
+                engineType: car.engineType,
+                fuelType: car.fuelType,
+                color: car.color,
+                images: car.images,
+                rcNumber: car.rcNumber,
+                rcExpiry: car.rcExpiry,
+                insurancePolicyNumber: car.insurancePolicyNumber,
+                insuranceExpiry: car.insuranceExpiry,
+                pollutionCertificateNumber: car.pollutionCertificateNumber,
+                pollutionExpiry: car.pollutionExpiry,
+                providerId: car.providerId,
+                isStatus: car.isStatus,
+                createdAt: car.createdAt,
+                id: car.id
+            }));
+            return cars
+    } catch (error) {
+        console.error("Error fetching cars:", error);
+        return null; // Return null on error
+    }
+}
+// ******************************search car**********************
+
+
+async  searchCar(searchQuery: string): Promise<CarDataInterface[] | null> {
+    try {
+        const regex = new RegExp(searchQuery, "i");
+        const result = await CarModel.find({ car_name: { $regex: regex } }); 
+        return result 
+    } catch (error) {
+        console.error("Error searching for cars:", error);
+        return null;
+    }
+}
+// *************************fetch offer8*******************888
+async fetchOffer(): Promise<OfferReturnData[] | null> {
+    try {
+        // Fetch offers from the database, with type assertion
+        const data = await Offer.find() as OfferDataInterface[]; // Array of OfferDataInterface documents
+
+        console.log("Offers in management:", data);
+
+        // Map the documents to the OfferReturnData type
+        const offers: OfferReturnData[] = data.map((offer: OfferDataInterface) => ({
+            carName: offer.carName,
+            offerTitle: offer.offerTitle,
+            startDate: offer.startDate,
+            endDate: offer.endDate,
+            discountPercentage: offer.discountPercentage,
+            id: offer._id?.toString() || "", // Convert `_id` to string if present
+        }));
+
+        return offers;
+    } catch (error) {
+        console.error("Error fetching offers:", error);
+        return null;
+    }
+}
 }

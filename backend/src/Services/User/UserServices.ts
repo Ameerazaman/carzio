@@ -7,6 +7,7 @@ import { STATUS_CODES } from '../../Constants/HttpStatusCode';
 import bcrypt from 'bcrypt';
 import { CarAuthResponse } from '../../Interface/AuthServices/CarAuthInterface';
 import { CarDataInterface } from '../../Interface/CarInterface';
+import { OfferAuthResponse } from '../../Interface/AuthServices/OfferAuthInterface';
 
 
 
@@ -208,6 +209,61 @@ export class UserServices {
             return null;
         }
     }
+    // ******************************car filter*******************
+    async carFilter(engineType?: string[], fuelType?: string[], sortPrice?: string): Promise<CarDataInterface[] | null> {
+        try {
+            return await this.userRepository.carFilter(engineType, fuelType, sortPrice);
+        } catch (error) {
+            console.error("Error checking edit car via repository:", error);
+            return null;
+        }
+    }
+    // ******************************search Car****************************
+    async searchCar(searchQuery: string): Promise<CarDataInterface[] | null> {
+        try {
+            return await this.userRepository.searchCar(searchQuery)
+        }
+        catch (error) {
+            console.error("Error checking edit car via repository:", error);
+            return null;
+        }
+    }
 
+     // *******************88fetch User*******************8
+  async fetchOffer(): Promise<OfferAuthResponse | undefined> {
+    try {
+      const offerData = await this.userRepository.fetchOffer();
+      console.log(offerData, "fetch offerData services");
+
+      if (offerData && offerData.length > 0) {
+        return {
+          status: OK,
+          data: {
+            success: true,
+            message: 'Success',
+            data: offerData, // Return all users
+          },
+        };
+      } else {
+        return {
+          status: BAD_REQUEST,
+          data: {
+            success: false,
+            message: 'offers are not found',
+          },
+        };
+      }
+    } catch (error) {
+      console.error("Error fetching offerData:", (error as Error).message);
+      return {
+        status: INTERNAL_SERVER_ERROR,
+        data: {
+
+          success: false,
+          message: 'Internal server error',
+        },
+      };
+    }
+  }
 }
 

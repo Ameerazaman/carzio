@@ -12,33 +12,34 @@ import { fetchCars } from '../../Api/User'
 
 
 function LandingPage() {
-  const [carData, setCarData] = useState<CarDataInterface[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  // const [carData, setCarData] = useState<CarDataInterface[]>([]);
+  // const [loading, setLoading] = useState<boolean>(true);
+  // const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-      const fetchData = async () => {
-          try {
-              setLoading(true);
-              const result = await fetchCars(); // Assuming this is your API call to fetch data
-              console.log(result?.data?.data, "Fetched car data");
+  // useEffect(() => {
+  //     const fetchData = async () => {
+  //         try {
+  //             setLoading(true);
+  //             const result = await fetchCars(); // Assuming this is your API call to fetch data
+  //             console.log(result?.data?.data, "Fetched car data");
 
-              if (result?.data?.data) {
-                  // Ensure the data returned matches the CarDataInterface structure
-                  setCarData(result.data.data);
-              } else {
-                  setError("No car data returned.");
-              }
-          } catch (error) {
-              console.error("Error fetching data:", error);
-              setError("Error fetching car data.");
-          } finally {
-              setLoading(false);
-          }
-      };
+  //             if (result?.data?.data) {
+  //                 // Ensure the data returned matches the CarDataInterface structure
+  //                 setCarData(result.data.data);
+  //             } else {
+  //                 setError("No car data returned.");
+  //             }
+  
+  //         } catch (error) {
+  //             console.error("Error fetching data:", error);
+  //             setError("Error fetching car data.");
+  //         } finally {
+  //             setLoading(false);
+  //         }
+  //     };
 
-      fetchData();
-  }, []);
+  //     fetchData();
+  // }, []);
 
   return (
     <div>
@@ -46,12 +47,7 @@ function LandingPage() {
       <Carosel />
       <About />
       <ServicesCard />
-      <div className="grid grid-cols-3 gap-4">
-        {/* Render the Card component with proper car data */}
-        {carData.map((car, index) => (
-          <Card key={index} carData={car} />
-        ))}
-      </div>
+      
       <Footer />
     </div>
   )

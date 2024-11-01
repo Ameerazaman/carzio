@@ -4,6 +4,11 @@ import { refreshUserAccessToken, userLogout } from "../Api/User";
 import { providerLogout, refreshProviderAccessToken } from "../Api/Provider";
 import { adminLogout, refreshAdminAccessToken } from "../Api/Admin";
 import { Component } from 'react';
+
+import { store } from "../App/Store";
+import { signOut } from "../App/Slice/UserSlice";
+import { signOutProvider } from "../App/Slice/ProviderSlice";
+import { signOutAdmin } from "../App/Slice/AdminSlice";
 // **********************************Axios instance for User********************
 export { }
 const userApi: AxiosInstance = axios.create({
@@ -20,11 +25,21 @@ userApi.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
-    if (error?.response?.status === 401 && error.response.data.message === 'Admin Credentials Invalid please SignIn') {
+    if (error?.response?.status === 401 && error.response.data.message === 'User Credentials Invalid please SignIn') {
       await userLogout();
+      store.dispatch(signOut())
+     
     }
     if (error.response?.status === 401 && error.response.data?.message === 'Refresh Token Expired') {
       await userLogout();
+      store.dispatch(signOut())
+  
+    }
+    if (error.response?.status === 401 && error.response.data?.message === "User is blocked by Admin") {
+      await userLogout();
+      store.dispatch(signOut())
+      
+     
     }
     if (error.response?.status === 404) {
       window.location.href = '/error/404';
@@ -65,12 +80,15 @@ providerAPI.interceptors.response.use(
     const originalRequest = error.config;
     if (error?.response?.status === 401 && error.response.data.message === 'Admin Credentials Invalid please SignIn') {
       await providerLogout();
+      store.dispatch(signOutProvider())
     }
     if (error.response?.status === 401 && error.response.data?.message === 'Refresh Token Expired') {
       await providerLogout();
+      store.dispatch(signOutProvider())
     }
-    if (error.response?.status === 401 && error.response.data?.message ==="Provider is blocked by Admin") {
+    if (error.response?.status === 401 && error.response.data?.message === "Provider is blocked by Admin") {
       await providerLogout();
+      store.dispatch(signOutProvider())
     }
     if (error.response?.status === 404) {
       window.location.href = '/error/404';
@@ -99,47 +117,6 @@ const adminAPI: AxiosInstance = axios.create({
   withCredentials: true
 });
 
-// adminAPI.interceptors.response.use(
-//   (response) => {
-//     console.log('Response Interceptor:', response);
-//     return response;
-//   },
-//   async (error) => {
-//     const originalRequest = error.config;
-//     if (error.response) {
-//       const status = error.response.status;
-//       if (status === 401) {
-//         if (error.response.data.message === 'Refresh Token Expired') {
-//           toast.error('Refresh Token Expired');
-//           await adminLogout();
-//         } else if (error.response.data.message === 'Access Token Expired' && !originalRequest._retry) {
-//           originalRequest._retry = true;
-//           try {
-//             await refreshAdminAccessToken();
-//             return adminAPI(originalRequest);
-//           } catch (refreshError) {
-//             toast.error('Unable to refresh access token. Please log in again.');
-//             return Promise.reject(refreshError);
-//           }
-//         }
-//       } else if (status === 403) {
-//         toast.error('Access denied. Please log in.');
-//         await adminLogout();
-//         window.location.href = '/admin/login';
-//       } else if (status === 404) {
-//         if (error.response.data.message === 'Admin not found') {
-//           toast.error("Admin not found");
-//           await adminLogout();
-//         }
-//       } else if (status === 500) {
-//         toast.error('Internal server error. Please try again later.');
-//       }
-//     } else {
-//       toast.error('Network error. Please check your connection.');
-//     }
-//     return Promise.reject(error);
-//   }
-// );
 adminAPI.interceptors.response.use(
   (response) => {
     if (response.data.message) {
@@ -151,9 +128,13 @@ adminAPI.interceptors.response.use(
     const originalRequest = error.config;
     if (error?.response?.status === 401 && error.response.data.message === 'Admin Credentials Invalid please SignIn') {
       await adminLogout();
+      window.location.href = '/admin/login';
+      store.dispatch(signOutAdmin())
     }
     if (error.response?.status === 401 && error.response.data?.message === 'Refresh Token Expired') {
       await adminLogout();
+      window.location.href = '/admin/login';
+      store.dispatch(signOutAdmin())
     }
     if (error.response?.status === 404) {
       window.location.href = '/error/404';

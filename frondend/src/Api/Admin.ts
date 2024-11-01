@@ -1,12 +1,9 @@
 import { signupFormData } from '../Interface/SignupFormInterface';
-
 import { adminAPI } from '../Services/Axios';
-// import { AxiosError } from 'axios';
 import errorHandler from './ErrorHandler';
-
-
 import adminRouter from '../Services/EndPoints/AdminEndPoints';
 import Cookies from 'js-cookie';
+import { OfferFormData } from '../Interface/OfferInterface';
 
 // ********************refresh access token for Admin*************
 
@@ -279,8 +276,91 @@ const updateStatusCar = async (id: string) => {
 
     }
 }
+// ***********************Add Offer********************
+const addOffer = async (offer: OfferFormData) => {
+    try {
 
+        const result = await adminAPI.post(adminRouter.addOffer, { offer });
+        console.log(result, "resulteditUser")
+        if (result) {
+            return result
 
+        }
+
+    } catch (error) {
+        console.log(error as Error);
+        errorHandler(error as Error);
+
+    }
+}
+// *************************fetch Offer*****************
+const fetchOffer = async() => {
+    try {
+
+        const result = await adminAPI.get(adminRouter.fetchOffer);
+        console.log(result, "fetch offer")
+        if (result) {
+            return result
+
+        }
+
+    } catch (error) {
+        console.log(error as Error);
+        errorHandler(error as Error);
+
+    }
+}
+// **************************88edit offers***********************8
+const editOffer = async (id: string) => {
+    try {
+
+        const result = await adminAPI.get(`/admin/edit_offers/${id}`);
+        console.log(result, "edit_offers")
+        if (result) {
+            return result
+        }
+
+    } catch (error) {
+        console.log(error as Error);
+        errorHandler(error as Error);
+
+    }
+}
+// **************************************update offer*******************8
+const updateOffer = async ( offerId: string,offerData: OfferFormData) => {
+    try {
+        console.log("Edit offer called with ID:", offerId, "and Data:", offerData);
+
+        // Make PUT request to update profile
+        const result = await adminAPI.put(`/admin/edit_offers/${offerId}`, offerData, {
+            headers: { 'Content-Type': 'application/json' },
+        });
+        console.log(result, "offerData update result");
+
+        if (result) {
+            return result;  // Return result to update state or handle further
+        }
+    } catch (error) {
+        console.error("Error in edit offerData Data:", error);
+        errorHandler(error as Error);
+    }
+};
+// ****************************Delete Offer************************
+const deleteOffer = async (id: string) => {
+    try {
+
+        const result = await adminAPI.delete(`/admin/delete_offers/${id}`);
+        console.log(result, "edit_offers")
+        if (result) {
+            return result
+        }
+
+    } catch (error) {
+        console.log(error as Error);
+        errorHandler(error as Error);
+
+    }
+}
 export {
     adminLogout,
     adminLogin,
@@ -297,6 +377,10 @@ export {
     notificaionDetails,
     verifyNotification,
     carManagementt,
-    updateStatusCar
-
+    updateStatusCar,
+    addOffer,
+    fetchOffer,
+    editOffer,
+    updateOffer,
+    deleteOffer
 }

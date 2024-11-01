@@ -13,11 +13,11 @@ export class UserController {
 
     constructor(private userServices: UserServices) { }
     milliseconds = (h: number, m: number, s: number) => ((h * 60 * 60 + m * 60 + s) * 1000);
- 
+
 
     // ********************************refresh access token for user******************
 
-    
+
     async refreshToken(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
 
         const refreshToken = req.cookies.refresh_token;
@@ -38,7 +38,7 @@ export class UserController {
 
             const result = await this.userServices.userGetById(decoded.data);
             console.log(result, "result after create neew token")
-   
+
             const accessTokenMaxAge = 5 * 60 * 1000;
             const newAccessToken = result?.data?.token
             console.log(newAccessToken, "new token")
@@ -247,47 +247,104 @@ export class UserController {
     }
 
 
-// ****************************fetch  car for card***************************
-async fetchCars(req: Request, res: Response): Promise<void> {
-    try {
-        const result = await this.userServices.fetchCars(); // Fetch users from service
-
-        if (result) {
-            // Respond with the service result, no need to return
-            res.status(result.status).json(result.data);
-        } else {
+    // ****************************fetch  car for card***************************
+    async fetchCars(req: Request, res: Response): Promise<void> {
+        try {
+            const result = await this.userServices.fetchCars(); // Fetch users from service
+            console.log(result, "rsult fetch car")
+            if (result) {
+                // Respond with the service result, no need to return
+                res.status(result.status).json(result.data);
+            } else {
+                res.status(500).json({ message: "Internal server error" });
+            }
+        } catch (error) {
+            console.error("Error during fetch cars:", error);
             res.status(500).json({ message: "Internal server error" });
         }
-    } catch (error) {
-        console.error("Error during fetch cars:", error);
-        res.status(500).json({ message: "Internal server error" });
     }
-}
 
-// *********************************car details page********************
-async carDetails(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
-    try {
-        const id = req.params.id; // Extract 'id' from req.params
-        console.log(id, "edit car provider controller");
+    // *********************************car details page********************
+    async carDetails(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
+        try {
+            const id = req.params.id; // Extract 'id' from req.params
+            console.log(id, "edit car provider controller");
 
-        // Validate if ID is a string and a valid ObjectId
-        if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: "Invalid ID parameter" });
+            // Validate if ID is a string and a valid ObjectId
+            if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(400).json({ message: "Invalid ID parameter" });
+            }
+
+            const carExist = await this.userServices.carDetails(id);
+
+            console.log(carExist, "exist car");
+
+            if (!carExist) {
+                return res.status(404).json({ message: "Car not found" });
+            }
+
+            return res.status(200).json(carExist);
+        } catch (error) {
+            console.error("Error during check Car exist:", error);
+            return res.status(500).json({ message: "Internal server error" });
         }
-
-        const carExist = await this.userServices.carDetails(id);
-
-        console.log(carExist, "exist car");
-
-        if (!carExist) {
-            return res.status(404).json({ message: "Car not found" });
-        }
-
-        return res.status(200).json(carExist);
-    } catch (error) {
-        console.error("Error during check Car exist:", error);
-        return res.status(500).json({ message: "Internal server error" });
     }
-}
+
+    // *****************************filter****************
+
+    async filterCar(req: Request, res: Response): Promise<Response> {
+        try {
+            console.log(req.body, "req query")
+            const { engineType, fuelType, sortPrice, searchQuery } = req.body.params;
+
+            const carExist = await this.userServices.carFilter(engineType, fuelType, sortPrice);
+
+            console.log(carExist, "exist car");
+
+            if (!carExist || carExist.length === 0) {
+                return res.status(200).json({ message: "Car not found" });
+            }
+
+            return res.status(200).json(carExist);
+        } catch (error) {
+            console.error("Error during car filtering:", error);
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    }
+    // ***********************************search Car************************
+    async searchCar(req: Request, res: Response): Promise<Response> {
+        try {
+            console.log(req.body.searchQuery, "req.body")
+            const carExist = await this.userServices.searchCar(req.body.searchQuery)
+            console.log(carExist, "carexist when searching")
+            if (!carExist) {
+                return res.status(404).json({ message: "Car not found" });
+            }
+            return res.status(200).json(carExist);
+        }
+        catch (error) {
+            console.error("Error during car searching:", error);
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    }
+    // ***********************fetch offer**********************8
+    async fetchOffer(req: Request, res: Response): Promise<void> {
+        try {
+            const result = await this.userServices.fetchOffer(); // Fetch offers from service
+            console.log(result, "result in fetch offer")
+            if (result) {
+                // Send the response, no explicit return needed
+                res.status(result.status).json(result.data);
+            } else {
+                res.status(500).json({ message: "Internal server error" });
+            }
+        } catch (error) {
+            console.error("Error during fetch offers:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
 
 }
+
+
+

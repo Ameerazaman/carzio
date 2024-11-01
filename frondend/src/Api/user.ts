@@ -1,9 +1,11 @@
 import { signupFormData } from '../Interface/SignupFormInterface';
-import {userApi} from '../Services/Axios'
+import { userApi } from '../Services/Axios'
 import userRouter from '../Services/EndPoints/UserEndPoints';
 import { AxiosError } from 'axios';
 import errorHandler from './ErrorHandler';
 import Cookies from 'js-cookie';
+import { Filter } from '../Interface/FilterInterface';
+import { string } from 'yargs';
 
 // refresh Accesss token
 
@@ -97,41 +99,17 @@ const loginUser = async ({ email, password }: signupFormData) => {
         errorHandler(error as Error);
     }
 }
-// const loginUser = async ({ email, password }: FormData) => {
-//     try {
-//         // const result = await Api.post(userRouter.userLogin, { email, password });
-//         const result = await Api.post(userRouter.userLogin, { email, password }, { withCredentials: true });
 
-//         console.log(result, "result");
-
-//         // Check if result.data exists and then access the success state
-//         if (result.data && result.data.success === true) {
-//             console.log("Login successful");
-//             return {
-//                 success: true,
-//                 data: result.data.data // Access actual user data
-//             };
-//         } else {
-//             console.log("Login failed");
-//             return {
-//                 success: false,
-//                 message: result.data?.message || 'Login failed. Please check password and email'
-//             };
-//         }
-//     } catch (error) {
-//         console.log(error as Error);
-//         errorHandler(error as Error);
-//     }
-// };
 
 const userLogout = async () => {
     try {
-        console.log("logout")
+
         const result = await userApi.get(userRouter.userLogout)
         if (result) {
-            console.log("result", result)
-            return result
+            window.location.href = '/login'
+
         }
+        return result
     } catch (error) {
         console.log(error as Error);
         errorHandler(error as Error);
@@ -141,9 +119,9 @@ const userLogout = async () => {
 
 
 // **************************fetch cars ******************************
-const fetchCars= async () => {
+const fetchCars = async () => {
     try {
-        console.log("fetch cars")
+
         const result = await userApi.get(userRouter.fetchCar)
         if (result) {
             return result
@@ -172,6 +150,44 @@ const carDetail = async (id: string) => {
     }
 
 }
+// ************************Apply filters*********************
+const applyFilters = async (params: Filter) => {
+    try {
+        const result = await userApi.post(userRouter.carFilter, { params });
+        if (result) {
+            return result;
+        }
+    } catch (error) {
+        console.error(error as Error);
+        errorHandler(error as Error);
+    }
+};
+
+// **************************search Car*************************
+const searchCar = async (searchQuery:string) => {
+    try {
+      
+        const result = await userApi.post(userRouter.searchCar,{searchQuery});
+        if (result) {
+            return result;
+        }
+    } catch (error) {
+        console.error(error as Error);
+        errorHandler(error as Error);
+    }
+}
+// ***************************Offers*********************
+const getOffer = async () => {
+    try {
+        const result = await userApi.get(userRouter.getOfferCar);
+        if (result) {
+            return result;
+        }
+    } catch (error) {
+        console.error(error as Error);
+        errorHandler(error as Error);
+    }
+}
 export {
     signup,
     resend,
@@ -180,5 +196,8 @@ export {
     userLogout,
     refreshUserAccessToken,
     fetchCars,
-    carDetail
+    carDetail,
+    applyFilters,
+    searchCar,
+    getOffer
 };

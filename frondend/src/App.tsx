@@ -5,8 +5,16 @@ import Loading from './Pages/Common/Loading';
 
 
 
+
 // Lazy loading components
-const CarDetailPage= lazy(()=>import ('./Components/User/CarDetailPage'))
+const CouponMgt=lazy(()=>import('./Components/Admin/CouponMgt'))
+const AddCoupons=lazy(()=>import('./Components/Admin/AddCoupons'))
+const OfferPage=lazy(()=>import('./Components/User/OfferPage'))
+const EditOfferMgt = lazy(() => import('./Components/Admin/EditOfferMgt'))
+const AddOffers = lazy(() => import('./Components/Admin/AddOffers'))
+const OfferMgt = lazy(() => import('./Components/Admin/OfferMgt'))
+const CarList = lazy(() => import('./Components/User/CarList'))
+const CarDetailPage = lazy(() => import('./Components/User/CarDetailPage'))
 const EditCarMgt = lazy(() => import('./Components/Provider/EditCarMgt'))
 const CarsMgt = lazy(() => import('./Components/Admin/CarsMgt'))
 const CarMgt = lazy(() => import('./Components/Provider/CarMgt'))
@@ -51,9 +59,13 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/otp" element={<Otp />} />
             <Route path="/home" element={<Home />} />
-            <Route path='/car_details/:id' element={<CarDetailPage />}/>
+            <Route path='/car_details/:id' element={<CarDetailPage />} />
+            <Route path='/carlist' element={<CarList />} />
+            <Route path='/offers' element={<OfferPage />} />
 
-              {/* ************************************Provider Side*************************** */}
+
+
+            {/* ************************************Provider Side*************************** */}
 
             <Route path="/provider/login" element={<ProviderLogin />} />
             <Route path="/provider/signup" element={<ProviderSignup />} />
@@ -74,6 +86,11 @@ function App() {
             <Route path="/admin/notifications" element={<NotificationMgt />} />
             <Route path="/admin/notifications_details/:id" element={<NotificationDetail />} />
             <Route path="/admin/cars" element={<CarsMgt />} />
+            <Route path="/admin/offers" element={<OfferMgt />} />
+            <Route path="/admin/add_offer" element={<AddOffers />} />
+            <Route path="/admin/edit_offers/:id" element={<EditOfferMgt />} />
+            <Route path="/admin/coupon" element={<CouponMgt />} />/
+            <Route path="/admin/add_coupon" element={<AddCoupons/>} />
           </Routes>
         </Suspense>
       </Router>

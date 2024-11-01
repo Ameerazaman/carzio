@@ -35,6 +35,11 @@ adminRouter.get('/notification_details/:id',adminAuthenticate, async (req, res) 
 adminRouter.get('/verify_notification/:id/:value', adminAuthenticate, async (req, res) => adminController.verifyNotification(req, res));
 adminRouter.get('/cars', adminAuthenticate, async (req, res) => adminController.fetchCars(req, res))
 adminRouter.put('/update_status_car/:id',adminAuthenticate,async(req,res)=>adminController.updateStatusCar(req,res))
+adminRouter.post('/add_offer',adminAuthenticate,async(req,res)=>adminController.addOffer(req,res))
+adminRouter.get('/fetchOffer',adminAuthenticate,async(req,res)=>adminController.fetchOffer(req,res))
+adminRouter.get('/edit_offers/:id', adminAuthenticate, async (req, res) => adminController.editOffer(req, res))
+adminRouter.put('/edit_offers/:id', adminAuthenticate, async (req, res)=> adminController.updateOffer(req, res));
+adminRouter.delete('/delete_offers/:id', adminAuthenticate, async (req, res)=> adminController.deleteOffer(req, res));
 
 export default adminRouter;
 

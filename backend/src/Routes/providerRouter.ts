@@ -28,6 +28,9 @@ providerRouter.post('/refresh-token', (req, res, next) => providerController.ref
 providerRouter.get('/home/:id', providerAuthenticate, async (req, res) => providerController.checkProviderAddrress(req, res))
 providerRouter.post('/save_profile',providerAuthenticate, async (req, res) => providerController.saveProfile(req, res))
 providerRouter.put('/edit_profile/:id', providerAuthenticate, async (req, res) => providerController.editProfile(req, res));
+providerRouter.put('/edit_profile_image/:id',providerAuthenticate,upload.single('image'),async (req, res) => providerController.updateProfileImage(req, res));
+  
+
 providerRouter.post('/add_car',providerAuthenticate, upload.array('images', 4),async (req, res)=> providerController.addCarDetails(req,res))
 providerRouter.get('/cars', providerAuthenticate, async (req, res) => providerController.fetchCars(req, res))
 providerRouter.put('/update_status_car/:id',providerAuthenticate,async(req,res)=>providerController.updateStatusCar(req,res))

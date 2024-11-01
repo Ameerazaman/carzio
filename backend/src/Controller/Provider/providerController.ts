@@ -317,6 +317,37 @@ export class ProviderController {
             return res.status(500).json({ message: "Internal server error" });
         }
     }
+    // *************************************update Profileimage*******************************
+    // Controller - updateProfileImage
+    async updateProfileImage(req: Request, res: Response): Promise<Response> {
+        try {
+            console.log("update profile image")
+            const { id } = req.params;
+            if (!id) {
+                return res.status(400).json({ message: 'ID is missing' });
+            }
+            const uploadedFile = req.file;
+
+            if (!uploadedFile) {
+                return res.status(400).json({ message: 'No image file uploaded' });
+            }
+
+            // Generate image path to save in the database
+            const imagePath = `/uploads/${uploadedFile.filename}`;
+            console.log(imagePath, "image path")
+            // Update the profile with the image path
+            const result = await this.providerServices.updateProfileImage(req.file, id);
+            console.log(result, "result")
+            if (result?.status === OK) {
+                return res.status(OK).json(result.data);
+            } else {
+                return res.status(INTERNAL_SERVER_ERROR).json({ message: "Failed to update profile image" });
+            }
+        } catch (error) {
+            console.error("Error during profile image update:", error);
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    }
 
     // *************************************Addd car details******************************
     async addCarDetails(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
@@ -420,21 +451,21 @@ export class ProviderController {
         try {
             const id = req.params.id;
             // console.log("req.files:", req.files);  // Check if files are being received
-            console.log("req.body:", req.body);   
-    
+            console.log("req.body:", req.body);
+
             if (!id) {
                 return res.status(400).json({ message: 'ID is missing' });
             }
-    
+
             const carData = req.body;
             // const uploadedFiles = req.files as Express.Multer.File[]; // Uploaded image files
-    
+
             // const imagePaths = uploadedFiles.map((file) => `/uploads/${file.filename}`);
             // carData.images = imagePaths;
             // let result = await this.providerServices.updateCar(req.files, carData, id);
-            console.log(carData,"cardata")
+            console.log(carData, "cardata")
             let result = await this.providerServices.updateCar(carData, id);
-            console.log(result,"result")
+            console.log(result, "result")
             if (result?.status === OK) {
                 return res.status(OK).json(result.data);
             } else {
@@ -445,27 +476,27 @@ export class ProviderController {
             return res.status(500).json({ message: "Internal server error" });
         }
     }
-    
+
     // ************************************update Car image******************************
     async updateCarImage(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
         try {
             const id = req.params.id;
             console.log("req.files:", req.files);  // Check if files are being received
-            console.log("req.body:", req.body);   
-    
+            console.log("req.body:", req.body);
+
             if (!id) {
                 return res.status(400).json({ message: 'ID is missing' });
             }
-    
+
             const carData = req.body;
             const uploadedFiles = req.files as Express.Multer.File[]; // Uploaded image files
-    
+
             const imagePaths = uploadedFiles.map((file) => `/uploads/${file.filename}`);
             carData.images = imagePaths;
-            let result = await this.providerServices.updateCarImage(req.files,id);
-            console.log(carData,"cardata")
-            
-            console.log(result,"result")
+            let result = await this.providerServices.updateCarImage(req.files, id);
+            console.log(carData, "cardata")
+
+            console.log(result, "result")
             if (result?.status === OK) {
                 return res.status(OK).json(result.data);
             } else {

@@ -39,13 +39,13 @@ const AddCar: React.FC = () => {
     const [uploadedImages, setUploadedImages] = useState<string[]>(carData.images);
     const [errors, setErrors] = useState<Errors>({});
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setCarData((prevData) => ({
             ...prevData,
             [name]: value,
         }));
-
+    
         if (errors[name]) {
             setErrors((prevErrors) => {
                 const updatedErrors = { ...prevErrors };
@@ -54,6 +54,7 @@ const AddCar: React.FC = () => {
             });
         }
     };
+    
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
@@ -202,14 +203,17 @@ const AddCar: React.FC = () => {
                                     <label className="block text-gray-400 font-medium mb-2">Engine Type</label>
                                     <div className="flex items-center bg-gray-700 rounded-lg p-2">
                                         <BsFuelPump className="text-white text-xl mr-2" />
-                                        <input
-                                            type="text"
+                                        <select
                                             name="engineType"
                                             value={carData.engineType}
                                             onChange={handleInputChange}
-                                            placeholder="e.g., V6, Electric"
                                             className={`bg-transparent text-white w-full outline-none ${errors.engineType ? 'border border-red-500' : ''}`}
-                                        />
+                                        >
+                                            <option value="" disabled>Select engine type</option>
+                                            <option value="V6">Manual</option>
+                                            <option value="V8">Automatic</option>
+                                            <option value="Electric">Electric</option>
+                                        </select>
                                     </div>
                                     {errors.engineType && <p className="text-red-500 text-sm mt-1">{errors.engineType}</p>}
                                 </div>
@@ -219,17 +223,22 @@ const AddCar: React.FC = () => {
                                     <label className="block text-gray-400 font-medium mb-2">Fuel Type</label>
                                     <div className="flex items-center bg-gray-700 rounded-lg p-2">
                                         <BsFuelPump className="text-white text-xl mr-2" />
-                                        <input
-                                            type="text"
+                                        <select
                                             name="fuelType"
                                             value={carData.fuelType}
                                             onChange={handleInputChange}
-                                            placeholder="e.g., Petrol, Diesel, Electric"
                                             className={`bg-transparent text-white w-full outline-none ${errors.fuelType ? 'border border-red-500' : ''}`}
-                                        />
+                                        >
+                                            <option value="" disabled>Select fuel type</option>
+                                            <option value="Petrol">Petrol</option>
+                                            <option value="Diesel">Diesel</option>
+                                            <option value="Electric">Electric</option>
+                                            <option value="Hybrid">Hybrid</option>
+                                        </select>
                                     </div>
                                     {errors.fuelType && <p className="text-red-500 text-sm mt-1">{errors.fuelType}</p>}
                                 </div>
+
 
                                 {/* Color */}
                                 <div>

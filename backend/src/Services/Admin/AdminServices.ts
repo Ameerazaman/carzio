@@ -13,6 +13,8 @@ import { UserInterface } from '../../Interface/UserInterface';
 import { ProviderInterface } from '../../Interface/ProviderInterface';
 import { CarAuthResponse } from '../../Interface/AuthServices/CarAuthInterface';
 import { CarDataInterface } from '../../Interface/CarInterface';
+import { OfferDataInterface, OfferReturnData } from '../../Interface/OfferInterface';
+import { OfferAuthResponse } from '../../Interface/AuthServices/OfferAuthInterface';
 
 
 export class AdminServices {
@@ -390,5 +392,124 @@ export class AdminServices {
       return null;
     }
   }
+  //  ***************************Add offer********************************88
+  async addOffer(offer: OfferDataInterface): Promise<OfferAuthResponse | null> {
+    try {
+      console.log("offer save in services")
+      const offerData = await this.adminRepostry.addOffer(offer)
+      console.log("offerdata service",offerData)
+      if (offerData) {
+        return {
+          status: OK,
+          data: {
+            success: true,
+            message: 'Success',
+            data: offerData, // Return all users
+          },
+        };
+      } else {
+        return {
+          status: BAD_REQUEST,
+          data: {
+            success: false,
+            message: 'Offers are not found',
+          },
+        };
+      }
+    } catch (error) {
+      console.error("Error saving offer:", (error as Error).message);
+      return {
+        status: INTERNAL_SERVER_ERROR,
+        data: {
 
+          success: false,
+          message: 'Internal server error',
+        },
+      };
+    }
+  }
+  // *******************88fetch User*******************8
+  async fetchOffer(): Promise<OfferAuthResponse | undefined> {
+    try {
+      const offerData = await this.adminRepostry.fetchOffer();
+      console.log(offerData, "fetch offerData services");
+
+      if (offerData && offerData.length > 0) {
+        return {
+          status: OK,
+          data: {
+            success: true,
+            message: 'Success',
+            data: offerData, // Return all users
+          },
+        };
+      } else {
+        return {
+          status: BAD_REQUEST,
+          data: {
+            success: false,
+            message: 'offers are not found',
+          },
+        };
+      }
+    } catch (error) {
+      console.error("Error fetching offerData:", (error as Error).message);
+      return {
+        status: INTERNAL_SERVER_ERROR,
+        data: {
+
+          success: false,
+          message: 'Internal server error',
+        },
+      };
+    }
+  }
+// *****************************Edit Offer************************8
+async editOffer(id: string): Promise< OfferReturnData | null> {
+  try {
+    console.log("exist provider in services")
+    return await this.adminRepostry.editOffer(id); // Use the repository method for checking
+  } catch (error) {
+    console.error("Error checking edit provider via repository:", error);
+    return null;
+  }
+}
+// ************************update Offer*************8888
+async updateOffer(offerData: OfferDataInterface, id: string): Promise<OfferAuthResponse | undefined> {
+  try {
+    console.log("edit offer is services")
+    const provider = await this.adminRepostry.updateOffer(offerData, id);
+    
+
+    return {
+      status: 200, // Successful save
+      data: {
+        success: true,
+        message: 'Offer update successfully',
+        // data: provider, // Optionally include saved data
+      },
+    };
+
+  } catch (error) {
+    console.error("Error upadting offer Data:", (error as Error).message);
+    return {
+      status: 500, // Internal server error
+      data: {
+        success: false,
+        message: 'Internal server error',
+      },
+    };
+  }
+}
+
+// ***********************delete Offer****************
+async deleteOffer(id: string): Promise< OfferReturnData | null> {
+  try {
+
+    return await this.adminRepostry.deleteOffer(id); // Use the repository method for checking
+  } catch (error) {
+    console.error("Error  deletee offer:", error);
+    return null;
+  }
+}
 }

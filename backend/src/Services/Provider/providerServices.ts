@@ -222,7 +222,7 @@ export class ProviderServices {
     // *********************************Edit profile**************************
     async editProfile(providerData: ProviderAdressInterface, id: string): Promise<ProviderAuthResponse | undefined> {
         try {
-         
+
             const provider = await this.providerRepostry.editProfile(providerData, id);
             // Log the saved provider data
 
@@ -247,6 +247,70 @@ export class ProviderServices {
         }
     }
 
+    // **************************************update car Image***********************
+    async updateProfileImage<T>(file: T, id: string): Promise<CarAuthResponse | undefined> {
+        try {
+            // 1. Upload image to Cloudinary (or another cloud service)
+            const result = await uploadImageToCloudinary(file);
+            console.log(result, "Cloudinary upload result");
+    
+            // Type-check for results array
+            if (!result.success || !result.results || result.results.length === 0) {
+                return {
+                    status: 400,
+                    data: {
+                        success: false,
+                        message: 'Image upload failed: No valid results returned',
+                    },
+                };
+            }
+    
+            // Extract the URL from the first result in the results array
+            const imageUrl = result.results[0].url;
+            console.log(imageUrl, 'Image URL in profile update');
+    
+            if (!imageUrl) {
+                return {
+                    status: 400,
+                    data: {
+                        success: false,
+                        message: 'Image upload failed: No URL returned',
+                    },
+                };
+            }
+    
+            // 3. Update provider profile in the database
+            const provider = await this.providerRepostry.updateprofileImage(imageUrl, id);
+           
+            if (!provider) {
+                return {
+                    status: 404,
+                    data: {
+                        success: false,
+                        message: 'Provider not found or update failed',
+                    },
+                };
+            }
+    
+            return {
+                status: 200,
+                data: {
+                    success: true,
+                    message: 'Profile image updated successfully',
+                },
+            };
+        } catch (error) {
+            console.error("Error updating profile image:", (error as Error).message);
+            return {
+                status: 500,
+                data: {
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
+    
 
     // **********************************add car details***********************
     async addCarDetails<T>(files: T, carData: CarDataInterface): Promise<CarAuthResponse | undefined> {
@@ -298,7 +362,7 @@ export class ProviderServices {
     async fetchCars(): Promise<CarAuthResponse | undefined> {
         try {
             const carData = await this.providerRepostry.fetchCars();
-          
+
 
             if (carData && carData.length > 0) {
                 return {
@@ -334,7 +398,7 @@ export class ProviderServices {
     //  **********************change car status***********************
     async updateStatusCar(id: string): Promise<CarDataInterface | null> {
         try {
-           
+
             return await this.providerRepostry.updateStatusCar(id); // Use the repository method for checking
         } catch (error) {
             console.error("Error checking provider address via repository:", error);
@@ -344,7 +408,7 @@ export class ProviderServices {
     // *************************fetch car for edit in  car mgt*********************
     async editCar(id: string): Promise<CarDataInterface | null> {
         try {
-           
+
             return await this.providerRepostry.editCar(id); // Use the repository method for checking
         } catch (error) {
             console.error("Error checking edit car via repository:", error);
@@ -352,9 +416,9 @@ export class ProviderServices {
         }
     }
     // ***********************************update car in edit management************************
-    async updateCar( carData: CarDataInterface, id: string): Promise<CarAuthResponse | undefined> {
+    async updateCar(carData: CarDataInterface, id: string): Promise<CarAuthResponse | undefined> {
         try {
-            
+
             // const result = await uploadImageToCloudinary(files);
             // if (!result.success) {
             //     return {
@@ -370,7 +434,7 @@ export class ProviderServices {
 
             // console.log(images, 'Images in add car details repository');
             // carData.images = images
-          
+
             const provider = await this.providerRepostry.updateCar(carData, id);
             return {
                 status: 200,
@@ -406,15 +470,15 @@ export class ProviderServices {
                     },
                 };
             }
-    
+
             // Extract image URLs from the result
             const images = result?.results?.map((obj: any) => obj?.url) || [];
-    
+
             console.log(images, 'Images in add car details repository');
-    
+
             // Ensure you're passing an array of images
             const provider = await this.providerRepostry.updateCarImage(images, id);
-    
+
             return {
                 status: 200,
                 data: {
@@ -433,7 +497,7 @@ export class ProviderServices {
             };
         }
     }
-    
+
 }
 
 

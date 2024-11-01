@@ -100,7 +100,7 @@ const verifyOtp = async (otp: string) => {
 const loginProvider = async ({ email, password }: signupFormData) => {
     try {
 
-        const result = await providerAPI.post(providerRouter.userLogin, { email, password });
+        const result = await providerAPI.post(providerRouter.providerLogin, { email, password });
         return result;
     } catch (error) {
         console.log(error as Error);
@@ -111,10 +111,10 @@ const loginProvider = async ({ email, password }: signupFormData) => {
 const providerLogout = async () => {
     try {
         console.log("logout ")
-        const result = await providerAPI.get(providerRouter.userLogout)
+        const result = await providerAPI.get(providerRouter.providerLogout)
         console.log("result when logout")
         if (result) {
-            window.location.href = '/provider/login'
+            window.location.href = '/'
         }
     } catch (error) {
         console.log(error as Error);
@@ -311,6 +311,27 @@ const editCarImage = async (uploadedFiles: File[], id: string) => {
     }
 };
 
+//************************ */ Frontend - updateProfileImage function**************************
+const updateProfileImage = async (formData: FormData, id: string) => {
+    try {
+      const result = await providerAPI.put(
+        `/provider/edit_profile_image/${id}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data', // Required for file upload
+          },
+        }
+      );
+      return result.data;
+    } catch (error) {
+      console.error('Error in updateProfileImage:', error);
+      errorHandler(error as Error);
+    }
+  };
+  
+  
+
 
 export {
     signup,
@@ -327,6 +348,7 @@ export {
     updateStatusCar,
     editCar,
     editCarDetails,
-    editCarImage
+    editCarImage,
+    updateProfileImage
 
 };

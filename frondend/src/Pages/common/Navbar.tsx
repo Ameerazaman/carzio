@@ -30,29 +30,6 @@ function Navbar() {
   }
   const token = localStorage.getItem('token');
 
- 
-
-  // Function to handle user logout
-  // const logoutUser = async () => {
-  //   if (token) {
-  //     try {
-  //       const result = await userLogout(token);
-  //       if (result.success) {
-  //         console.log('Logout successful');
-  //         // Optionally clear the token from local storage and navigate to login
-  //         localStorage.removeItem('token');
-  //       } else {
-  //         console.log('Logout failed:', result.message);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error during logout:', error);
-  //     }
-  //   } else {
-  //     console.error('No token found for logout');
-  //   }
-  // };
-
-
   const logoutUser = async () => {
     try {
       console.log("logout in swt alert")
@@ -70,13 +47,13 @@ function Navbar() {
 
             userLogout().then(() => console.log(''))
             dispatch(signOut());
-            toast.success("You are logged out!")
+          
             navigate('/')
           }
           else if (provider) {
             providerLogout().then(() => console.log(''))
             dispatch(signOutProvider());
-            toast.success("You are logged out!")
+        
             navigate('/')
           }
 
@@ -177,12 +154,12 @@ function Navbar() {
         <div className="bg-black p-2">
           <div className="container mx-auto flex justify-between items-center">
             <div className="flex space-x-8">
-              <a href="#" className="text-white hover:text-red-400 transition duration-300 font-semibold">Home</a>
-              <a href="#" className="text-white hover:text-red-400 transition duration-300 font-semibold">About</a>
-              <a href="#" className="text-white hover:text-red-400 transition duration-300 font-semibold">Cars</a>
-              <a href="#" className="text-white hover:text-red-400 transition duration-300 font-semibold flex items-center">
-                <FaMapMarkerAlt className="mr-2" /> {/* Location Icon */}
-                Location
+              <a href="/home" className="text-white hover:text-red-400 transition duration-300 font-semibold">Home</a>
+              <a href="/home" className="text-white hover:text-red-400 transition duration-300 font-semibold">About</a>
+              <a href="/carList" className="text-white hover:text-red-400 transition duration-300 font-semibold">Cars</a>
+              <a href="/offers" className="text-white hover:text-red-400 transition duration-300 font-semibold flex items-center">
+               
+                Offers
               </a>
             </div>
           </div>

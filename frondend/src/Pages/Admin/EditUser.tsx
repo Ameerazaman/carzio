@@ -86,15 +86,6 @@ const EditUser: React.FC<EditUserProps> = ({ header }) => {
       newErrors.email = 'Email address is invalid.';
       isValid = false;
     }
-
-    // if (!formData.password) {
-    //   newErrors.password = 'Password is required.';
-    //   isValid = false;
-    // } else if (formData.password.length < 6) {
-    //   newErrors.password = 'Password must be at least 6 characters long.';
-    //   isValid = false;
-    // }
-
     setErrors(newErrors);
     return isValid;
   };

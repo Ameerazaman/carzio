@@ -57,10 +57,11 @@ function Login() {
       // Call loginUser with form data
       const response = await loginUser(formData);
      
+     
       if (response) {
         dispatch(signInSuccess(response.data.user.data))
-        localStorage.setItem('token', response.data.token); // Store the token
-        navigate('/home'); // Redirect to home page
+        localStorage.setItem('token', response.data.user.refreshToken); // Store the token
+        navigate('/home', { replace: true }); // Redirect to home page
       } else {
 
         navigate('/login'); // Redirect back to login page if failed
