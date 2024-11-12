@@ -423,7 +423,6 @@ export class UserServices {
                     status: OK,
                     data: {
                         success: true,
-                        message: 'Success',
                         data: couponData,
                     },
                 };
@@ -461,7 +460,6 @@ export class UserServices {
                     status: OK,
                     data: {
                         success: true,
-                        message: 'Success',
                         data: offerData,
                     },
                 };
@@ -501,7 +499,6 @@ export class UserServices {
                     status: OK,
                     data: {
                         success: true,
-                        message: 'Success',
                         data: savedBookingData,
                     },
                 };

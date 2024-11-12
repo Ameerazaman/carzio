@@ -14,7 +14,7 @@ export interface ProviderAuthResponse {
     status: number;
     data: {
         success: boolean;
-        message: string;
+        message?: string;
         data?: ProviderInterface|ProviderAdressInterface|ProviderInterface[]|undefined,
         
         providerId?: string;

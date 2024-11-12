@@ -49,7 +49,7 @@ export class UserController {
                 secure: process.env.NODE_ENV === 'production',
             })
             console.log(res.cookie, "cookie")
-            res.status(200).json({ success: true, message: "Token Updated" });
+            res.status(200).json({ success: true});
         }
         catch (error) {
             next(error);
@@ -416,17 +416,17 @@ export class UserController {
     // ********************************check Address***********************
     async checkAddress(req: Request, res: Response): Promise<void> {
         try {
-            const addressId = req.params.id; 
-            const result = await this.userServices.checkAddress(addressId); 
-    
+           
+            const userId = req.params.id; 
+            const result = await this.userServices.checkAddress(userId); 
+   
             if (!result) {
-                res.status(404).json({ message: "Address not found" }); 
+                res.status(500).json({ message: "Address not found" }); 
                 return
             }
     
             res.status(200).json({
                 success: true,
-                message: 'Address retrieved successfully',
                 data: result
             });
     
@@ -500,11 +500,7 @@ async fetchCoupon(req:Request,res:Response):Promise<void>{
         }
 
         // Successfully saved, return the response
-        res.status(200).json({
-            success: true,
-            message: 'successully',
-            data: result
-        });
+        res.status(result.status).json(result.data);
     } catch (error) {
         console.error("Error fetch coupon:", error);
         res.status(500).json({ message: "Internal server error" });
@@ -523,11 +519,7 @@ async checkOfferForBooking(req:Request,res:Response):Promise<void>{
             res.status(500).json({ message: "No Offers" });
             return
         }
-        res.status(200).json({
-            success: true,
-            message: 'successully',
-            data: result
-        });
+        res.status(result.status).json(result.data);
     } catch (error) {
         console.error("Error fetch coupon:", error);
         res.status(500).json({ message: "Internal server error" });

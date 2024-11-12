@@ -256,6 +256,7 @@ export class UserRepository {
 
     async saveProfile(profileData: ProfileInterface): Promise<ProfileInterface | null> {
         try {
+
             const savedProfile = await UserProfileModel.create(profileData);
             return savedProfile as ProfileInterface;
         } catch (error) {
@@ -287,9 +288,9 @@ export class UserRepository {
     }
 
     //******************** */ check Address**************************
-    async checkAddress(addressId: string): Promise<UserAddressInterface | null> {
+    async checkAddress(userId: string): Promise<UserAddressInterface | null> {
         try {
-            const checkAddress = await UserAddressModel.findById(addressId)
+            const checkAddress = await UserAddressModel.findOne({ userId: userId })
 
             if (checkAddress) {
                 return checkAddress as UserAddressInterface;
@@ -306,6 +307,7 @@ export class UserRepository {
     // ***************save address*********************8
     async saveAddress(addressData: UserAddressInterface): Promise<UserAddressInterface | null> {
         try {
+            console.log(addressData, "addressData")
             const savedAddress = await UserAddressModel.create(addressData);
             return savedAddress as UserAddressInterface;
         } catch (error) {
@@ -335,10 +337,10 @@ export class UserRepository {
     // **************************fetch coupon************
     async fetchCoupon(userId: string): Promise<CouponInterface[] | null> {
         try {
-
-            const checkAddress = await Coupon.find({ userId: { $ne: userId } }) as CouponInterface[];
-            if (checkAddress && checkAddress.length > 0) {
-                return checkAddress as CouponInterface[];
+            console.log(userId, "userId")
+            const couponsWithoutUser = await Coupon.find({ userId: { $ne: userId } }) as CouponInterface[];
+            if (couponsWithoutUser && couponsWithoutUser.length > 0) {
+                return couponsWithoutUser;
             }
             return null;
         } catch (error) {
@@ -348,9 +350,19 @@ export class UserRepository {
     }
 
     // ******************check offer for booking******************
-    async checkOfferForBooking(carName: string): Promise<OfferDataInterface|null>{
+    async checkOfferForBooking(carName: string): Promise<OfferDataInterface | null> {
         try {
-            const offer = await Offer.findOne({ carName, isActive: true });
+            console.log(carName, "carname")
+            // const offer = await Offer.findOne({
+            //     carName: { $regex: new RegExp(`^${carName}$`, "i") }, // 'i' makes it case-insensitive
+            //     isActive: true
+            // });
+            const offer = await Offer.findOne({
+                carName: { $regex: new RegExp(`^${carName}$`, 'i') }, 
+              });
+              
+
+            console.log(offer, "offer")
             if (offer) {
                 return offer as OfferDataInterface
             }
@@ -360,15 +372,15 @@ export class UserRepository {
             return null;
         }
     }
-// **********************************save Booking**********************
+    // **********************************save Booking**********************
 
-async saveBookingData(bookingData:BookingInterface):Promise<BookingInterface|null>{
-    try {
-        const savedBooking= await BookingModel.create(bookingData);
-        return savedBooking as BookingInterface;
-    } catch (error) {
-        console.error("Error saving profile:", (error as Error).message);
-        return null; // Return null if there's an error
+    async saveBookingData(bookingData: BookingInterface): Promise<BookingInterface | null> {
+        try {
+            const savedBooking = await BookingModel.create(bookingData);
+            return savedBooking as BookingInterface;
+        } catch (error) {
+            console.error("Error saving profile:", (error as Error).message);
+            return null; // Return null if there's an error
+        }
     }
-}
 }

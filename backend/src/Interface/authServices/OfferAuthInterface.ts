@@ -4,7 +4,7 @@ export interface OfferAuthResponse {
     status: number;
     data: {
         success: boolean;
-        message: string;
+        message?: string;
         data?: OfferDataInterface | OfferDataInterface[]| undefined,
         providerId?: string;
      

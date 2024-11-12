@@ -5,7 +5,7 @@ export interface CouponAuthResponse {
     status: number;
     data: {
         success: boolean;
-        message: string;
+        message?: string;
         data?: CouponInterface | CouponInterface[] | undefined
      
     };

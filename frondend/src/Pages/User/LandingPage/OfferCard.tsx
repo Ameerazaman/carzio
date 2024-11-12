@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaCar, FaCalendarAlt, FaPercent } from 'react-icons/fa';
-import { getOffer } from '../../../Api/User';
 import { OfferFormData } from '../../../Interface/OfferInterface';
+import { getOffer } from '../../../Api/User';
 
 const OfferCard: React.FC = () => {
     const [offerCards, setOfferCards] = useState<OfferFormData[]>([]);

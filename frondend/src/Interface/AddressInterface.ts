@@ -5,6 +5,6 @@ export interface AddressInterface  {
     zip: string;
     houseName:string,
     district:string,
-    id:string|undefined
+    userId:string|undefined
     
 }

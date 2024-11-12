@@ -4,7 +4,7 @@ export interface BookingAuthResponse {
     status: number;
     data: {
         success: boolean;
-        message: string;
+        message?: string;
         data?: BookingInterface | BookingInterface[] | undefined
      
     };

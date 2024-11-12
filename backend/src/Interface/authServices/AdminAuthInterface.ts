@@ -4,7 +4,7 @@ export interface adminAuthResponse {
     status: number;
     data: {
         success: boolean;
-        message: string;
+        message?: string;
         data?: adminInterface
         token?: string;
         refreshToken?: string;

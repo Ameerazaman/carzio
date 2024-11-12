@@ -12,7 +12,7 @@ export interface UserAuthResponse {
     status: number;
     data: {
         success: boolean;
-        message: string;
+        message?: string;
         data?: UserInterface|UserInterface[]|undefined,
         userId?: string;
         token?: string;

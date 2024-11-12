@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { FaCalendarAlt, FaCalendarCheck, FaMoneyBillWave } from 'react-icons/fa';
-import { useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../App/Store';
 import { User } from '../../Common/Navbar';
-import { carDetail, checkOffer, fetchCoupon, checkAddress,  } from '../../../Api/User';
+import { carDetail, checkOffer, fetchCoupon, checkAddress, BookingConfirm, } from '../../../Api/User';
 import { BookingFormData } from '../../../Interface/BookingInterface';
 import { CarDataInterface } from '../../../Interface/CarInterface';
 import { CouponFormData } from '../../../Interface/CouponFormData';
@@ -21,7 +21,7 @@ interface BookingDetails {
 }
 
 function BookingPage() {
-
+const navigate=useNavigate()
   const user = useSelector((state: RootState) => state.user.currentUser) as User | null;
   const { carId } = useParams<string>();
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
@@ -34,11 +34,11 @@ function BookingPage() {
   const [formData, setFormData] = useState({
     IssueDate: '',
     ReturnDate: '',
-    Amount:0,
+    Amount: 0,
     Payment: '',
     AdhaarNo: '',
-    UserId: '',
-    CarsId: '',
+    UserId: user?._id,
+    CarsId: carId,
     UserAddressId: '',
     CouponAmt: 0,
     Coupon: '',
@@ -46,7 +46,8 @@ function BookingPage() {
     PickUpTime: '',
     offerAmt: 0,
     rentDays: 1,
-    total_Amt:0
+    total_Amt: 0,
+    AmtOndays: 0
   });
 
   useEffect(() => {
@@ -56,7 +57,24 @@ function BookingPage() {
         if (carId) {
           const result = await carDetail(carId);
           console.log(result?.data, "result car data");
-          setCarData(result?.data);
+
+          // Set carData with fetched data
+          const carDetails = result?.data;
+          setCarData(carDetails);
+
+          if (carDetails) {
+            setFormData((prevData) => {
+              const rentalPrice = carDetails.rentalPrice ?? 0; // Use 0 if rentalPrice is undefined
+              const rentDays = prevData.rentDays || 1;
+
+              return {
+                ...prevData,
+                Amount: rentalPrice,
+                AmtOndays: rentDays * rentalPrice,
+                total_Amt: rentalPrice,  // Ensure total_Amt is a number
+              };
+            });
+          }
         }
       } catch (err: any) {
         console.error("Error fetching car data:", err);
@@ -72,14 +90,33 @@ function BookingPage() {
     const fetchCouponAndOfferData = async () => {
       try {
         setLoading(true);
+
+        // Ensure user and carData are available before fetching data
         if (user?._id && carData?.car_name) {
+
+          // Fetch coupon data
           const couponData = await fetchCoupon(user?._id);
           setCouponData(couponData?.data?.data);
           console.log(couponData, "couponData");
 
+          // Fetch offer data and access discountPercentage
           const offerData = await checkOffer(carData.car_name);
-          console.log(offerData?.data?.data, "result offerData");
-          setOfferData(offerData?.data?.data);
+          console.log(offerData?.data?.data?.data, "result offerData");
+
+          if (offerData?.data?.data) {
+            const offer = offerData?.data?.data;  // Assuming the offer data is in 'data.data' path
+            console.log(offer, "offer data");
+
+            // Access discountPercentage from offerData and handle missing data
+            const discountPercentage = offer.discountPercentage || 0;
+            console.log(discountPercentage, "discountPercentage");
+
+            // Update the form data with the offer amount calculation
+            setFormData((prevData) => ({
+              ...prevData,
+              offerAmt: (discountPercentage * prevData.AmtOndays) / 100,  // Ensure calculation is correct
+            }));
+          }
         }
 
       } catch (err: any) {
@@ -89,11 +126,10 @@ function BookingPage() {
       }
     };
 
-    // Only trigger when both carData and user._id are available
-    if (carData?.car_name && user?._id) {
-      fetchCouponAndOfferData();
-    }
-  }, [carData, user?._id]);  // Depend on carData and user._id
+    // Call the function
+    fetchCouponAndOfferData();
+  }, [user, carData?.car_name]);  // Dependencies: runs when user or carData changes
+  // Depend on carData and user._id
 
 
 
@@ -102,7 +138,7 @@ function BookingPage() {
     const { name, value } = e.target;
     setFormData((prevData) => {
       const updatedData = { ...prevData, [name]: value };
-  
+
       // Calculate rental days if both IssueDate and ReturnDate are provided
       if (name === 'IssueDate' || name === 'ReturnDate') {
         const { IssueDate, ReturnDate } = updatedData;
@@ -112,13 +148,16 @@ function BookingPage() {
           const timeDifference = returnDate.getTime() - issueDate.getTime();
           const daysDifference = Math.max(Math.ceil(timeDifference / (1000 * 3600 * 24)), 1); // Minimum 1 day
           updatedData.rentDays = daysDifference;
+          updatedData.AmtOndays = updatedData.rentDays * updatedData.Amount
+
         }
-        
+
       }
+      console.log(updatedData, "updatedData")
       return updatedData;
     });
   };
-  
+
 
 
   // *************************validation for form submission**************
@@ -167,7 +206,24 @@ function BookingPage() {
       toast.error("Please fix the errors before submitting.");
       return;
     }
-
+  if(formData.Payment==="Online payment"){
+    setFormData((prevaData) => {
+      return {
+        ...prevaData,
+        total_Amt: prevaData.AmtOndays - prevaData.offerAmt - prevaData.CouponAmt,
+        status:"pending"
+      }
+    })
+    navigate('/checkOut')
+  }
+    setFormData((prevaData) => {
+      return {
+        ...prevaData,
+        total_Amt: prevaData.AmtOndays - prevaData.offerAmt - prevaData.CouponAmt,
+        status:"pending"
+      }
+    })
+    const result=await BookingConfirm(formData)
     console.log("Form submitted successfully:", formData);
     // Proceed with submission logic
   };
@@ -184,20 +240,21 @@ function BookingPage() {
   const handleCouponApply = () => {
     if (couponData && Array.isArray(couponData)) {  // Check if couponData is not null
       const selectedCoupon = couponData.find((coupon) => coupon.code === formData.Coupon);
-  
+
       if (selectedCoupon) {
-        const discountAmount = (selectedCoupon.discountPercentage / 100) * formData.Amount;
+        const discountAmount = (selectedCoupon.discountPercentage / 100) * formData.AmtOndays;
+        console.log(discountAmount, "discount")
         setFormData((prevData) => {
           const newTotalAmt = prevData.Amount * prevData.rentDays - discountAmount; // Calculate the new total amount
-  
+
           return {
             ...prevData,
             CouponAmt: discountAmount,
             total_Amt: Math.max(newTotalAmt, 0)  // Ensure total_Amt doesn't go below 0
           };
         });
-  
-  
+
+
       } else {
         toast.error("Please select a valid coupon.");
       }
@@ -205,7 +262,7 @@ function BookingPage() {
       toast.error("Coupon data is not available.");
     }
   };
-  
+
 
 
 
@@ -220,7 +277,7 @@ function BookingPage() {
             <div>
               <h2 className="text-2xl font-bold text-gray-800 mb-4">{carData?.car_name}</h2>
               <div className="space-y-3">
-                {/* Issue Date Input */}
+                {/* Issue Date Input */}{formData.AmtOndays}
                 <div key="IssueDate" className="relative">
                   <input
                     type="date"
@@ -329,7 +386,7 @@ function BookingPage() {
           {/* Payment Section */}
           <div className="bg-white rounded-lg shadow-lg p-6 space-y-4">
             <label className="block text-lg font-semibold text-gray-800">Payment Method:</label>
-            {['Net Banking', 'Credit Card', 'Debit Card', 'UPI'].map((method) => (
+            {['Cash on issue date', 'Online payment', 'Cash on return date'].map((method) => (
               <div key={method} className="flex items-center">
                 <input
                   type="radio"
@@ -364,13 +421,13 @@ function BookingPage() {
 
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-700">Offers Deduction</span>
-              <span className="text-sm text-green-600">- {offerData?.discountPercentage || 0}%</span>
-              {formErrors.discountPercentage && <p className="text-red-500">{formErrors.discountPercentage}</p>}
+              <span className="text-sm text-green-600">- {formData.offerAmt || 0}%</span>
+              {formErrors.offerAmt && <p className="text-red-500">{formErrors.offerAmt}</p>}
             </div>
 
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-700">Coupon Code Deduction</span>
-              <span className="text-sm text-green-600">- ₹{0}</span>
+              <span className="text-sm text-green-600">- ₹{formData.CouponAmt}</span>
               {formErrors.discountPercentage && <p className="text-red-500">{formErrors.discountPercentage}</p>}
             </div>
 
@@ -378,7 +435,7 @@ function BookingPage() {
               <span className="text-lg text-gray-800">Total Amount</span>
               <span className="text-lg text-blue-600">
 
-                ₹{(formData.total_Amt || 0) - (formData.CouponAmt || 0) - (formData.offerAmt || 0)}
+                ₹{(formData.AmtOndays || 0) - (formData.CouponAmt || 0) - (formData.offerAmt || 0)}
                 {formErrors.total_Amt && <p className="text-red-500">{formErrors.total_Amt}</p>}
 
               </span>

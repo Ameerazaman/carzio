@@ -5,7 +5,7 @@ export interface ProfileAuthResponse {
     status: number;
     data: {
         success: boolean;
-        message: string;
+        message?: string;
         data?: ProfileInterface,
         userId?: string;
      

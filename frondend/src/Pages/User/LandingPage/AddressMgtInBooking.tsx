@@ -21,35 +21,35 @@ function AddressMgtInBooking({ onAddressIdChange }: AddressMgtInBookingProps) {
         state: '',
         district: '',
         zip: '',
-        id: user?._id
+        userId: user?._id
     });
     const [addressErrors, setAddressErrors] = useState<Partial<AddressInterface>>({});
 
     useEffect(() => {
         const fetchProfile = async () => {
-          if (user && user._id) {
-            try {
-              const response = await checkAddress(user._id);
-              if (response?.status === 200) {
-                setCurrentAddress(response.data);
-                setAddressId(response.data._id);
-                setIsEditingAddress(true);
-                onAddressIdChange(response.data._id); // Pass addressId to the parent component
-              } else {
-                toast.error('No address found. Please create a new address.');
-              }
-            } catch {
-              toast.error('Error fetching address data.');
+            if (user && user._id) {
+                try {
+                    const response = await checkAddress(user._id);
+                    if (response?.status === 200) {
+                        setCurrentAddress(response.data.data);
+                        setAddressId(response.data.data._id);
+                        setIsEditingAddress(true);
+                        onAddressIdChange(response.data.data._id); // Pass addressId to the parent component
+                    } else {
+                        toast.error('No address found. Please create a new address.');
+                    }
+                } catch {
+                    toast.error('Error fetching address data.');
+                }
             }
-          }
         };
-      
+
         // Check if the addressId is already set before fetching it again
         if (!addressId) {
-          fetchProfile();
+            fetchProfile();
         }
-      }, [user, addressId, onAddressIdChange]); // Depend on addressId to prevent multiple calls
-      
+    }, [user, addressId, onAddressIdChange]); // Depend on addressId to prevent multiple calls
+
 
     const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -90,7 +90,7 @@ function AddressMgtInBooking({ onAddressIdChange }: AddressMgtInBookingProps) {
             state: currentAddress.state,
             district: currentAddress.district,
             zip: currentAddress.zip,
-            id: user?._id
+            userId: user?._id
         };
 
         try {
