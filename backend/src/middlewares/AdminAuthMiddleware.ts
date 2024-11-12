@@ -36,7 +36,6 @@ const adminAuth = async (req: Request, res: Response, next: NextFunction) => {
         // Fetch user using the token
         const admin = await adminRepository.getAdminById(refreshTokenValid.data);
 
-        console.log(admin, "middleware when call admin")
 
         if (!token) {
             return res.status(401).json({ success: false, message: "Access Token Expired" });
@@ -54,11 +53,11 @@ const adminAuth = async (req: Request, res: Response, next: NextFunction) => {
         if (!existingAdmin) {
             return res.status(404).json({ message: "Admin not found" });
         }
-        console.log(existingAdmin, "existing user")
+
         if (existingAdmin) {
 
             req.admin = existingAdmin;
-            console.log(req.admin, "req.admin")
+           
             next();
         }
 

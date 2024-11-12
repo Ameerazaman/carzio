@@ -39,8 +39,15 @@ adminRouter.post('/add_offer',adminAuthenticate,async(req,res)=>adminController.
 adminRouter.get('/fetchOffer',adminAuthenticate,async(req,res)=>adminController.fetchOffer(req,res))
 adminRouter.get('/edit_offers/:id', adminAuthenticate, async (req, res) => adminController.editOffer(req, res))
 adminRouter.put('/edit_offers/:id', adminAuthenticate, async (req, res)=> adminController.updateOffer(req, res));
-adminRouter.delete('/delete_offers/:id', adminAuthenticate, async (req, res)=> adminController.deleteOffer(req, res));
+adminRouter.put('/update_status_offers/:id', adminAuthenticate, async (req, res)=> adminController.updateStatusOffer(req, res));
+adminRouter.post('/add_coupon', adminAuthenticate, async (req, res)=> adminController.addCoupon(req, res));
+adminRouter.get('/fetchCoupon',adminAuthenticate,async(req,res)=>adminController.fetchCoupon(req,res))
+adminRouter.get('/edit_coupons/:id',adminAuthenticate,async(req,res)=>adminController.editCoupon(req,res))
+adminRouter.put('/edit_coupon/:id', adminAuthenticate, async (req, res)=> adminController.updateCoupon(req, res));
+adminRouter.put('/update_status_coupon/:id', adminAuthenticate, async (req, res)=> adminController.updateStatusCoupon(req, res));
+
 
 export default adminRouter;
+
 
 

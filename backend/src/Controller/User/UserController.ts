@@ -6,10 +6,11 @@ import { generateAndSendOTP } from '../../Utlis/GenerateAndSendOtp';
 import { STATUS_CODES } from '../../Constants/HttpStatusCode'
 import { Otp } from '../../Model/User/OtpModel';
 import { verifyRefreshToken } from '../../Utlis/VerifyTokens';
+import { BookingInterface } from '../../Interface/BookingInterface';
+import Stripe from 'stripe';
 const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED, } = STATUS_CODES;
 
 export class UserController {
-
 
     constructor(private userServices: UserServices) { }
     milliseconds = (h: number, m: number, s: number) => ((h * 60 * 60 + m * 60 + s) * 1000);
@@ -333,7 +334,6 @@ export class UserController {
             const result = await this.userServices.fetchOffer(); // Fetch offers from service
             console.log(result, "result in fetch offer")
             if (result) {
-                // Send the response, no explicit return needed
                 res.status(result.status).json(result.data);
             } else {
                 res.status(500).json({ message: "Internal server error" });
@@ -344,7 +344,245 @@ export class UserController {
         }
     }
 
+    //******************************check profile********************************
+
+    async checkProfile(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = req.params.id;
+            const result = await this.userServices.checkProfile(userId);
+
+            if (!result) {
+                res.status(404).json({ message: "Profile not found" });
+                return;
+            }
+
+            res.status(200).json(result);
+        } catch (error) {
+            console.error("Error during fetch profile:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+    // ****************************savee Profile***********************
+
+    async saveProfile(req: Request, res: Response): Promise<void> {
+        try {
+            // Extract profileData from the request body
+            const profileData = req.body.profileData;
+
+            // Save the profile using your user service
+            const result = await this.userServices.saveProfile(profileData);
+
+            if (!result) {
+                res.status(500).json({ message: "Error saving profile" });
+                return
+            }
+
+            // Successfully saved, return the response
+            res.status(200).json({
+                success: true,
+                message: 'Profile saved successfully',
+                data: result
+            });
+        } catch (error) {
+            console.error("Error saving profile:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+    // ******************************8Edit profile*******************
+    async editProfile(req: Request, res: Response): Promise<void> {
+        try {
+            // Extract profileData from the request body
+            const profileData = req.body.profileData;
+            const userId = req.params.id
+            // Save the profile using your user service
+            const result = await this.userServices.editProfile(profileData ,userId);
+
+            if (!result) {
+                res.status(500).json({ message: "Error editing profile" });
+                return
+            }
+
+            // Successfully saved, return the response
+            res.status(200).json({
+                success: true,
+                message: 'Profile edit successfully',
+                data: result
+            });
+        } catch (error) {
+            console.error("Error edit profile:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+    // ********************************check Address***********************
+    async checkAddress(req: Request, res: Response): Promise<void> {
+        try {
+            const addressId = req.params.id; 
+            const result = await this.userServices.checkAddress(addressId); 
+    
+            if (!result) {
+                res.status(404).json({ message: "Address not found" }); 
+                return
+            }
+    
+            res.status(200).json({
+                success: true,
+                message: 'Address retrieved successfully',
+                data: result
+            });
+    
+        } catch (error) {
+            console.error("Error checking address:", error); 
+            res.status(500).json({ message: "Internal server error" }); 
+        }
+    }
+       // ****************************savee Address***********************
+
+       async saveAddress(req: Request, res: Response): Promise<void> {
+        try {
+            // Extract profileData from the request body
+            const addressData = req.body.addressData;
+
+            // Save the profile using your user service
+            const result = await this.userServices.saveAddress(addressData);
+
+            if (!result) {
+                res.status(500).json({ message: "Error saving Address" });
+                return
+            }
+
+            // Successfully saved, return the response
+            res.status(200).json({
+                success: true,
+                message: 'Address saved successfully',
+                data: result
+            });
+        } catch (error) {
+            console.error("Error saving profile:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+    // ******************************8Edit Address*******************
+    async editAddress(req: Request, res: Response): Promise<void> {
+        try {
+            // Extract profileData from the request body
+            const addressData = req.body.addressData;
+            const addressId = req.params.id
+            // Save the profile using your user service
+            const result = await this.userServices.editAddress(addressData ,addressId);
+
+            if (!result) {
+                res.status(500).json({ message: "Error editing address" });
+                return
+            }
+
+            // Successfully saved, return the response
+            res.status(200).json({
+                success: true,
+                message: 'Address edit successfully',
+                data: result
+            });
+        } catch (error) {
+            console.error("Error edit profile:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+// *************************************fetch coupon******************8
+async fetchCoupon(req:Request,res:Response):Promise<void>{
+    try {
+       
+        const userId = req.params.id
+        // Save the profile using your user service
+        const result = await this.userServices.fetchCoupon(userId);
+
+        if (!result) {
+            res.status(500).json({ message: "Error fetch coupon" });
+            return
+        }
+
+        // Successfully saved, return the response
+        res.status(200).json({
+            success: true,
+            message: 'successully',
+            data: result
+        });
+    } catch (error) {
+        console.error("Error fetch coupon:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 }
 
+//*********************** */ Check offer for Booking**********************
+
+async checkOfferForBooking(req:Request,res:Response):Promise<void>{
+    try {
+       
+        const carName = req.params.car_name
+        const result = await this.userServices.checkOfferForBookiing(carName);
+
+        if (!result) {
+            res.status(500).json({ message: "No Offers" });
+            return
+        }
+        res.status(200).json({
+            success: true,
+            message: 'successully',
+            data: result
+        });
+    } catch (error) {
+        console.error("Error fetch coupon:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+// *************************save BookingData*********************
+async saveBookingData(req: Request, res: Response): Promise<void> {
+    try {
+        // Extract profileData from the request body
+        const bookingData = req.body.bookingData;
+
+        // Save the profile using your user service
+        const result = await this.userServices.saveBookingData(bookingData);
+
+        if (!result) {
+            res.status(500).json({ message: "Error saving Booking" });
+            return
+        }
+
+        // Successfully saved, return the response
+        res.status(200).json({
+            success: true,
+            message: 'Booking Successfully',
+            data: result
+        });
+    } catch (error) {
+        console.error("Error saving profile:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+// *************************payment for stripe*******************
 
 
+async  paymentForStripe(req: Request, res: Response): Promise<void> {
+  const { amount } = req.body; // Amount should be in cents for Stripe
+
+  try {
+    // Initialize Stripe with your secret key
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount, // Amount in cents
+      currency: 'usd', // Set currency based on your preference
+      payment_method_types: ['card'], // Specify the payment method
+    });
+
+    res.send({
+      clientSecret: paymentIntent.client_secret, // Send the client secret to the frontend
+    });
+  } catch (error) {
+    console.error("Error creating payment intent:", error);
+    res.status(500).send({ error: 'Internal Server Error' });
+  }
+}
+
+}

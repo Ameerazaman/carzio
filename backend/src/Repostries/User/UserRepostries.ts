@@ -1,9 +1,17 @@
+import { BookingInterface } from '../../Interface/BookingInterface';
 import { CarDataInterface } from '../../Interface/CarInterface';
-import { OfferDataInterface, OfferReturnData } from '../../Interface/OfferInterface';
+import { CouponInterface } from '../../Interface/CouponInterface';
+import { OfferDataInterface } from '../../Interface/OfferInterface';
+import { ProfileInterface } from '../../Interface/Profileinterface';
+import { UserAddressInterface } from '../../Interface/UserAddressInterface';
 import { UserInterface } from '../../Interface/UserInterface';
+import Coupon from '../../Model/Admin/CouponModel';
 import Offer from '../../Model/Admin/OfferModel';
 import CarModel from '../../Model/Provider/CarModel';
+import UserAddressModel from '../../Model/User/AddressModel';
+import BookingModel from '../../Model/User/BookingModel';
 import { Otp } from '../../Model/User/OtpModel';
+import UserProfileModel from '../../Model/User/ProfileModel';
 import userModel from '../../Model/User/UserModel';
 
 interface UserLoginResponse {
@@ -147,21 +155,21 @@ export class UserRepository {
             // Create a filter object
             const filters: any = {};
 
-        if (engineType && engineType.length > 0) {
-            filters.engineType = { $in: engineType.map(type => new RegExp(type, 'i')) }; // Case-insensitive filter
-        }
-        if (fuelType && fuelType.length > 0) {
-            filters.fuelType = { $in: fuelType.map(type => new RegExp(type, 'i')) }; // Case-insensitive filter
-        }
+            if (engineType && engineType.length > 0) {
+                filters.engineType = { $in: engineType.map(type => new RegExp(type, 'i')) }; // Case-insensitive filter
+            }
+            if (fuelType && fuelType.length > 0) {
+                filters.fuelType = { $in: fuelType.map(type => new RegExp(type, 'i')) }; // Case-insensitive filter
+            }
 
-        // Determine sorting order based on sortPrice parameter
-        const sortOrder = sortPrice === 'lowToHigh' ? 1 : sortPrice === 'highToLow' ? -1 : undefined;
-        console.log(filters, "filters");
+            // Determine sorting order based on sortPrice parameter
+            const sortOrder = sortPrice === 'lowToHigh' ? 1 : sortPrice === 'highToLow' ? -1 : undefined;
+            console.log(filters, "filters");
 
-        // Execute the query with filters and optional sorting
-        const filteredCars = await CarModel.find(filters)
-            .sort(sortOrder ? { rentalPrice: sortOrder } : {}) // Sort only if sortOrder is defined
-            .exec() as CarDataInterface[]; // Make sure CarModel is defined and imported
+            // Execute the query with filters and optional sorting
+            const filteredCars = await CarModel.find(filters)
+                .sort(sortOrder ? { rentalPrice: sortOrder } : {}) // Sort only if sortOrder is defined
+                .exec() as CarDataInterface[]; // Make sure CarModel is defined and imported
 
             const cars: CarDataInterface[] = filteredCars.map((car: CarDataInterface) => ({
                 car_name: car.car_name,
@@ -183,46 +191,184 @@ export class UserRepository {
                 id: car.id
             }));
             return cars
-    } catch (error) {
-        console.error("Error fetching cars:", error);
-        return null; // Return null on error
+        } catch (error) {
+            console.error("Error fetching cars:", error);
+            return null; // Return null on error
+        }
     }
-}
-// ******************************search car**********************
+    // ******************************search car**********************
 
 
-async  searchCar(searchQuery: string): Promise<CarDataInterface[] | null> {
-    try {
-        const regex = new RegExp(searchQuery, "i");
-        const result = await CarModel.find({ car_name: { $regex: regex } }); 
-        return result 
-    } catch (error) {
-        console.error("Error searching for cars:", error);
+    async searchCar(searchQuery: string): Promise<CarDataInterface[] | null> {
+        try {
+            const regex = new RegExp(searchQuery, "i");
+            const result = await CarModel.find({ car_name: { $regex: regex } });
+            return result
+        } catch (error) {
+            console.error("Error searching for cars:", error);
+            return null;
+        }
+    }
+    // *************************fetch offer8*******************888
+    async fetchOffer(): Promise<OfferDataInterface[] | null> {
+        try {
+            // Fetch offers from the database, with type assertion
+            const data = await Offer.find() as OfferDataInterface[]; // Array of OfferDataInterface documents
+
+            console.log("Offers in management:", data);
+
+            // Map the documents to the OfferReturnData type
+            const offers: OfferDataInterface[] = data.map((offer: OfferDataInterface) => ({
+                carName: offer.carName,
+                offerTitle: offer.offerTitle,
+                startDate: offer.startDate,
+                endDate: offer.endDate,
+                discountPercentage: offer.discountPercentage,
+                id: offer.id?.toString() || "", // Convert `_id` to string if present
+                isActive: offer.isActive ?? true, // Set a default value if `isActive` is undefined
+            }));
+
+            return offers;
+        } catch (error) {
+            console.error("Error fetching offers:", error);
+            return null;
+        }
+    }
+
+    // ***********************check profile******************
+    async checkProfile(userId: string): Promise<ProfileInterface | null> {
+        const data = await UserProfileModel.findOne({ userId: userId });
+
+        if (data) {
+            return {
+                _id: data._id,
+                userId: data.userId ?? undefined,
+                name: data.name ?? undefined,
+                email: data.email ?? undefined,
+                phone: data.phone ?? undefined,
+                adharNo: data.adharNo ?? undefined,
+                gender: data.gender ?? undefined
+            } as ProfileInterface;
+        }
         return null;
     }
-}
-// *************************fetch offer8*******************888
-async fetchOffer(): Promise<OfferReturnData[] | null> {
+    // **********************88save profile********************
+
+    async saveProfile(profileData: ProfileInterface): Promise<ProfileInterface | null> {
+        try {
+            const savedProfile = await UserProfileModel.create(profileData);
+            return savedProfile as ProfileInterface;
+        } catch (error) {
+            console.error("Error saving profile:", (error as Error).message);
+            return null; // Return null if there's an error
+        }
+    }
+    // *************************Edit profile************************
+
+    async editProfile(profileData: ProfileInterface, userId: string): Promise<ProfileInterface | null> {
+        try {
+            const updatedProfile = await UserProfileModel.findOneAndUpdate(
+                { userId: userId },
+                profileData,
+                { new: true }
+            );
+
+
+            if (updatedProfile) {
+                return updatedProfile as ProfileInterface;
+            }
+
+
+            return null;
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            return null;
+        }
+    }
+
+    //******************** */ check Address**************************
+    async checkAddress(addressId: string): Promise<UserAddressInterface | null> {
+        try {
+            const checkAddress = await UserAddressModel.findById(addressId)
+
+            if (checkAddress) {
+                return checkAddress as UserAddressInterface;
+            }
+
+            return null;
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            return null;
+        }
+
+    }
+
+    // ***************save address*********************8
+    async saveAddress(addressData: UserAddressInterface): Promise<UserAddressInterface | null> {
+        try {
+            const savedAddress = await UserAddressModel.create(addressData);
+            return savedAddress as UserAddressInterface;
+        } catch (error) {
+            console.error("Error saving profile:", (error as Error).message);
+            return null; // Return null if there's an error
+        }
+    }
+    // *************************Edit Address************************
+
+    async editAddress(addressData: UserAddressInterface, addressId: string): Promise<UserAddressInterface | null> {
+        try {
+            const updatedAddress = await UserAddressModel.findOneAndUpdate(
+                { _id: addressId },
+                addressData,
+                { new: true }
+            );
+            if (updatedAddress) {
+                return updatedAddress as UserAddressInterface;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error updating Adress:", error);
+            return null;
+        }
+    }
+
+    // **************************fetch coupon************
+    async fetchCoupon(userId: string): Promise<CouponInterface[] | null> {
+        try {
+
+            const checkAddress = await Coupon.find({ userId: { $ne: userId } }) as CouponInterface[];
+            if (checkAddress && checkAddress.length > 0) {
+                return checkAddress as CouponInterface[];
+            }
+            return null;
+        } catch (error) {
+            console.error("Error fetching coupons:", error);
+            return null;
+        }
+    }
+
+    // ******************check offer for booking******************
+    async checkOfferForBooking(carName: string): Promise<OfferDataInterface|null>{
+        try {
+            const offer = await Offer.findOne({ carName, isActive: true });
+            if (offer) {
+                return offer as OfferDataInterface
+            }
+            return null;
+        } catch (error) {
+            console.error("Error checking offer for booking:", error);
+            return null;
+        }
+    }
+// **********************************save Booking**********************
+
+async saveBookingData(bookingData:BookingInterface):Promise<BookingInterface|null>{
     try {
-        // Fetch offers from the database, with type assertion
-        const data = await Offer.find() as OfferDataInterface[]; // Array of OfferDataInterface documents
-
-        console.log("Offers in management:", data);
-
-        // Map the documents to the OfferReturnData type
-        const offers: OfferReturnData[] = data.map((offer: OfferDataInterface) => ({
-            carName: offer.carName,
-            offerTitle: offer.offerTitle,
-            startDate: offer.startDate,
-            endDate: offer.endDate,
-            discountPercentage: offer.discountPercentage,
-            id: offer._id?.toString() || "", // Convert `_id` to string if present
-        }));
-
-        return offers;
+        const savedBooking= await BookingModel.create(bookingData);
+        return savedBooking as BookingInterface;
     } catch (error) {
-        console.error("Error fetching offers:", error);
-        return null;
+        console.error("Error saving profile:", (error as Error).message);
+        return null; // Return null if there's an error
     }
 }
 }

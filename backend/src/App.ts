@@ -4,12 +4,12 @@ import cors from 'cors';
 import userRouter from './Routes/UserRouter';
 import createHttpError from 'http-errors';
 import connectDB from './Config/Db';
-import { Toaster } from 'react-hot-toast'; 
+import { Toaster } from 'react-hot-toast';
 import providerRouter from './Routes/ProviderRouter';
 import adminRouter from './Routes/AdminRouter';
 import cookieParser from 'cookie-parser';
 import path from 'path'
-import multer  from 'multer';
+import multer from 'multer';
 import fs from 'fs'
 import morgan from 'morgan';
 
@@ -19,10 +19,8 @@ connectDB();
 
 const app: Application = express();
 // morgan
-app.use(morgan('dev')); 
+app.use(morgan('dev'));
 
-
-// app.use('/uploads', express.static(path.join(__dirname,(uploadDir))));
 
 app.use(cookieParser());
 const PORT = process.env.PORT || 3000;
@@ -55,6 +53,8 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 };
 
 app.use(errorHandler);
+
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

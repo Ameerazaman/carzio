@@ -1,15 +1,24 @@
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { Suspense, lazy } from 'react'; // Import Suspense and lazy
+import { Suspense, lazy,} from 'react'; // Import Suspense and lazy
 import Loading from './Pages/Common/Loading';
+import Profile from './Components/User/Profile';
+import CheckoutForm from './Pages/User/LandingPage/CheckOutForm';
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import SuccessPage from './Pages/User/LandingPage/Success';
+import BookingHistory from './Pages/User/LandingPage/BookingHistory';
 
 
+const stripePromise = loadStripe('pk_test_51QJq7aDRjWHiMHMFbKsTqHRDHPep0XNgdvdjLwN8gWxkZpn2mMKx4fKXm0fQLjusUKKqRfFPzd17w52FH9Koe07800Ce8IksDd');
 
 
 // Lazy loading components
-const CouponMgt=lazy(()=>import('./Components/Admin/CouponMgt'))
-const AddCoupons=lazy(()=>import('./Components/Admin/AddCoupons'))
-const OfferPage=lazy(()=>import('./Components/User/OfferPage'))
+const BookingDetails = lazy(() => import('./Components/User/BookingDetails'))
+const EditCouponMgt = lazy(() => import('./Components/Admin/EditCouponMgt'))
+const CouponMgt = lazy(() => import('./Components/Admin/CouponMgt'))
+const AddCoupons = lazy(() => import('./Components/Admin/AddCoupons'))
+const OfferPage = lazy(() => import('./Components/User/OfferPage'))
 const EditOfferMgt = lazy(() => import('./Components/Admin/EditOfferMgt'))
 const AddOffers = lazy(() => import('./Components/Admin/AddOffers'))
 const OfferMgt = lazy(() => import('./Components/Admin/OfferMgt'))
@@ -41,18 +50,17 @@ const InternalServerError = lazy(() => import('./Pages/Common/InternalServerErro
 
 function App() {
   return (
+
     <div>
       <Router>
-        {/* Wrap the routes with Suspense and provide a loading message */}
+
         <Suspense fallback={<div><Loading /></div>}>
           <Routes>
             {/* Error routes */}
             <Route path="/error/404" element={<Error404 />} />
             <Route path="/internal_server_error" element={<InternalServerError />} />
 
-
             {/* ************************************userSide*********************** */}
-
 
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
@@ -62,8 +70,11 @@ function App() {
             <Route path='/car_details/:id' element={<CarDetailPage />} />
             <Route path='/carlist' element={<CarList />} />
             <Route path='/offers' element={<OfferPage />} />
-
-
+            <Route path='/booking_details/:carId' element={<BookingDetails />} />
+            <Route path='/profile' element={<Profile />} />
+            <Route path='/checkout' element={<Elements stripe={stripePromise}><CheckoutForm /></Elements>} />
+            <Route path='/success' element={<SuccessPage />} />
+            <Route path='/booking_history' element={<BookingHistory />} />
 
             {/* ************************************Provider Side*************************** */}
 
@@ -90,7 +101,8 @@ function App() {
             <Route path="/admin/add_offer" element={<AddOffers />} />
             <Route path="/admin/edit_offers/:id" element={<EditOfferMgt />} />
             <Route path="/admin/coupon" element={<CouponMgt />} />/
-            <Route path="/admin/add_coupon" element={<AddCoupons/>} />
+            <Route path="/admin/add_coupon" element={<AddCoupons />} />
+            <Route path="/admin/edit_coupons/:id" element={<EditCouponMgt />} />
           </Routes>
         </Suspense>
       </Router>

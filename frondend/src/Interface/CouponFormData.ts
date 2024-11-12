@@ -1,5 +1,5 @@
 export interface CouponFormData {
-    code: string;
+    code?: string;
     discountPercentage: number;
     maxDiscountAmount: number;
     minRentalAmount: number;

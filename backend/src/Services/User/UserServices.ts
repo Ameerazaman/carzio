@@ -8,6 +8,13 @@ import bcrypt from 'bcrypt';
 import { CarAuthResponse } from '../../Interface/AuthServices/CarAuthInterface';
 import { CarDataInterface } from '../../Interface/CarInterface';
 import { OfferAuthResponse } from '../../Interface/AuthServices/OfferAuthInterface';
+import { ProfileInterface } from '../../Interface/Profileinterface';
+import { ProfileAuthResponse } from '../../Interface/AuthServices/ProfileAuthInterface';
+import { UserAddressInterface } from '../../Interface/UserAddressInterface';
+import { UserAddressAuthResponse } from '../../Interface/AuthServices/UserAddressAuthResponse';
+import { CouponAuthResponse } from '../../Interface/AuthServices/CouponAuthInterface';
+import { BookingInterface } from '../../Interface/BookingInterface';
+import { BookingAuthResponse } from '../../Interface/AuthServices/BookingAuthInterface';
 
 
 
@@ -229,41 +236,296 @@ export class UserServices {
         }
     }
 
-     // *******************88fetch User*******************8
-  async fetchOffer(): Promise<OfferAuthResponse | undefined> {
-    try {
-      const offerData = await this.userRepository.fetchOffer();
-      console.log(offerData, "fetch offerData services");
+    // *******************fetch User*******************8
+    async fetchOffer(): Promise<OfferAuthResponse | undefined> {
+        try {
+            const offerData = await this.userRepository.fetchOffer();
+            console.log(offerData, "fetch offerData services");
 
-      if (offerData && offerData.length > 0) {
-        return {
-          status: OK,
-          data: {
-            success: true,
-            message: 'Success',
-            data: offerData, // Return all users
-          },
-        };
-      } else {
-        return {
-          status: BAD_REQUEST,
-          data: {
-            success: false,
-            message: 'offers are not found',
-          },
-        };
-      }
-    } catch (error) {
-      console.error("Error fetching offerData:", (error as Error).message);
-      return {
-        status: INTERNAL_SERVER_ERROR,
-        data: {
+            if (offerData && offerData.length > 0) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        message: 'Success',
+                        data: offerData, // Return all users
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: 'offers are not found',
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error fetching offerData:", (error as Error).message);
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
 
-          success: false,
-          message: 'Internal server error',
-        },
-      };
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
     }
-  }
+    //   ***********************************check profile****************************
+    async checkProfile(id: string): Promise<ProfileInterface | null> {
+        try {
+            return await this.userRepository.checkProfile(id); // Use the repository method for checking
+        } catch (error) {
+            console.error("Error checking provider address via repository:", error);
+            return null;
+        }
+    }
+
+    // ********************************************save Profile******************************
+
+    async saveProfile(profileData: ProfileInterface): Promise<ProfileAuthResponse | undefined> {
+        try {
+
+            const provider = await this.userRepository.saveProfile(profileData);
+            return {
+                status: 200,
+                data: {
+                    success: true,
+                    message: 'Profile saved successfully',
+                },
+            };
+
+        } catch (error) {
+            console.error("Error saving provider profile:", (error as Error).message);
+            return {
+                status: 500,
+                data: {
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
+
+    // *********************************Edit profile**************************
+    async editProfile(profileData: ProfileInterface, id: string): Promise<ProfileAuthResponse | undefined> {
+        try {
+
+            const provider = await this.userRepository.editProfile(profileData, id);
+            // Log the saved provider data
+
+            return {
+                status: 200, // Successful save
+                data: {
+                    success: true,
+                    message: 'Profile saved successfully',
+                    // data: provider, // Optionally include saved data
+                },
+            };
+
+        } catch (error) {
+            console.error("Error saving provider profile:", (error as Error).message);
+            return {
+                status: 500, // Internal server error
+                data: {
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
+    //   ***********************************check profile****************************
+    async checkAddress(id: string): Promise<UserAddressInterface | null> {
+        try {
+            return await this.userRepository.checkAddress(id); // Use the repository method for checking
+        } catch (error) {
+            console.error("Error checking user address via repository:", error);
+            return null;
+        }
+    }
+    // ********************************************save Address******************************
+
+    async saveAddress(addressData: UserAddressInterface): Promise<UserAddressAuthResponse | undefined> {
+        try {
+
+            const provider = await this.userRepository.saveAddress(addressData);
+            // Log the saved provider data
+
+            return {
+                status: 200, // Successful save
+                data: {
+                    success: true,
+                    message: 'Address saved successfully',
+                    // data: provider, // Optionally include saved data
+                },
+            };
+
+        } catch (error) {
+            console.error("Error saving provider profile:", (error as Error).message);
+            return {
+                status: 500, // Internal server error
+                data: {
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
+
+    // *********************************Edit Address**************************
+    async editAddress(addressData: UserAddressInterface, id: string): Promise<UserAddressAuthResponse | undefined> {
+        try {
+
+            const provider = await this.userRepository.editAddress(addressData, id);
+            // Log the saved provider data
+
+            return {
+                status: 200, // Successful save
+                data: {
+                    success: true,
+                    message: 'Address saved successfully',
+                    // data: provider, // Optionally include saved data
+                },
+            };
+
+        } catch (error) {
+            console.error("Error saving user Address:", (error as Error).message);
+            return {
+                status: 500, // Internal server error
+                data: {
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
+
+    // *******************get Car details and user address for booking details***************
+    // async getBookingPage(userId: string, carId: string): Promise<UserAddressAuthResponse | undefined> {
+    //     try {
+    //         const result = await this.userRepository.getBookingPage(carId, userId)
+    //         console.log(result, "result")
+    //     }
+    //     catch (error) {
+    //         return
+    //     }
+    // }
+
+    // *******************88fetch Coupon*******************8
+    async fetchCoupon(userId: string): Promise<CouponAuthResponse | undefined> {
+        try {
+            const couponData = await this.userRepository.fetchCoupon(userId);
+            console.log(couponData, "fetch offerData services");
+
+            if (couponData && couponData.length > 0) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        message: 'Success',
+                        data: couponData,
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: 'coupons are not found',
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error fetching couponData:", (error as Error).message);
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
+
+    //   ******************************fetch offeer for booking******************8
+
+    async checkOfferForBookiing(carName: string): Promise<OfferAuthResponse | undefined> {
+        try {
+            const offerData = await this.userRepository.checkOfferForBooking(carName);
+            console.log(offerData, "fetch offerData services");
+
+            if (offerData) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        message: 'Success',
+                        data: offerData,
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: 'Offers are not available',
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error fetching couponData:", (error as Error).message);
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
+
+    // ********************************booking confirm************************
+
+    async saveBookingData(bookingData: BookingInterface): Promise<BookingAuthResponse | undefined> {
+        try {
+            // Call saveBookingData and handle the possibility of null return
+            const savedBookingData = await this.userRepository.saveBookingData(bookingData);
+
+            console.log(savedBookingData, "fetch bookingData services");
+
+            if (savedBookingData) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        message: 'Success',
+                        data: savedBookingData,
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: 'Offers are not available',
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error fetching couponData:", (error as Error).message);
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
+
+
 }
 

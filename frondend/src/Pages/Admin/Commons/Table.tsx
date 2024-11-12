@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { FaEdit, FaTrash, FaTrashAlt } from 'react-icons/fa';
-import { deleteOffer, editOffer, editProvider, editUser, notificaionDetails, updateStatus, updateStatusCar, updateStatusProvider } from '../../../Api/Admin';
+import { editCoupon, editOffer, editProvider, editUser, notificaionDetails, updateStatus, updateStatusCar, updateStatusCoupon, updateStatusOffer, updateStatusProvider } from '../../../Api/Admin';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 interface TableProps {
   tableData: Array<{ [key: string]: any }>;
-  header: string; // New header prop
+  header: string;
 }
 
 const Table: React.FC<TableProps> = ({ tableData: initialTableData, header }) => {
@@ -21,35 +21,25 @@ const Table: React.FC<TableProps> = ({ tableData: initialTableData, header }) =>
   const handleEdit = async (id: string) => {
     if (header === "user") {
       await editUser(id);
-      navigate(`/admin/edit_${header}/${id}`); // Use header to determine the correct route (user or provider)
+      navigate(`/admin/edit_${header}/${id}`);
+    }
+    else if (header === 'coupons') {
+      await editCoupon(id);
+      navigate(`/admin/edit_${header}/${id}`);
     }
     else if (header === "offers") {
       await editOffer(id);
-      navigate(`/admin/edit_${header}/${id}`); // Use header to determine the correct route (user or provider)
+      navigate(`/admin/edit_${header}/${id}`);
     }
     else {
       await editProvider(id)
       navigate(`/admin/edit_${header}/${id}`)
     }
   };
-  const handleDelete = async (id: string) => {
-    try {
-      const result = await deleteOffer(id);
-
-      if (result) {
-        console.log("Offer deleted successfully:", result); 
-        navigate('/admin/offers'); 
-      } else {
-        console.error("Offer not found or could not be deleted."); 
-      }
-    } catch (error) {
-      console.error("Error while deleting offer:", error);
-    }
-  }
-
 
   const handleStatus = async (id: string) => {
     try {
+      console.log("id check", id)
       let result;
 
       if (header === "user") {
@@ -57,6 +47,12 @@ const Table: React.FC<TableProps> = ({ tableData: initialTableData, header }) =>
       } else if (header === "cars") {
         console.log("Handling car status update");
         result = await updateStatusCar(id);
+      } else if (header === 'coupons') {
+        console.log("Handling car status update");
+        result = await updateStatusCoupon(id);
+      } else if (header === "offers") {
+        console.log("Handling offer status update");
+        result = await updateStatusOffer(id);
       } else {
         result = await updateStatusProvider(id);
       }
@@ -64,7 +60,13 @@ const Table: React.FC<TableProps> = ({ tableData: initialTableData, header }) =>
       if (result) {
         setTableData((prevTableData) =>
           prevTableData.map((data) =>
-            data.id === id ? { ...data, isBlocked: !data.isBlocked } : data
+            data.id === id
+              ? {
+                  ...data,
+                  isBlocked: data.hasOwnProperty('isBlocked') ? !data.isBlocked : data.isBlocked,
+                  isActive: data.hasOwnProperty('isActive') ? !data.isActive : data.isActive,
+                }
+              : data
           )
         );
       }
@@ -104,20 +106,20 @@ const Table: React.FC<TableProps> = ({ tableData: initialTableData, header }) =>
               <th className="py-2 px-4 border-b text-left">carName</th>
               <th className="py-2 px-4 border-b text-left">End Date</th>
               <th className="py-2 px-4 border-b text-left">Edit</th>
-              <th className="py-2 px-4 border-b text-left">Delete</th>
+              <th className="py-2 px-4 border-b text-left">Status</th>
             </>
-          ) :header === "coupons" ? (
+          ) : header === "coupons" ? (
             <>
               <th className="py-2 px-4 border-b text-left">No</th>
               <th className="py-2 px-4 border-b text-left">Code</th>
               <th className="py-2 px-4 border-b text-left">Discount (%)</th>
-              <th className="py-2 px-4 border-b text-left">Max Discount</th>
+              <th className="py-2 px-4 border-b text-left">Min Rent Amt</th>
               <th className="py-2 px-4 border-b text-left">Start Date</th>
               <th className="py-2 px-4 border-b text-left">End Date</th>
               <th className="py-2 px-4 border-b text-left">Edit</th>
-              <th className="py-2 px-4 border-b text-left">Delete</th>
+              <th className="py-2 px-4 border-b text-left">Status</th>
             </>
-          ) :  (
+          ) : (
             <>
               <th className="py-2 px-4 border-b text-left">No</th>
               <th className="py-2 px-4 border-b text-left">Email</th>
@@ -194,7 +196,7 @@ const Table: React.FC<TableProps> = ({ tableData: initialTableData, header }) =>
                   <td className="py-2 px-4 border-b">{index + 1}</td>
                   <td className="py-2 px-4 border-b">{data.code || "N/A"}</td>
                   <td className="py-2 px-4 border-b">{data.discountPercentage || "N/A"}</td>
-                  <td className="py-2 px-4 border-b">{data.maxDiscountAmount || "N/A"}</td>
+                  <td className="py-2 px-4 border-b">{data.minRentalAmount || "N/A"}</td>
                   <td className="py-2 px-4 border-b">{new Date(data.startDate).toLocaleDateString() || "N/A"}</td>
                   <td className="py-2 px-4 border-b">{new Date(data.endDate).toLocaleDateString() || "N/A"}</td>
                   <td className="py-2 px-4 border-b text-center">
@@ -203,8 +205,8 @@ const Table: React.FC<TableProps> = ({ tableData: initialTableData, header }) =>
                     </button>
                   </td>
                   <td className="py-2 px-4 border-b text-center">
-                    <button onClick={() => handleDelete(data.id)} className="text-red-600 hover:text-red-800 ml-2">
-                      <FaTrashAlt />
+                    <button onClick={() => handleStatus(data?.id)} className={`py-1 px-3 rounded-full ${data?.isActive ? 'bg-green-600 text-white' : 'bg-red-600 text-white'} cursor-pointer`}>
+                      {data?.isActive ? 'Active' : 'Block'}
                     </button>
                   </td>
                 </>
@@ -221,9 +223,12 @@ const Table: React.FC<TableProps> = ({ tableData: initialTableData, header }) =>
                     </button>
                   </td>
                   <td className="py-2 px-4 border-b text-center">
-                    <button onClick={() =>
-                      handleDelete(data?.id)} className="text-red-600 hover:text-red-800 ml-2">
-                      <FaTrashAlt />
+                    <button
+                      onClick={() => handleStatus(data?.id)}
+                      className={`py-1 px-3 rounded-full ${data?.isActive ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+                        } cursor-pointer`}
+                    >
+                      {data?.isActive ? 'Active' : 'Block'}
                     </button>
                   </td>
                 </>

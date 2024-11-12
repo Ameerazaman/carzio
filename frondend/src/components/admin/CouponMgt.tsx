@@ -3,7 +3,7 @@ import { FaPlus } from 'react-icons/fa';
 import Navbar from '../../Pages/Admin/Commons/Navbar';
 import Sidebar from '../../Pages/Admin/Commons/Sidebar';
 import Table from '../../Pages/Admin/Commons/Table';
-import { carManagementt, fetchOffer } from '../../Api/Admin';
+import { carManagementt, fetchCoupon, fetchOffer } from '../../Api/Admin';
 import { Link } from 'react-router-dom';
 
 function CouponMgt() {
@@ -16,17 +16,17 @@ function CouponMgt() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const result = await fetchOffer();
+        const result = await fetchCoupon();
         console.log(result, "Fetched car data");
   
         if (result && result.data && result.data.data) {
           setTableData(result.data.data);
         } else {
-          setError("Cars are Empty");
+          setError("Coupons are empty");
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
-        setError("Error fetching user data.");
+        console.error("Error fetching coupon data:", error);
+        setError("Error fetching coupon data.");
       } finally {
         setLoading(false);
       }

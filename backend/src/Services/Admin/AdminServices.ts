@@ -13,8 +13,11 @@ import { UserInterface } from '../../Interface/UserInterface';
 import { ProviderInterface } from '../../Interface/ProviderInterface';
 import { CarAuthResponse } from '../../Interface/AuthServices/CarAuthInterface';
 import { CarDataInterface } from '../../Interface/CarInterface';
-import { OfferDataInterface, OfferReturnData } from '../../Interface/OfferInterface';
+import { OfferDataInterface } from '../../Interface/OfferInterface';
 import { OfferAuthResponse } from '../../Interface/AuthServices/OfferAuthInterface';
+import { generateRandomCouponCode } from '../../Utlis/CouponGenerator';
+import { CouponInterface } from '../../Interface/CouponInterface';
+import { CouponAuthResponse } from '../../Interface/AuthServices/CouponAuthInterface';
 
 
 export class AdminServices {
@@ -397,7 +400,7 @@ export class AdminServices {
     try {
       console.log("offer save in services")
       const offerData = await this.adminRepostry.addOffer(offer)
-      console.log("offerdata service",offerData)
+      console.log("offerdata service", offerData)
       if (offerData) {
         return {
           status: OK,
@@ -464,52 +467,176 @@ export class AdminServices {
       };
     }
   }
-// *****************************Edit Offer************************8
-async editOffer(id: string): Promise< OfferReturnData | null> {
-  try {
-    console.log("exist provider in services")
-    return await this.adminRepostry.editOffer(id); // Use the repository method for checking
-  } catch (error) {
-    console.error("Error checking edit provider via repository:", error);
-    return null;
+  // *****************************Edit Offer************************8
+  async editOffer(id: string): Promise<OfferDataInterface | null> {
+    try {
+      console.log("exist provider in services")
+      return await this.adminRepostry.editOffer(id); // Use the repository method for checking
+    } catch (error) {
+      console.error("Error checking edit provider via repository:", error);
+      return null;
+    }
   }
-}
-// ************************update Offer*************8888
-async updateOffer(offerData: OfferDataInterface, id: string): Promise<OfferAuthResponse | undefined> {
-  try {
-    console.log("edit offer is services")
-    const provider = await this.adminRepostry.updateOffer(offerData, id);
-    
+  // ************************update Offer*************8888
+  async updateOffer(offerData: OfferDataInterface, id: string): Promise<OfferAuthResponse | undefined> {
+    try {
+      console.log("edit offer is services")
+      const provider = await this.adminRepostry.updateOffer(offerData, id);
 
-    return {
-      status: 200, // Successful save
-      data: {
-        success: true,
-        message: 'Offer update successfully',
-        // data: provider, // Optionally include saved data
-      },
-    };
 
-  } catch (error) {
-    console.error("Error upadting offer Data:", (error as Error).message);
-    return {
-      status: 500, // Internal server error
-      data: {
-        success: false,
-        message: 'Internal server error',
-      },
-    };
+      return {
+        status: 200, // Successful save
+        data: {
+          success: true,
+          message: 'Offer update successfully',
+         
+        },
+      };
+
+    } catch (error) {
+      console.error("Error upadting offer Data:", (error as Error).message);
+      return {
+        status: 500, // Internal server error
+        data: {
+          success: false,
+          message: 'Internal server error',
+        },
+      };
+    }
   }
-}
 
-// ***********************delete Offer****************
-async deleteOffer(id: string): Promise< OfferReturnData | null> {
-  try {
-
-    return await this.adminRepostry.deleteOffer(id); // Use the repository method for checking
-  } catch (error) {
-    console.error("Error  deletee offer:", error);
-    return null;
+  // ***********************delete Offer****************
+  async updateStatusOffer(id: string): Promise<OfferDataInterface | null> {
+    try {
+      return await this.adminRepostry.updateStatusOffer(id); // Use the repository method for checking
+    } catch (error) {
+      console.error("Error  deletee offer:", error);
+      return null;
+    }
   }
-}
+
+  // ***********************add coupon******************
+  async addCoupon(coupon: CouponInterface): Promise<CouponAuthResponse | null> {
+    try {
+      console.log("Generating random coupon code");
+      coupon.code = generateRandomCouponCode(8); // e.g., 8 characters long
+      console.log("Coupon code generated:", coupon.code);
+      console.log(coupon, "in services coupo")
+      const offerData = await this.adminRepostry.addCoupon(coupon);
+      console.log("Coupon data service", offerData);
+
+      if (offerData) {
+        return {
+          status: OK,
+          data: {
+            success: true,
+            message: 'Success',
+            data: offerData,
+          },
+        };
+      } else {
+        return {
+          status: BAD_REQUEST,
+          data: {
+            success: false,
+            message: 'Offers are not found',
+          },
+        };
+      }
+    } catch (error) {
+      console.error("Error saving offer:", (error as Error).message);
+      return {
+        status: INTERNAL_SERVER_ERROR,
+        data: {
+          success: false,
+          message: 'Internal server error',
+        },
+      };
+    }
+  }
+
+   // *******************88fetch Coupon*******************8
+   async fetchCoupon(): Promise<CouponAuthResponse| undefined> {
+    try {
+      const couponData = await this.adminRepostry.fetchCoupon();
+      console.log(couponData, "fetch offerData services");
+
+      if (couponData && couponData.length > 0) {
+        return {
+          status: OK,
+          data: {
+            success: true,
+            message: 'Success',
+            data: couponData, 
+          },
+        };
+      } else {
+        return {
+          status: BAD_REQUEST,
+          data: {
+            success: false,
+            message: 'coupons are not found',
+          },
+        };
+      }
+    } catch (error) {
+      console.error("Error fetching couponData:", (error as Error).message);
+      return {
+        status: INTERNAL_SERVER_ERROR,
+        data: {
+
+          success: false,
+          message: 'Internal server error',
+        },
+      };
+    }
+  }
+
+  // *****************************Edit Coupon************************8
+  async editCoupon(id: string): Promise<CouponInterface | null> {
+    try {
+      console.log("exist Coupon in services")
+      return await this.adminRepostry.editCoupon(id); // Use the repository method for checking
+    } catch (error) {
+      console.error("Error checking edit Coupon via repository:", error);
+      return null;
+    }
+  }
+
+   // ************************update Coupon*************8888
+   async updateCoupon(couponData: CouponInterface, id: string): Promise<CouponAuthResponse | undefined> {
+    try {
+      const updatedCoupon = await this.adminRepostry.updateCoupon(couponData, id);
+
+
+      return {
+        status: 200, // Successful save
+        data: {
+          success: true,
+          message: 'Coupon update successfully',
+        },
+      };
+
+    } catch (error) {
+      console.error("Error upadting offer Data:", (error as Error).message);
+      return {
+        status: 500, // Internal server error
+        data: {
+          success: false,
+          message: 'Internal server error',
+        },
+      };
+    }
+  }
+
+  // ***********************delete or update status of coupon****************
+  async updateStatusCoupon(id: string): Promise<CouponInterface | null> {
+    try {
+      return await this.adminRepostry.updateStatusCoupon(id); // Use the repository method for checking
+    } catch (error) {
+      console.error("Error  deletee offer:", error);
+      return null;
+    }
+  }
+
 }

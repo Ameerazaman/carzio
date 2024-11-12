@@ -7,7 +7,13 @@ const userRouter = {
     fetchCar:"/cars",
     carFilter:'/filter',
     searchCar:'/search',
-    getOfferCar:'/offers'
+    getOfferCar:'/offers',
+    saveProfile:'/save_profile',
+    editProfile:'/edit_profile',
+    saveAddress:'/save_address',
+    fetchCoupon:"/fetchCoupon",
+    bookingConfirm:'/booking_confirm',
+    createPayment:'/create_payment'
   };
   
   export default userRouter;

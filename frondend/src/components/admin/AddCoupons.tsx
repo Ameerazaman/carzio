@@ -13,7 +13,7 @@ function AddCoupons() {
       <Navbar />
       <div className="flex-1 bg-gray-100">
    
-        <div className="overflow-x-auto bg-white rounded-lg shadow-md">
+        <div className="overflow-x-auto bg-white  rounded-lg shadow-md pt-4 mt-5">
           <AddCoupon/>
         </div>
       </div>

@@ -10,10 +10,6 @@ export interface ProviderInterface {
     isBlocked?: boolean;
 }
 
-
-
-
-
 export interface ProviderAuthResponse {
     status: number;
     data: {

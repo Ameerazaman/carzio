@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from "axios";
 import { toast } from 'react-hot-toast';
 import { refreshUserAccessToken, userLogout } from "../Api/User";
 import { providerLogout, refreshProviderAccessToken } from "../Api/Provider";
-import { adminLogout, refreshAdminAccessToken } from "../Api/Admin";
+import { adminLogout, refreshAdminAccessToken } from '../Api/Admin'
 import { Component } from 'react';
 
 import { store } from "../App/Store";
@@ -13,9 +13,9 @@ import { signOutAdmin } from "../App/Slice/AdminSlice";
 export { }
 const userApi: AxiosInstance = axios.create({
   baseURL: "http://localhost:5000/api/users",
-  withCredentials: true
+  withCredentials: true   
 });
-
+   
 userApi.interceptors.response.use(
   (response) => {
     if (response.data.message) {
@@ -59,7 +59,7 @@ userApi.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  }    
 );
 
 // **********************************Axios instance for Provider********************

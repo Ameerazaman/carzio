@@ -8,7 +8,8 @@ const adminRouter = {
     carMgt:'/admin/cars',
     addOffer:'/admin/add_offer',
     fetchOffer:"/admin/fetchOffer",
-    addCoupon:'/admin/add_coupon'
+    addCoupon:'/admin/add_coupon',
+    fetchCoupon:"/admin/fetchCoupon",
   };
   
   export default adminRouter;

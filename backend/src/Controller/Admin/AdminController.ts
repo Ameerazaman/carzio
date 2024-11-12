@@ -1,13 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
-
 import { AdminServices } from '../../Services/Admin/AdminServices';
 import { generateAndSendOTP } from '../../Utlis/GenerateAndSendOtp';
 import { StatusCodes } from 'http-status-codes';
 import { verifyRefreshToken } from '../../Utlis/VerifyTokens';
 const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = StatusCodes;
-
-
 
 
 export class AdminController {
@@ -464,86 +461,195 @@ export class AdminController {
       res.status(500).json({ message: "Internal server error" });
     }
   }
-// ************************************8edit offer***************************
-async editOffer(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
-  try {
-    const id = req.params.id; // Extract 'id' from req.params
-    console.log(id, "edit offer admin controller");
+  // ************************************8edit offer***************************
+  async editOffer(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
+    try {
+      const id = req.params.id; // Extract 'id' from req.params
+      console.log(id, "edit offer admin controller");
 
 
-    if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid ID parameter" });
+      if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "Invalid ID parameter" });
+      }
+
+      const offerExist = await this.adminServices.editOffer(id);
+
+      console.log(offerExist, "offerExist");
+
+      if (!offerExist) {
+        return res.status(404).json({ message: "Offer not found" });
+      }
+
+      return res.status(200).json(offerExist);
+    } catch (error) {
+      console.error("Error during check offer exist:", error);
+      return res.status(500).json({ message: "Internal server error" });
     }
-
-    const offerExist = await this.adminServices.editOffer(id);
-
-    console.log(offerExist, "offerExist");
-
-    if (!offerExist) {
-      return res.status(404).json({ message: "Offer not found" });
-    }
-
-    return res.status(200).json(offerExist);
-  } catch (error) {
-    console.error("Error during check offer exist:", error);
-    return res.status(500).json({ message: "Internal server error" });
   }
-}
 
-// ***********************************update offer*************************
+  // ***********************************update offer*************************
 
-async updateOffer(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
-  try {
-    console.log("Edit offer - Params:", req.params);
-    console.log("offer Data:", req.body);
+  async updateOffer(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
+    try {
+      console.log("Edit offer - Params:", req.params);
+      console.log("offer Data:", req.body);
 
-    const id = req.params.id;  // Get the id from params
-    if (!id) {
-      return res.status(400).json({ message: 'ID is missing' });
+      const id = req.params.id;  // Get the id from params
+      if (!id) {
+        return res.status(400).json({ message: 'ID is missing' });
+      }
+
+      const offerData = req.body;  // Directly use req.body, assuming you're sending JSON
+      if (!offerData) {
+        return res.status(400).json({ message: 'offer data is missing' });
+      }
+
+      // Call the service to save the profile
+      const result = await this.adminServices.updateOffer(offerData, id);
+      console.log(result, "Edit offer Result");
+
+      if (result?.status === OK) {
+        return res.status(OK).json(result.data);  // Return success response
+      } else {
+        return res.status(INTERNAL_SERVER_ERROR).json(result?.data);  // Handle internal error from service
+      }
+    } catch (error) {
+      console.error("Error during  offer update:", error);
+      return res.status(500).json({ message: "Internal server error" });
     }
-
-    const offerData = req.body;  // Directly use req.body, assuming you're sending JSON
-    if (!offerData) {
-      return res.status(400).json({ message: 'offer data is missing' });
-    }
-
-    // Call the service to save the profile
-    const result = await this.adminServices.updateOffer(offerData, id);
-    console.log(result, "Edit offer Result");
-
-    if (result?.status === OK) {
-      return res.status(OK).json(result.data);  // Return success response
-    } else {
-      return res.status(INTERNAL_SERVER_ERROR).json(result?.data);  // Handle internal error from service
-    }
-  } catch (error) {
-    console.error("Error during  offer update:", error);
-    return res.status(500).json({ message: "Internal server error" });
   }
-}
-// *******************************delete Offer*********************888
-async deleteOffer(req: Request, res: Response): Promise<Response> {
-  try {
-    console.log("deleteOffer");
-    const id = req.params.id;
-    console.log(id, "Car ID in deleteOffer");
+  // *******************************delete Offer*********************888
+  async updateStatusOffer(req: Request, res: Response): Promise<Response> {
+    try {
+      console.log("updateStatusOffer");
+      const id = req.params.id;
+      console.log(id, "Car ID in updateStatusOffer");
 
-    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid car ID" });
+      if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "Invalid car ID" });
+      }
+
+      const offerExist = await this.adminServices.updateStatusOffer(id);
+      console.log("delete offer", offerExist)
+
+      if (!offerExist) {
+        return res.status(404).json({ message: "Offer not found" });
+      }
+
+      return res.status(200).json({ message: "Offer updateStatusOffer successfully", data: offerExist });
+    } catch (error) {
+      console.error("Error updating car status:", error);
+      return res.status(500).json({ message: "Internal server error" });
     }
-
-    const offerExist = await this.adminServices.deleteOffer(id);
-    console.log("delete offer",offerExist)
-
-    if (!offerExist) {
-      return res.status(404).json({ message: "Offer not found" });
-    }
-
-    return res.status(200).json({ message: "Offer deleted successfully", data: offerExist });
-  } catch (error) {
-    console.error("Error updating car status:", error);
-    return res.status(500).json({ message: "Internal server error" });
   }
-}
+  // *************************add coupon**************************
 
+
+  async addCoupon(req: Request, res: Response): Promise<Response> {
+    try {
+      console.log(req.body, "coupon")
+      const saveCoupon = await this.adminServices.addCoupon(req.body.coupon);
+      console.log(saveCoupon, "Coupon offer")
+      if (!saveCoupon) {
+        return res.status(404).json({ message: "Coupon is not saved" });
+      }
+
+      return res.status(200).json({ message: "Coupon saved updated successfully", car: req.body });
+    } catch (error) {
+      console.error("Error save Offer status:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
+  // ***************************fetch Coupon**********************
+  async fetchCoupon(req: Request, res: Response): Promise<void> {
+    try {
+      const result = await this.adminServices.fetchCoupon(); // Fetch offers from service
+      console.log(result, "result in fetch Coupon")
+      if (result) {
+        // Send the response, no explicit return needed
+        res.status(result.status).json(result.data);
+      } else {
+        res.status(500).json({ message: "Internal server error" });
+      }
+    } catch (error) {
+      console.error("Error during fetch Coupon:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
+  // ************************************edit coupon***************************
+  async editCoupon(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
+    try {
+      const id = req.params.id; // Extract 'id' from req.params
+      console.log(id, "edit coupon admin controller");
+
+
+      if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "Invalid ID parameter" });
+      }
+
+      const couponExist = await this.adminServices.editCoupon(id);
+
+      console.log(couponExist, "couponExist");
+
+      if (!couponExist) {
+        return res.status(404).json({ message: "Coupon not found" });
+      }
+
+      return res.status(200).json(couponExist);
+    } catch (error) {
+      console.error("Error during check coupon exist:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+  // ***********************************update Coupon *************************
+
+  async updateCoupon(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
+    try {
+      console.log("Edit coupon - Params:", req.params);
+      console.log("coupon Data:", req.body);
+
+      const id = req.params.id;  // Get the id from params
+      if (!id) {
+        return res.status(400).json({ message: 'ID is missing' });
+      }
+
+      const couponData = req.body;  // Directly use req.body, assuming you're sending JSON
+      if (!couponData) {
+        return res.status(400).json({ message: 'coupon data is missing' });
+      }
+
+      // Call the service to save the profile
+      const result = await this.adminServices.updateCoupon(couponData, id);
+      console.log(result, "Edit coupon Data Result");
+
+      if (result?.status === OK) {
+        return res.status(OK).json(result.data);  // Return success response
+      } else {
+        return res.status(INTERNAL_SERVER_ERROR).json(result?.data);  // Handle internal error from service
+      }
+    } catch (error) {
+      console.error("Error during  couponData update:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
+  // *******************************delete Offer*********************888
+  async updateStatusCoupon(req: Request, res: Response): Promise<Response> {
+    try {
+      const id = req.params.id;
+      if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "Invalid car ID" });
+      }
+      const couponExist = await this.adminServices.updateStatusCoupon(id);
+      if (!couponExist) {
+        return res.status(404).json({ message: "Coupon not found" });
+      }
+      return res.status(200).json({ message: "update successfully", data: couponExist });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+  
 }

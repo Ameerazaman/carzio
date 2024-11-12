@@ -45,7 +45,6 @@ const userAuth = async (req: Request, res: Response, next: NextFunction) => {
             return res.status(401).json({ success: false, message: 'Refresh Token Expired' });
         }
 
-        // Verify refresh token
         const refreshTokenValid = verifyRefreshToken(refresh_token);
   
         // Fetch user using the token
