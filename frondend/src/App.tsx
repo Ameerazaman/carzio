@@ -1,19 +1,21 @@
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { Suspense, lazy,} from 'react'; // Import Suspense and lazy
+import { Suspense, lazy, } from 'react'; // Import Suspense and lazy
 import Loading from './Pages/Common/Loading';
 import Profile from './Components/User/Profile';
 import CheckoutForm from './Pages/User/LandingPage/CheckOutForm';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import SuccessPage from './Pages/User/LandingPage/Success';
-import BookingHistory from './Pages/User/LandingPage/BookingHistory';
-
 
 const stripePromise = loadStripe('pk_test_51QJq7aDRjWHiMHMFbKsTqHRDHPep0XNgdvdjLwN8gWxkZpn2mMKx4fKXm0fQLjusUKKqRfFPzd17w52FH9Koe07800Ce8IksDd');
-
-
 // Lazy loading components
+const HistoryDetailsInAdmin=lazy(()=>(import('./Components/Admin/HistoryDetailsInAdmin')))
+const BookingHistoryInAdmin=lazy(()=>(import('./Components/Admin/BookingHistoryInAdmin')))
+const HistoryDetailsInProvider=lazy(()=>import('./Components/Provider/HistoryDetailsInProvider'))
+const BookingHistoryInProvider=lazy(()=>import('./Components/Provider/BookingHistoryInProvider'))
+const UserHistoryDetails = lazy(() => import('./Components/User/UserHistoryDetails'))
+const BookingHistory = lazy(() => import('./Components/User/BookingHistory'))
+const SuccessPage = lazy(() => import('./Pages/User/LandingPage/Success'))
 const BookingDetails = lazy(() => import('./Components/User/BookingDetails'))
 const EditCouponMgt = lazy(() => import('./Components/Admin/EditCouponMgt'))
 const CouponMgt = lazy(() => import('./Components/Admin/CouponMgt'))
@@ -75,6 +77,7 @@ function App() {
             <Route path='/checkout' element={<Elements stripe={stripePromise}><CheckoutForm /></Elements>} />
             <Route path='/success' element={<SuccessPage />} />
             <Route path='/booking_history' element={<BookingHistory />} />
+            <Route path='/view_details/:bookingId' element={<UserHistoryDetails />} />
 
             {/* ************************************Provider Side*************************** */}
 
@@ -85,6 +88,8 @@ function App() {
             <Route path="/provider/add_car" element={<AddCarMgt />} />
             <Route path="/provider/cars" element={<CarMgt />} />
             <Route path="/provider/edit_car/:id" element={<EditCarMgt />} />
+            <Route path="/provider/booking" element={<BookingHistoryInProvider />} />
+            <Route path='/provider/view_details/:bookingId' element={<HistoryDetailsInProvider />} />
 
             {/* *************************************Admin Side**************************** */}
 
@@ -103,6 +108,9 @@ function App() {
             <Route path="/admin/coupon" element={<CouponMgt />} />/
             <Route path="/admin/add_coupon" element={<AddCoupons />} />
             <Route path="/admin/edit_coupons/:id" element={<EditCouponMgt />} />
+            <Route path="/admin/booking" element={<BookingHistoryInAdmin />} />
+            <Route path='/admin/view_details/:bookingId' element={<HistoryDetailsInAdmin />} />
+
           </Routes>
         </Suspense>
       </Router>

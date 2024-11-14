@@ -49,7 +49,7 @@ export class UserController {
                 secure: process.env.NODE_ENV === 'production',
             })
             console.log(res.cookie, "cookie")
-            res.status(200).json({ success: true});
+            res.status(200).json({ success: true });
         }
         catch (error) {
             next(error);
@@ -281,7 +281,7 @@ export class UserController {
             console.log(carExist, "exist car");
 
             if (!carExist) {
-                return res.status(404).json({ message: "Car not found" });
+                return res.status(400).json({ message: "Car not found or car is blockec" });
             }
 
             return res.status(200).json(carExist);
@@ -395,7 +395,7 @@ export class UserController {
             const profileData = req.body.profileData;
             const userId = req.params.id
             // Save the profile using your user service
-            const result = await this.userServices.editProfile(profileData ,userId);
+            const result = await this.userServices.editProfile(profileData, userId);
 
             if (!result) {
                 res.status(500).json({ message: "Error editing profile" });
@@ -416,28 +416,28 @@ export class UserController {
     // ********************************check Address***********************
     async checkAddress(req: Request, res: Response): Promise<void> {
         try {
-           
-            const userId = req.params.id; 
-            const result = await this.userServices.checkAddress(userId); 
-   
+
+            const userId = req.params.id;
+            const result = await this.userServices.checkAddress(userId);
+
             if (!result) {
-                res.status(500).json({ message: "Address not found" }); 
+                res.status(500).json({ message: "Address not found" });
                 return
             }
-    
+
             res.status(200).json({
                 success: true,
                 data: result
             });
-    
+
         } catch (error) {
-            console.error("Error checking address:", error); 
-            res.status(500).json({ message: "Internal server error" }); 
+            console.error("Error checking address:", error);
+            res.status(500).json({ message: "Internal server error" });
         }
     }
-       // ****************************savee Address***********************
+    // ****************************savee Address***********************
 
-       async saveAddress(req: Request, res: Response): Promise<void> {
+    async saveAddress(req: Request, res: Response): Promise<void> {
         try {
             // Extract profileData from the request body
             const addressData = req.body.addressData;
@@ -468,7 +468,7 @@ export class UserController {
             const addressData = req.body.addressData;
             const addressId = req.params.id
             // Save the profile using your user service
-            const result = await this.userServices.editAddress(addressData ,addressId);
+            const result = await this.userServices.editAddress(addressData, addressId);
 
             if (!result) {
                 res.status(500).json({ message: "Error editing address" });
@@ -486,95 +486,161 @@ export class UserController {
             res.status(500).json({ message: "Internal server error" });
         }
     }
-// *************************************fetch coupon******************8
-async fetchCoupon(req:Request,res:Response):Promise<void>{
-    try {
-       
-        const userId = req.params.id
-        // Save the profile using your user service
-        const result = await this.userServices.fetchCoupon(userId);
+    // *************************************fetch coupon******************8
+    async fetchCoupon(req: Request, res: Response): Promise<void> {
+        try {
 
-        if (!result) {
-            res.status(500).json({ message: "Error fetch coupon" });
-            return
+            const userId = req.params.id
+            // Save the profile using your user service
+            const result = await this.userServices.fetchCoupon(userId);
+
+            if (!result) {
+                res.status(500).json({ message: "Error fetch coupon" });
+                return
+            }
+
+            // Successfully saved, return the response
+            res.status(result.status).json(result.data);
+        } catch (error) {
+            console.error("Error fetch coupon:", error);
+            res.status(500).json({ message: "Internal server error" });
         }
-
-        // Successfully saved, return the response
-        res.status(result.status).json(result.data);
-    } catch (error) {
-        console.error("Error fetch coupon:", error);
-        res.status(500).json({ message: "Internal server error" });
     }
-}
 
-//*********************** */ Check offer for Booking**********************
+    //*********************** */ Check offer for Booking**********************
 
-async checkOfferForBooking(req:Request,res:Response):Promise<void>{
-    try {
-       
-        const carName = req.params.car_name
-        const result = await this.userServices.checkOfferForBookiing(carName);
+    async checkOfferForBooking(req: Request, res: Response): Promise<void> {
+        try {
 
-        if (!result) {
-            res.status(500).json({ message: "No Offers" });
-            return
+            const carName = req.params.car_name
+            const result = await this.userServices.checkOfferForBookiing(carName);
+
+            if (!result) {
+                res.status(500).json({ message: "No Offers" });
+                return
+            }
+            res.status(result.status).json(result.data);
+        } catch (error) {
+            console.error("Error fetch coupon:", error);
+            res.status(500).json({ message: "Internal server error" });
         }
-        res.status(result.status).json(result.data);
-    } catch (error) {
-        console.error("Error fetch coupon:", error);
-        res.status(500).json({ message: "Internal server error" });
     }
-}
 
-// *************************save BookingData*********************
-async saveBookingData(req: Request, res: Response): Promise<void> {
-    try {
-        // Extract profileData from the request body
-        const bookingData = req.body.bookingData;
+    // *************************save BookingData*********************
+    async saveBookingData(req: Request, res: Response): Promise<void> {
+        try {
 
-        // Save the profile using your user service
-        const result = await this.userServices.saveBookingData(bookingData);
-
-        if (!result) {
-            res.status(500).json({ message: "Error saving Booking" });
-            return
+            console.log(req.body, "req.body")
+            const bookingData = req.body;
+            const result = await this.userServices.saveBookingData(bookingData);
+            if (!result) {
+                res.status(500).json({ message: "Error saving Booking" });
+                return
+            }
+            res.status(200).json({
+                success: true,
+                message: 'Booking Successfully',
+                data: result
+            });
+        } catch (error) {
+            console.error("Error saving profile:", error);
+            res.status(500).json({ message: "Internal server error" });
         }
-
-        // Successfully saved, return the response
-        res.status(200).json({
-            success: true,
-            message: 'Booking Successfully',
-            data: result
-        });
-    } catch (error) {
-        console.error("Error saving profile:", error);
-        res.status(500).json({ message: "Internal server error" });
     }
-}
 
-// *************************payment for stripe*******************
+    // *************************payment for stripe*******************
 
 
-async  paymentForStripe(req: Request, res: Response): Promise<void> {
-  const { amount } = req.body; // Amount should be in cents for Stripe
+    async paymentForStripe(req: Request, res: Response): Promise<void> {
+        const { amount } = req.body;
+        console.log(req.body, "amount")
+        try {
 
-  try {
-    // Initialize Stripe with your secret key
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+            const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_PRICE_ID as string);
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount, // Amount in cents
-      currency: 'usd', // Set currency based on your preference
-      payment_method_types: ['card'], // Specify the payment method
-    });
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: amount,
+                currency: 'usd',
+                payment_method_types: ['card'],
+            });
+            console.log(paymentIntent, "paymentIntent")
+            res.send({
+                clientSecret: paymentIntent.client_secret,
+            });
+        } catch (error) {
+            console.error("Error creating payment intent:", error);
+            res.status(500).send({ error: 'Internal Server Error' });
+        }
+    }
+    //  ********************stored userid in coupon********************
+    async userIdInCoupon(req: Request, res: Response): Promise<void> {
+        try {
+            const coupon = req.params.coupon
+            const userId = req.params.userId
+            console.log(coupon, userId, "coupon and userid")
+            const result = await this.userServices.userIdInCoupon(coupon, userId);
+            if (!result) {
+                res.status(500).json({ message: "Error Coupon Updating" });
+                return
+            }
+            res.status(200).json({
+                success: true,
+                data: result
+            });
+        } catch (error) {
+            console.error("Error saving profile:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
 
-    res.send({
-      clientSecret: paymentIntent.client_secret, // Send the client secret to the frontend
-    });
-  } catch (error) {
-    console.error("Error creating payment intent:", error);
-    res.status(500).send({ error: 'Internal Server Error' });
-  }
-}
+    // ******************************get booking history**************************8
+    async getBookingHistory(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = req.params.id
+            console.log(userId,"userid")
+            const result = await this.userServices.getBookingHistory(userId);
+            if (!result) {
+                res.status(500).json({ message: "Error booking history" });
+                return
+            }
+            res.status(200).json(result.data);
+        } catch (error) {
+            console.error("Error saving profile:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+    // ******************************details of specic details**************************8
+    async specificBookingDetails(req: Request, res: Response): Promise<void> {
+        try {
+            const bookingId = req.params.id
+            const status=req.params.status
+            console.log(bookingId,"bookingId")
+            const result = await this.userServices.specificBookingDetails(bookingId);
+            if (!result) {
+                res.status(500).json({ message: "Error booking history" });
+                return
+            }
+            res.status(200).json(result.data);
+        } catch (error) {
+            console.error("Error saving profile:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
 
+    // *********************cancel booking By user**********************
+    async cancelBookingByUser(req:Request,res:Response):Promise<void>{
+        try {
+            const bookingId = req.params.id
+            console.log(bookingId,"bookingId")
+            const result = await this.userServices.cancelBookingByUser(bookingId);
+            if (!result) {
+                res.status(500).json({ message: "Error Cancel Boooking" });
+                return
+            }
+            res.status(200).json(result.data);
+        } catch (error) {
+            console.error("Error cancel booking:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
 }

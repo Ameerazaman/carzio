@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaUser, FaCar, FaCog, FaSignOutAlt } from 'react-icons/fa';
+import { FaUser, FaCar, FaCog, FaSignOutAlt, FaCalendarAlt } from 'react-icons/fa';
 
 function Sidebar() {
   return (
@@ -22,6 +22,12 @@ function Sidebar() {
           <a href="/settings" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-200">
             <FaCog className="mr-2" />
             Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="/provider/booking" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-200">
+          <FaCalendarAlt className="mr-2" /> 
+            Booking
           </a>
         </li>
         <li>

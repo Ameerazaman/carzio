@@ -32,7 +32,7 @@ const providerProfileModel = new mongoose.Schema({
         type: Number, // Keep as Number
 
     }
-});
+},{timestamps:true});
 
 const providerProfile = mongoose.model('providerAddress', providerProfileModel);
 

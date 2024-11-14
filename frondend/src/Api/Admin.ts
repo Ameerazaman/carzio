@@ -444,7 +444,43 @@ const updateStatusCoupon = async (id: string) => {
 
     }
 }
+  // ****************************Booking Page ***************************
+  const getBookingHistory=async()=>{
+    try {
+        console.log("booking history")
+        const result = await adminAPI.get(`/admin/booking_history`);
+        return result;
+    } catch (error) {
+        console.error("API Error:", error);
+        errorHandler(error as Error);
+        throw error;
+    }
+}
 
+// ****************************booking details of specilf order***************
+const specificBookingDetails=async(bookingId:string)=>{
+    try {
+        const result = await adminAPI.get(`/admin/details_of_specifc_order/${bookingId}`);
+        return result;
+    } catch (error) {
+        console.error("API Error:", error);
+        errorHandler(error as Error);
+        throw error;
+    }
+}
+
+// ****************************cancel booking by user**********************
+const updateStatusOfBooking =async(bookingId:string,status:string)=>{
+    try {
+        const result = await adminAPI.get(`/admin/update_status/${bookingId}/${status}`);
+        return result;
+    } catch (error) {
+        console.error("API Error:", error);
+        errorHandler(error as Error);
+        throw error;
+    }
+}
+  
 
 export {
     adminLogout,
@@ -472,5 +508,8 @@ export {
     fetchCoupon,
     editCoupon,
     updateCoupon,
-    updateStatusCoupon
+    updateStatusCoupon,
+    getBookingHistory,
+    specificBookingDetails,
+    updateStatusOfBooking
 }

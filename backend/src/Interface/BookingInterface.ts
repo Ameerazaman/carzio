@@ -1,5 +1,4 @@
 
-
 export interface BookingInterface {
     IssueDate: string;
     ReturnDate: string;
@@ -11,10 +10,11 @@ export interface BookingInterface {
     UserAddressId: string;
     Coupon?: string;
     PickUpTime: string;
-    TotalOffersDeduction?: number; 
-    CouponDeduction?: number; 
-    AmtOnDays:number,
-    status:string
+    TotalOffersDeduction?: number;
+    CouponDeduction?: number;
+    AmtOnDays: number,
+    status?: string,
+    providerId?: string
     }
     
     

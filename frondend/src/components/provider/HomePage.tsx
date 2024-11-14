@@ -1,8 +1,9 @@
 // HomePage.jsx
 import React from 'react';
 import Navbar from '../../Pages/Common/Navbar';
-import Sidebar from '../../Pages/Provider/Sidebar';
+
 import ProfilePage from '../../Pages/Provider/ProfilePage';
+import Sidebar from '../../Pages/Provider/Sidebar';
 
 function HomePage() {
   return (

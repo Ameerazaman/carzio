@@ -35,4 +35,10 @@ userRouter.get('/fetch_coupon/:id', userAuth, async (req, res) => userController
 userRouter.get('/fetch_offer/:car_name', userAuth, async (req, res) => userController.checkOfferForBooking(req, res));
 userRouter.post('/booking_confirm', userAuth, async (req, res) => userController.saveBookingData(req, res));
 userRouter.post('/create-payment-intent',userAuth,async(req,res)=>userController.paymentForStripe(req,res))
+userRouter.post('/userid_in_coupon/:coupon/:userId',userAuth,async(req,res)=>userController.userIdInCoupon(req,res))
+userRouter.get('/bookibg_history/:id',userAuth,async(req,res)=>userController.getBookingHistory(req,res))
+userRouter.get('/details_of_specifc_order/:id',userAuth,async(req,res)=>userController.specificBookingDetails(req,res))
+userRouter.get('/cancel_booking/:id',userAuth,async(req,res)=>userController.cancelBookingByUser(req,res))
+
 export default userRouter;
+

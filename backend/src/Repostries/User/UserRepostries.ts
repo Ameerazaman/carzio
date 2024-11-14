@@ -13,6 +13,8 @@ import BookingModel from '../../Model/User/BookingModel';
 import { Otp } from '../../Model/User/OtpModel';
 import UserProfileModel from '../../Model/User/ProfileModel';
 import userModel from '../../Model/User/UserModel';
+import mongoose from 'mongoose';
+
 
 interface UserLoginResponse {
     exists: boolean;
@@ -113,11 +115,7 @@ export class UserRepository {
     // ***********************************Car Details *************************
     async carDetails(carId: string): Promise<CarDataInterface | null> {
         try {
-            // Log the providerId to ensure it's passed correctly
-            console.log(carId, "provider in editUser");
-
-            // Pass userId directly to findById (no need for an object)
-            let car = await CarModel.findById(carId);
+            let car = await CarModel.findOne({ _id: carId, isBlocked: false });
 
             console.log(car, "check");
 
@@ -353,14 +351,11 @@ export class UserRepository {
     async checkOfferForBooking(carName: string): Promise<OfferDataInterface | null> {
         try {
             console.log(carName, "carname")
-            // const offer = await Offer.findOne({
-            //     carName: { $regex: new RegExp(`^${carName}$`, "i") }, // 'i' makes it case-insensitive
-            //     isActive: true
-            // });
+
             const offer = await Offer.findOne({
-                carName: { $regex: new RegExp(`^${carName}$`, 'i') }, 
-              });
-              
+                carName: { $regex: new RegExp(`^${carName}$`, 'i') },
+            });
+
 
             console.log(offer, "offer")
             if (offer) {
@@ -383,4 +378,120 @@ export class UserRepository {
             return null; // Return null if there's an error
         }
     }
+    // **********************update userid in coupon ***********************
+    async userIdInCoupon(couponCode: string, userId: string): Promise<CouponInterface | null> {
+        try {
+            console.log("coupon code:", couponCode, userId);
+            const updatedCoupon = await Coupon.findOneAndUpdate(
+                { code: couponCode },
+                { $push: { userId: userId } },
+                { new: true }
+            ) as CouponInterface
+
+            if (updatedCoupon) {
+                return updatedCoupon;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error updating coupon userId:", (error as Error).message);
+            return null;  // Return null in case of error
+        }
+    }
+
+    // ***************************booking history*****************
+
+
+
+    async getBookingHistory(userId: string): Promise<BookingInterface[] | null> {
+        try {
+            console.log(userId, "userId in get booking history");
+
+            const bookingHistory = await BookingModel.aggregate([
+                { $match: { UserId: userId } },
+                {
+                    $addFields: {
+                        CarsObjectId: { $toObjectId: "$CarsId" } // Convert CarsId string to ObjectId
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'carmodels', // Collection name for CarModel (Mongoose pluralizes by default)
+                        localField: 'CarsObjectId', // Use the converted ObjectId field
+                        foreignField: '_id',
+                        as: 'bookingDetails',
+                    },
+                },
+                { $unwind: '$bookingDetails' } // Flatten the bookingDetails array
+            ]);
+
+            console.log(bookingHistory, "booking history");
+            return bookingHistory.length ? bookingHistory : null;
+        } catch (error) {
+            console.error("Error fetching booking history with car details:", (error as Error).message);
+            return null;
+        }
+    }
+    // ***************************specific booking details*****************
+
+
+
+    async specificBookingDetails(bookingId: string): Promise<BookingInterface | null> {
+        try {
+            console.log(bookingId, "bookingId in get booking history");
+
+            // Convert bookingId to an ObjectId
+            const objectId = new mongoose.Types.ObjectId(bookingId);
+
+            const bookingHistory = await BookingModel.aggregate([
+                { $match: { _id: objectId } }, // Match the specific booking by ObjectId
+                {
+                    $addFields: {
+                        CarsObjectId: { $toObjectId: "$CarsId" }, // Convert CarsId to ObjectId
+                        UserAddressObjectId: { $toObjectId: "$UserAddressId" } // Convert UserAddressId to ObjectId
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'carmodels', // Collection name for CarModel
+                        localField: 'CarsObjectId',
+                        foreignField: '_id',
+                        as: 'bookingDetails'
+                    }
+                },
+                { $unwind: '$bookingDetails' }, // Flatten bookingDetails array
+                {
+                    $lookup: {
+                        from: 'useraddressmodels', // Collection name for UserAddress
+                        localField: 'UserAddressObjectId',
+                        foreignField: '_id',
+                        as: 'userAddress'
+                    }
+                },
+                { $unwind: '$userAddress' } // Flatten userAddress array
+            ]);
+
+            console.log(bookingHistory, "booking history");
+            return bookingHistory[0] || null; // Return the first matched result or null if none found
+        } catch (error) {
+            console.error("Error fetching booking history with car and address details:", (error as Error).message);
+            return null;
+        }
+    }
+
+    // *******************************update status for booking*****************
+    
+    async cancelBookingByUser(bookingId: string): Promise<BookingInterface | null> {
+        try {
+            const updatedBooking = await BookingModel.findByIdAndUpdate(
+                bookingId, 
+                { status: 'Cancelled' }, 
+                { new: true } 
+            );
+            return updatedBooking as BookingInterface
+        } catch (error) {
+            console.error("Error fetching booking history with car and address details:", (error as Error).message);
+            return null;
+        }
+    }
+
 }

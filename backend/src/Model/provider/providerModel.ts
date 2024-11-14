@@ -21,9 +21,6 @@ const providerSchema = new mongoose.Schema({
   image:{
     type:String
   }
-
-});
-
+},{timestamps:true});
 const providerModel = mongoose.model('providerModel', providerSchema);
-
 export default providerModel;

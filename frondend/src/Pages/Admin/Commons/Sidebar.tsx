@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaTachometerAlt, FaCar, FaUser, FaCog, FaBell, FaTags, FaTicketAlt} from 'react-icons/fa';
+import { FaTachometerAlt, FaCar, FaUser, FaCog, FaBell, FaTags, FaTicketAlt, FaCalendarAlt} from 'react-icons/fa';
 
 
 
@@ -42,6 +42,12 @@ function Sidebar() {
           <a href="/admin/offers" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-300 transform hover:scale-105 shadow-md">
             <FaTags className="mr-2" />
             Offer
+          </a>
+        </li>
+        <li>
+          <a href="/admin/booking" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-300 transform hover:scale-105 shadow-md">
+          <FaCalendarAlt className="mr-2" />
+            Booking
           </a>
         </li>
         <li>

@@ -522,7 +522,141 @@ export class UserServices {
             };
         }
     }
+    // **********************************updated userId i coupon*****************
+    async userIdInCoupon(coupon: string, userId: string): Promise<CouponAuthResponse | undefined> {
+        try {
+            const updateCoupon = await this.userRepository.userIdInCoupon(coupon, userId);
+            console.log(updateCoupon, "fetch updateCoupon services");
+            if (updateCoupon) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        data: updateCoupon,
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error fetching updateCoupon:", (error as Error).message);
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
 
+    // ************************* booking page************************
+
+    async getBookingHistory(userId: string): Promise<BookingAuthResponse | undefined> {
+        try {
+            console.log("getbooking history", userId)
+            const bookingHistory = await this.userRepository.getBookingHistory(userId);
+            if (bookingHistory) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        data: bookingHistory,
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "Booking history is not get"
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error fetching updateCoupon:", (error as Error).message);
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
+    // ************************* specif booking details************************
+
+    async specificBookingDetails(bookingId: string): Promise<BookingAuthResponse | undefined> {
+        try {
+            console.log("getbooking history", bookingId)
+            const bookingHistory = await this.userRepository.specificBookingDetails(bookingId);
+            if (bookingHistory) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        data: bookingHistory,
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "Booking history is not get"
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error fetching updateCoupon:", (error as Error).message);
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
+
+    // *******************************update status for booking*****************
+
+    async cancelBookingByUser(bookingId: string): Promise<BookingAuthResponse | undefined> {
+        try {
+            console.log("update booking status", bookingId)
+            const updateStatus = await this.userRepository.cancelBookingByUser(bookingId);
+            if (updateStatus) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        data: updateStatus,
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "Boking cancel not working"
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error fetching updateCoupon:", (error as Error).message);
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
 
 }
-

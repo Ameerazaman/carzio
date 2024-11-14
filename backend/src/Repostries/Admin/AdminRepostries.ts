@@ -12,7 +12,9 @@ import CarModel from "../../Model/Provider/CarModel";
 import { OfferDataInterface } from "../../Interface/OfferInterface";
 import Coupon from "../../Model/Admin/CouponModel";
 import { CouponInterface } from "../../Interface/CouponInterface";
-import { ObjectId } from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
+import { BookingInterface } from "../../Interface/BookingInterface";
+import BookingModel from "../../Model/User/BookingModel";
 // Assuming OtpDocument is defined for the Otp schema
 interface UserDocument extends Document {
   email: string;
@@ -652,12 +654,12 @@ export class AdminRepository {
     try {
 
       let coupon = await Coupon.findById(couponId);
-  
+
       if (!coupon) {
         return null;
       }
-  
-   
+
+
       const updateCoupon = await Coupon.findByIdAndUpdate(
         couponId,
         { isActive: !coupon.isActive },
@@ -676,12 +678,98 @@ export class AdminRepository {
           id: updateCoupon._id.toString(),
         } as CouponInterface;
       }
-  
+
       return null;
     } catch (error) {
       console.error("Error updating car status:", error);
       return null;
     }
   }
-  
+  // ***************************booking history*****************
+
+ async getBookingHistory(): Promise<BookingInterface[] | null> {
+  try {
+      const bookingHistory = await BookingModel.aggregate([
+          {
+              $addFields: {
+                  CarsObjectId: { $toObjectId: "$CarsId" } 
+              }
+          },
+          {
+              $lookup: {
+                  from: 'carmodels', 
+                  localField: 'CarsObjectId',
+                  foreignField: '_id',
+                  as: 'bookingDetails',
+              },
+          },
+          { $unwind: '$bookingDetails' } 
+      ]);
+      console.log(bookingHistory, "booking history");
+      return bookingHistory.length ? bookingHistory : null;
+  } catch (error) {
+      console.error("Error fetching booking history with car details:", (error as Error).message);
+      return null;
+  }
+}
+  // / ***************************specific booking details*****************
+
+  async specificBookingDetails(bookingId:string): Promise<BookingInterface | null> {
+    try {
+       // Convert bookingId to an ObjectId
+      const objectId = new mongoose.Types.ObjectId(bookingId);
+
+      const bookingHistory = await BookingModel.aggregate([
+        { $match: { _id: objectId } }, 
+        {
+          $addFields: {
+            CarsObjectId: { $toObjectId: "$CarsId" }, // Convert CarsId to ObjectId
+            UserAddressObjectId: { $toObjectId: "$UserAddressId" } // Convert UserAddressId to ObjectId
+          }
+        },
+        {
+          $lookup: {
+            from: 'carmodels', // Collection name for CarModel
+            localField: 'CarsObjectId',
+            foreignField: '_id',
+            as: 'bookingDetails'
+          }
+        },
+        { $unwind: '$bookingDetails' }, // Flatten bookingDetails array
+        {
+          $lookup: {
+            from: 'useraddressmodels', // Collection name for UserAddress
+            localField: 'UserAddressObjectId',
+            foreignField: '_id',
+            as: 'userAddress'
+          }
+        },
+        { $unwind: '$userAddress' } // Flatten userAddress array
+      ]);
+
+      console.log(bookingHistory, "booking history");
+      return bookingHistory[0] || null; // Return the first matched result or null if none found
+    } catch (error) {
+      console.error("Error fetching booking history with car and address details:", (error as Error).message);
+      return null;
+    }
+  }
+  //  // *******************************update status for booking*****************
+
+  async updateStatusOfBooking(bookingId: string, status: string): Promise<BookingInterface | null> {
+    try {
+      const updatedBooking = await BookingModel.findByIdAndUpdate(
+        bookingId,
+        { status: status },
+        { new: true }
+      );
+      return updatedBooking as BookingInterface
+    } catch (error) {
+      console.error("Error fetching booking history with car and address details:", (error as Error).message);
+      return null;
+
+
+    }
+
+  }
 }

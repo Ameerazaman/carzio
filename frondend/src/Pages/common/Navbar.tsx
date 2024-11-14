@@ -48,13 +48,13 @@ function Navbar() {
 
             userLogout().then(() => console.log(''))
             dispatch(signOut());
-          
+
             navigate('/')
           }
           else if (provider) {
             providerLogout().then(() => console.log(''))
             dispatch(signOutProvider());
-        
+
             navigate('/')
           }
 
@@ -94,12 +94,12 @@ function Navbar() {
             </div>
           ) : ( // If user is not null, show username and logout link
             <div className="relative z-10 space-x-6 flex items-center">
-             
+
               <Link to='/profile'>
-              <span className="text-white flex items-center">
-                <FaUser className="mr-2" /> {/* User Icon */}
-                {user ? user.username : provider?.username}{/* Show username */}
-              </span>
+                <span className="text-white flex items-center">
+                  <FaUser className="mr-2" /> {/* User Icon */}
+                  {user ? user.username : provider?.username}{/* Show username */}
+                </span>
               </Link>
               {/* Use an inline function to call logoutUser */}
               <a
@@ -152,6 +152,10 @@ function Navbar() {
               <a href="/provider/login">Provider Signup</a>
             </button> : ""
           }
+          {provider ?
+            <button className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition duration-300">
+              <a href="/provider/Home">Provider Home</a>
+            </button>:""}
         </div>
       </nav>
       {user ? (
@@ -162,7 +166,7 @@ function Navbar() {
               <a href="/booking_history" className="text-white hover:text-red-400 transition duration-300 font-semibold">History</a>
               <a href="/carList" className="text-white hover:text-red-400 transition duration-300 font-semibold">Cars</a>
               <a href="/offers" className="text-white hover:text-red-400 transition duration-300 font-semibold flex items-center">
-                            
+
                 Offers
               </a>
             </div>

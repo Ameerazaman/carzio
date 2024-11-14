@@ -18,6 +18,7 @@ import { OfferAuthResponse } from '../../Interface/AuthServices/OfferAuthInterfa
 import { generateRandomCouponCode } from '../../Utlis/CouponGenerator';
 import { CouponInterface } from '../../Interface/CouponInterface';
 import { CouponAuthResponse } from '../../Interface/AuthServices/CouponAuthInterface';
+import { BookingAuthResponse } from '../../Interface/AuthServices/BookingAuthInterface';
 
 
 export class AdminServices {
@@ -639,4 +640,107 @@ export class AdminServices {
     }
   }
 
+     // ************************* booking page************************
+
+     async getBookingHistory(): Promise<BookingAuthResponse | undefined> {
+      try {
+          
+          const bookingHistory = await this.adminRepostry.getBookingHistory();
+          if (bookingHistory) {
+              return {
+                  status: OK,
+                  data: {
+                      success: true,
+                      data: bookingHistory,
+                  },
+              };
+          } else {
+              return {
+                  status: BAD_REQUEST,
+                  data: {
+                      success: false,
+                      message: "Booking history is not get"
+                  },
+              };
+          }
+      } catch (error) {
+          console.error("Error fetching updateCoupon:", (error as Error).message);
+          return {
+              status: INTERNAL_SERVER_ERROR,
+              data: {
+                  success: false,
+                  message: 'Internal server error',
+              },
+          };
+      }
+  }
+  // ************************* specif booking details************************
+
+  async specificBookingDetails(bookingId: string): Promise<BookingAuthResponse | undefined> {
+      try {
+          console.log("getbooking history", bookingId)
+          const bookingHistory = await this.adminRepostry.specificBookingDetails(bookingId);
+          if (bookingHistory) {
+              return {
+                  status: OK,
+                  data: {
+                      success: true,
+                      data: bookingHistory,
+                  },
+              };
+          } else {
+              return {
+                  status: BAD_REQUEST,
+                  data: {
+                      success: false,
+                      message: "Booking history is not get"
+                  },
+              };
+          }
+      } catch (error) {
+          console.error("Error fetching updateCoupon:", (error as Error).message);
+          return {
+              status: INTERNAL_SERVER_ERROR,
+              data: {
+                  success: false,
+                  message: 'Internal server error',
+              },
+          };
+      }
+  }
+  // *******************************update status for booking*****************
+
+  async updateStatusOfBooking(bookingId: string, status: string): Promise<BookingAuthResponse | undefined> {
+      try {
+          console.log("update booking status", bookingId)
+          const updateStatus = await this.adminRepostry.updateStatusOfBooking(bookingId, status);
+          if (updateStatus) {
+              return {
+                  status: OK,
+                  data: {
+                      success: true,
+                      data: updateStatus,
+                  },
+              };
+          } else {
+              return {
+                  status: BAD_REQUEST,
+                  data: {
+                      success: false,
+                      message: "Status updation is failed"
+                  },
+              };
+          }
+      } catch (error) {
+          console.error("Error fetching updateCoupon:", (error as Error).message);
+          return {
+              status: INTERNAL_SERVER_ERROR,
+              data: {
+                  success: false,
+                  message: 'Internal server error',
+              },
+          };
+      }
+  }
 }
+

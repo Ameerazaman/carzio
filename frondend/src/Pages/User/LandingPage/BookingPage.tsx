@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { FaCalendarAlt, FaCalendarCheck, FaMoneyBillWave } from 'react-icons/fa';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../App/Store';
 import { User } from '../../Common/Navbar';
-import { carDetail, checkOffer, fetchCoupon, checkAddress, BookingConfirm, } from '../../../Api/User';
+import { carDetail, checkOffer, fetchCoupon, checkAddress, BookingConfirm } from '../../../Api/User';
 import { BookingFormData } from '../../../Interface/BookingInterface';
 import { CarDataInterface } from '../../../Interface/CarInterface';
 import { CouponFormData } from '../../../Interface/CouponFormData';
@@ -13,6 +12,7 @@ import { AddressInterface } from '../../../Interface/AddressInterface';
 import AddressMgtInBooking from './AddressMgtInBooking';
 import { OfferFormData } from '../../../Interface/OfferInterface';
 import toast from 'react-hot-toast';
+import { MdError } from 'react-icons/md';
 
 interface BookingDetails {
   date: string;
@@ -21,16 +21,16 @@ interface BookingDetails {
 }
 
 function BookingPage() {
-const navigate=useNavigate()
+  const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.user.currentUser) as User | null;
   const { carId } = useParams<string>();
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<BookingDetails | null>(null);
-  const [carData, setCarData] = useState<CarDataInterface | null>(null)
-  const [isEditing, setIsEditing] = useState(false)
-  const [offerData, setOfferData] = useState<OfferFormData | null>(null)
-  const [couponData, setCouponData] = useState<CouponFormData[] | null>(null)
+  const [carData, setCarData] = useState<CarDataInterface | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [offerData, setOfferData] = useState<OfferFormData | null>(null);
+  const [couponData, setCouponData] = useState<CouponFormData[] | null>(null);
   const [formData, setFormData] = useState({
     IssueDate: '',
     ReturnDate: '',
@@ -42,12 +42,12 @@ const navigate=useNavigate()
     UserAddressId: '',
     CouponAmt: 0,
     Coupon: '',
-    ManualCoupon: '',
+    ProviderId: '',
     PickUpTime: '',
     offerAmt: 0,
     rentDays: 1,
     total_Amt: 0,
-    AmtOndays: 0
+    AmtOnDays: 0,
   });
 
   useEffect(() => {
@@ -58,20 +58,20 @@ const navigate=useNavigate()
           const result = await carDetail(carId);
           console.log(result?.data, "result car data");
 
-          // Set carData with fetched data
           const carDetails = result?.data;
           setCarData(carDetails);
 
           if (carDetails) {
             setFormData((prevData) => {
-              const rentalPrice = carDetails.rentalPrice ?? 0; // Use 0 if rentalPrice is undefined
+              const rentalPrice = carDetails.rentalPrice ?? 0;
               const rentDays = prevData.rentDays || 1;
 
               return {
                 ...prevData,
                 Amount: rentalPrice,
-                AmtOndays: rentDays * rentalPrice,
-                total_Amt: rentalPrice,  // Ensure total_Amt is a number
+                AmtOnDays: rentDays * rentalPrice,
+                total_Amt: rentalPrice,
+                ProviderId: carDetails.providerId,
               };
             });
           }
@@ -84,41 +84,37 @@ const navigate=useNavigate()
     };
 
     fetchCarData();
-  }, [carId]);  // Only depend on carId
+  }, [carId]);
 
   useEffect(() => {
     const fetchCouponAndOfferData = async () => {
       try {
         setLoading(true);
 
-        // Ensure user and carData are available before fetching data
         if (user?._id && carData?.car_name) {
 
-          // Fetch coupon data
           const couponData = await fetchCoupon(user?._id);
-          setCouponData(couponData?.data?.data);
-          console.log(couponData, "couponData");
+          const couponsArray = couponData?.data?.data || [];
 
-          // Fetch offer data and access discountPercentage
+          const validCoupons = couponsArray.filter(
+            (coupon: CouponFormData) => formData.AmtOnDays >= coupon.minRentalAmount
+          );
+
+          if (validCoupons.length > 0) {
+            setCouponData(validCoupons);
+          }
+
           const offerData = await checkOffer(carData.car_name);
-          console.log(offerData?.data?.data?.data, "result offerData");
-
           if (offerData?.data?.data) {
-            const offer = offerData?.data?.data;  // Assuming the offer data is in 'data.data' path
-            console.log(offer, "offer data");
-
-            // Access discountPercentage from offerData and handle missing data
+            const offer = offerData.data.data;
             const discountPercentage = offer.discountPercentage || 0;
-            console.log(discountPercentage, "discountPercentage");
-
-            // Update the form data with the offer amount calculation
             setFormData((prevData) => ({
               ...prevData,
-              offerAmt: (discountPercentage * prevData.AmtOndays) / 100,  // Ensure calculation is correct
+              offerAmt: (discountPercentage * prevData.AmtOnDays) / 100,
             }));
+
           }
         }
-
       } catch (err: any) {
         console.error("Error fetching coupon and offer data:", err);
       } finally {
@@ -126,46 +122,34 @@ const navigate=useNavigate()
       }
     };
 
-    // Call the function
     fetchCouponAndOfferData();
-  }, [user, carData?.car_name]);  // Dependencies: runs when user or carData changes
-  // Depend on carData and user._id
-
-
-
+  }, [user, carData?.car_name, formData.AmtOnDays]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => {
       const updatedData = { ...prevData, [name]: value };
 
-      // Calculate rental days if both IssueDate and ReturnDate are provided
       if (name === 'IssueDate' || name === 'ReturnDate') {
         const { IssueDate, ReturnDate } = updatedData;
         if (IssueDate && ReturnDate) {
           const issueDate = new Date(IssueDate);
           const returnDate = new Date(ReturnDate);
           const timeDifference = returnDate.getTime() - issueDate.getTime();
-          const daysDifference = Math.max(Math.ceil(timeDifference / (1000 * 3600 * 24)), 1); // Minimum 1 day
+          const daysDifference = Math.max(Math.ceil(timeDifference / (1000 * 3600 * 24)), 1);
           updatedData.rentDays = daysDifference;
-          updatedData.AmtOndays = updatedData.rentDays * updatedData.Amount
-
+          updatedData.AmtOnDays = updatedData.rentDays * updatedData.Amount;
         }
-
       }
-      console.log(updatedData, "updatedData")
+
       return updatedData;
     });
   };
 
-
-
-  // *************************validation for form submission**************
   const validateFormData = () => {
     const errors: { [key: string]: string } = {};
-    const today = new Date().toISOString().split("T")[0]; // Today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split("T")[0];
 
-    // Date validations
     if (!formData.IssueDate) {
       errors.IssueDate = "Issue Date is required.";
     } else if (formData.IssueDate <= today) {
@@ -180,7 +164,6 @@ const navigate=useNavigate()
       errors.ReturnDate = "Return Date must be after Issue Date.";
     }
 
-    // Other validations
     if (formData.Amount <= 0) errors.Amount = "Amount must be greater than zero.";
     if (!formData.Payment) errors.Payment = "Payment method is required.";
     if (!formData.AdhaarNo || formData.AdhaarNo.length !== 12) errors.AdhaarNo = "Aadhaar number must be 12 digits.";
@@ -196,9 +179,9 @@ const navigate=useNavigate()
     return errors;
   };
 
-  // ***************************save form*****************
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const errors = validateFormData();
     setFormErrors(errors);
 
@@ -206,29 +189,32 @@ const navigate=useNavigate()
       toast.error("Please fix the errors before submitting.");
       return;
     }
-  if(formData.Payment==="Online payment"){
-    setFormData((prevaData) => {
-      return {
-        ...prevaData,
-        total_Amt: prevaData.AmtOndays - prevaData.offerAmt - prevaData.CouponAmt,
-        status:"pending"
-      }
-    })
-    navigate('/checkOut')
-  }
-    setFormData((prevaData) => {
-      return {
-        ...prevaData,
-        total_Amt: prevaData.AmtOndays - prevaData.offerAmt - prevaData.CouponAmt,
-        status:"pending"
-      }
-    })
-    const result=await BookingConfirm(formData)
-    console.log("Form submitted successfully:", formData);
-    // Proceed with submission logic
+
+    const adjustedFormData = {
+      ...formData,
+      UserId: formData.UserId || '',
+      CarsId: formData.CarsId || '',
+      providerId: carData?.providerId || '',
+      total_Amt: formData.AmtOnDays - formData.offerAmt - formData.CouponAmt,
+      status: "pending",
+    };
+
+    if (formData.Payment === "Online payment") {
+      adjustedFormData.status = "success"
+      navigate('/checkOut', { state: { bookingData: adjustedFormData } });
+      return;
+    }
+
+    try {
+      const result = await BookingConfirm(adjustedFormData);
+      navigate('/success');
+      console.log("Form submitted successfully:", result);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast.error("Error submitting form. Please try again.");
+    }
   };
 
-  // ************8adrress id setting in form Data*************
   const handleAddressId = (id: string) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -236,13 +222,12 @@ const navigate=useNavigate()
     }));
   };
 
-  // ********************applay Coupon************
   const handleCouponApply = () => {
     if (couponData && Array.isArray(couponData)) {  // Check if couponData is not null
       const selectedCoupon = couponData.find((coupon) => coupon.code === formData.Coupon);
 
       if (selectedCoupon) {
-        const discountAmount = (selectedCoupon.discountPercentage / 100) * formData.AmtOndays;
+        const discountAmount = (selectedCoupon.discountPercentage / 100) * formData.AmtOnDays;
         console.log(discountAmount, "discount")
         setFormData((prevData) => {
           const newTotalAmt = prevData.Amount * prevData.rentDays - discountAmount; // Calculate the new total amount
@@ -266,9 +251,22 @@ const navigate=useNavigate()
 
 
 
+  if (!carData) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center">
+        <MdError className="text-red-500 text-6xl mb-4" />
+        <p className="text-red-500 text-2xl font-semibold">
+          Car Not Found or Blocked
+        </p>
+        <p className="text-gray-500 mt-2">
+          We're sorry, but the car you're looking for is either unavailable or has been blocked.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-100 via-blue-200 to-blue-100 p-4">
+    <div className="flex justify-center items-center min-h-screen via-blue-200 to-blue-100 p-4">
       <form onSubmit={handleSubmit} className="flex flex-wrap w-full max-w-5xl bg-white shadow-lg rounded-2xl p-8">
         {/* Left Side: Car Image and Booking Details */}
         <div className="w-full md:w-1/2 pr-6 flex flex-col space-y-6">
@@ -277,7 +275,7 @@ const navigate=useNavigate()
             <div>
               <h2 className="text-2xl font-bold text-gray-800 mb-4">{carData?.car_name}</h2>
               <div className="space-y-3">
-                {/* Issue Date Input */}{formData.AmtOndays}
+                {/* Issue Date Input */}
                 <div key="IssueDate" className="relative">
                   <input
                     type="date"
@@ -351,35 +349,36 @@ const navigate=useNavigate()
           <div>
             <AddressMgtInBooking onAddressIdChange={handleAddressId} />
           </div>
-          <div className="bg-white rounded-lg shadow-lg p-6 space-y-4">
-            <label className="block text-lg font-semibold text-gray-800">Coupon Code:</label>
-            <div className="flex items-center space-x-4">
-              <select
-                name="Coupon"
-                value={formData?.Coupon}
-                onChange={handleChange}
-                className="p-2 text-sm border border-gray-300 rounded-lg shadow-sm w-full md:w-2/3"
-              >
-                <option value="">Select Coupon</option>
-                {Array.isArray(couponData) && couponData.map((coupon) => (
-                  <option key={coupon.code} value={coupon.code}>
-                    {coupon.code} - {coupon.discountPercentage}% Off
-                  </option>
-                ))}
-              </select>
+          {couponData &&
+            <div className="bg-white rounded-lg shadow-lg p-6 space-y-4">
+              <label className="block text-lg font-semibold text-gray-800">Coupon Code:</label>
+              <div className="flex items-center space-x-4">
+                <select
+                  name="Coupon"
+                  value={formData?.Coupon}
+                  onChange={handleChange}
+                  className="p-2 text-sm border border-gray-300 rounded-lg shadow-sm w-full md:w-2/3"
+                >
+                  <option value="">Select Coupon</option>
+                  {Array.isArray(couponData) && couponData.map((coupon) => (
+                    <option key={coupon.code} value={coupon.code}>
+                      {coupon.code} - {coupon.discountPercentage}% Off
+                    </option>
+                  ))}
+                </select>
 
-              <button
-                type="button"
-                onClick={handleCouponApply}
-                className="ml-4 p-2 bg-green-500 text-white text-sm font-medium rounded-lg hover:bg-green-600"
-              >
-                Apply
-              </button>
-              {formErrors.Coupon && <p className="text-red-500">{formErrors.Coupon}</p>}
+                <button
+                  type="button"
+                  onClick={handleCouponApply}
+                  className="ml-4 p-2 bg-green-500 text-white text-sm font-medium rounded-lg hover:bg-green-600"
+                >
+                  Apply
+                </button>
+                {formErrors.Coupon && <p className="text-red-500">{formErrors.Coupon}</p>}
 
+              </div>
             </div>
-          </div>
-
+          }
         </div>
         {/* Right Side: Payment and Coupon Code */}
         <div className="w-full md:w-1/2 pl-6 flex flex-col space-y-6 mt-8 md:mt-0">
@@ -435,7 +434,7 @@ const navigate=useNavigate()
               <span className="text-lg text-gray-800">Total Amount</span>
               <span className="text-lg text-blue-600">
 
-                ₹{(formData.AmtOndays || 0) - (formData.CouponAmt || 0) - (formData.offerAmt || 0)}
+                ₹{(formData.AmtOnDays || 0) - (formData.CouponAmt || 0) - (formData.offerAmt || 0)}
                 {formErrors.total_Amt && <p className="text-red-500">{formErrors.total_Amt}</p>}
 
               </span>

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../../Pages/Common/Navbar';
-import Sidebar from '../../Pages/Provider/Sidebar';
+
 import CarMgtTable from '../../Pages/Provider/CarMgtTable';
 import { carManagement } from '../../Api/Provider';
+import Sidebar from '../../Pages/Provider/Sidebar';
 
 function CarMgt() {
     const [tableData, setTableData] = useState<Array<{ [key: string]: any }>>([]);

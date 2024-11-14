@@ -507,4 +507,54 @@ export class ProviderController {
             return res.status(500).json({ message: "Internal server error" });
         }
     }
+    
+    // ******************************get booking history**************************8
+    async getBookingHistory(req: Request, res: Response): Promise<void> {
+        try {
+            const providerId = req.params.id
+            console.log(providerId,"providerId")
+            const result = await this.providerServices.getBookingHistory(providerId);
+            if (!result) {
+                res.status(500).json({ message: "Error booking history" });
+                return
+            }
+            res.status(200).json(result.data);
+        } catch (error) {
+            console.error("Error saving profile:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+    // ******************************details of specic details**************************8
+    async specificBookingDetails(req: Request, res: Response): Promise<void> {
+        try {
+            const bookingId = req.params.id
+            console.log(bookingId,"bookingId")
+            const result = await this.providerServices.specificBookingDetails(bookingId);
+            if (!result) {
+                res.status(500).json({ message: "Error booking history" });
+                return
+            }
+            res.status(200).json(result.data);
+        } catch (error) {
+            console.error("Error saving profile:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+  // *********************update Status Of Booking**********************
+  async updateStatusOfBooking(req:Request,res:Response):Promise<void>{
+    try {
+        const bookingId = req.params.id
+        const status=req.params.status
+        console.log(bookingId,"bookingId",status,"status")
+        const result = await this.providerServices.updateStatusOfBooking(bookingId,status);
+        if (!result) {
+            res.status(500).json({ message: "Status updation failed" });
+            return
+        }
+        res.status(200).json(result.data);
+    } catch (error) {
+        console.error("Error cancel booking:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
 }

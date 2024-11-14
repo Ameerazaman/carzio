@@ -3,11 +3,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import toast from 'react-hot-toast';
 import { userApi } from '../../../Services/Axios';
-import { BookingConfirm } from '../../../Api/User';
+import { BookingConfirm, userIdStoredInCoupon } from '../../../Api/User';
 
 
 const CheckoutForm = () => {
-  const navigate=useNavigate()
+  const navigate = useNavigate()
   const location = useLocation();
   const { bookingData } = location.state; // Get form data passed via navigation
   const [loading, setLoading] = useState(false);
@@ -20,11 +20,11 @@ const CheckoutForm = () => {
   useEffect(() => {
     const createPaymentIntent = async () => {
       try {
-        console.log(bookingData,"total Amount")
+        console.log(bookingData, "bookiing data checkout")
         const response = await userApi.post('/create-payment-intent', {
           amount: bookingData.total_Amt, // Convert to cents
         });
-        console.log("response",response)
+
         setPaymentIntent(response.data);
       } catch (error) {
         console.error("Error creating payment intent:", error);
@@ -33,32 +33,36 @@ const CheckoutForm = () => {
 
     createPaymentIntent();
   }, [bookingData]);
+
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    console.log(paymentIntent,"paymentIntent")
-    if (!stripe || !elements || !paymentIntent || !paymentIntent.client_secret) {
-      console.error("Stripe.js has not loaded or payment intent is missing.");
+
+    if (!stripe || !elements || !paymentIntent?.clientSecret) {
+      console.error("Stripe.js has not loaded or payment intent client secret is missing.");
       return;
     }
 
     setLoading(true);
     try {
-      const { client_secret } = paymentIntent;
-      console.log(client_secret, "client secret")
-      const result = await stripe.confirmCardPayment(client_secret, {
+      const { clientSecret } = paymentIntent;
+      const result = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement)!,
         },
       });
-      console.log("Payment Result:", result);
 
       if (result.error) {
         console.error("Payment Error:", result.error.message);
         toast.error("An error occurred during payment.");
       } else if (result.paymentIntent?.status === 'succeeded') {
         toast.success('Payment successful!');
-        const bookingResult = await BookingConfirm(bookingData);
-        navigate('/success')
+        const result=await BookingConfirm(bookingData); 
+        if(result){
+          console.log(bookingData.Coupon,"coupon",bookingData.UserId,"userId")
+          await userIdStoredInCoupon(bookingData.Coupon,bookingData.UserId)
+          navigate('/success');  // Redirect to success page
+        }
       }
     } catch (error) {
       console.error("Error confirming payment:", error);
@@ -67,6 +71,7 @@ const CheckoutForm = () => {
       setLoading(false);
     }
   };
+
 
 
   return (

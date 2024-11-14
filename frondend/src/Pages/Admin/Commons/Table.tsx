@@ -3,6 +3,7 @@ import { FaEdit, FaTrash, FaTrashAlt } from 'react-icons/fa';
 import { editCoupon, editOffer, editProvider, editUser, notificaionDetails, updateStatus, updateStatusCar, updateStatusCoupon, updateStatusOffer, updateStatusProvider } from '../../../Api/Admin';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 interface TableProps {
   tableData: Array<{ [key: string]: any }>;
@@ -37,45 +38,79 @@ const Table: React.FC<TableProps> = ({ tableData: initialTableData, header }) =>
     }
   };
 
+
+
   const handleStatus = async (id: string) => {
     try {
-      console.log("id check", id)
-      let result;
-
-      if (header === "user") {
-        result = await updateStatus(id);
-      } else if (header === "cars") {
-        console.log("Handling car status update");
-        result = await updateStatusCar(id);
-      } else if (header === 'coupons') {
-        console.log("Handling car status update");
-        result = await updateStatusCoupon(id);
-      } else if (header === "offers") {
-        console.log("Handling offer status update");
-        result = await updateStatusOffer(id);
+      // Show confirmation dialog
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to change the status or delete it?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, change status',
+        cancelButtonText: 'No, cancel',
+      });
+  
+      if (result.isConfirmed) {
+        console.log("id check", id);
+        let statusUpdateResult;
+  
+        if (header === "user") {
+          statusUpdateResult = await updateStatus(id);
+        } else if (header === "cars") {
+          console.log("Handling car status update");
+          statusUpdateResult = await updateStatusCar(id);
+        } else if (header === 'coupons') {
+          console.log("Handling car status update");
+          statusUpdateResult = await updateStatusCoupon(id);
+        } else if (header === "offers") {
+          console.log("Handling offer status update");
+          statusUpdateResult = await updateStatusOffer(id);
+        } else {
+          statusUpdateResult = await updateStatusProvider(id);
+        }
+  
+        if (statusUpdateResult) {
+          // Show success alert
+          Swal.fire({
+            title: 'Success!',
+            text: 'Status updated successfully!',
+            icon: 'success',
+            confirmButtonText: 'OK',
+          });
+          if (statusUpdateResult) {
+            setTableData((prevTableData) =>
+              prevTableData.map((data) =>
+                data.id === id
+                  ? {
+                      ...data,
+                      isBlocked: data.hasOwnProperty('isBlocked') ? !data.isBlocked : data.isBlocked,
+                      isActive: data.hasOwnProperty('isActive') ? !data.isActive : data.isActive,
+                    }
+                  : data
+              )
+            );
+          }
+          
+        }
       } else {
-        result = await updateStatusProvider(id);
-      }
-
-      if (result) {
-        setTableData((prevTableData) =>
-          prevTableData.map((data) =>
-            data.id === id
-              ? {
-                  ...data,
-                  isBlocked: data.hasOwnProperty('isBlocked') ? !data.isBlocked : data.isBlocked,
-                  isActive: data.hasOwnProperty('isActive') ? !data.isActive : data.isActive,
-                }
-              : data
-          )
-        );
+        // User canceled the action
+        console.log("Action canceled.");
       }
     } catch (error) {
       console.error("Error updating status:", error);
-
+      
+      // Show error alert
+      Swal.fire({
+        title: 'Error!',
+        text: 'Something went wrong while updating the status.',
+        icon: 'error',
+        confirmButtonText: 'Try Again',
+      });
     }
   };
-
+  
   return (
     <table className="min-w-full bg-white border-collapse">
       <thead>

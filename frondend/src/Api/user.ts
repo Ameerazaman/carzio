@@ -204,11 +204,11 @@ const checkProfile = async (id: string) => {
         errorHandler(error as Error);
     }
 }
-   
+
 // ***********************save profile****************88
 const saveProfileData = async (profileData: ProfileInterface) => {
     try {
-        const result = await userApi.post(userRouter.saveProfile,{profileData})
+        const result = await userApi.post(userRouter.saveProfile, { profileData })
         if (result) {
             return result
         }
@@ -220,7 +220,7 @@ const saveProfileData = async (profileData: ProfileInterface) => {
 }
 
 // *****************Edit Profile********************
-const editProfile = async (profile: ProfileInterface,id:string) => {
+const editProfile = async (profile: ProfileInterface, id: string) => {
     try {
         const result = await userApi.put(`/edit_profile/${id}`)
         if (result) {
@@ -232,11 +232,11 @@ const editProfile = async (profile: ProfileInterface,id:string) => {
     }
 }
 // *********************check Address*******************
-const checkAddress=async(id:string)=>{
+const checkAddress = async (id: string) => {
     try {
         const result = await userApi.get(`/address/${id}`)
         if (result) {
-            console.log(result,"result fetch address")
+            console.log(result, "result fetch address")
             return result
         }
     } catch (error) {
@@ -246,7 +246,7 @@ const checkAddress=async(id:string)=>{
 }
 
 // **************************check offer********************
-const checkOffer=async(carName:string)=>{
+const checkOffer = async (carName: string) => {
     try {
         const result = await userApi.get(`/fetch_offer/${carName}`)
         if (result) {
@@ -258,9 +258,9 @@ const checkOffer=async(carName:string)=>{
     }
 }
 // ************************save address***************8
-const saveAddressData=async(addressData:AddressInterface)=>{
+const saveAddressData = async (addressData: AddressInterface) => {
     try {
-        const result = await userApi.post(userRouter.saveAddress,{addressData})
+        const result = await userApi.post(userRouter.saveAddress, { addressData })
         if (result) {
             return result
         }
@@ -271,9 +271,9 @@ const saveAddressData=async(addressData:AddressInterface)=>{
 }
 
 // ****************Edit address************
-const editAddress=async(addressData:AddressInterface,id:string)=>{
+const editAddress = async (addressData: AddressInterface, id: string) => {
     try {
-        const result = await userApi.put(`/edit_address/${id}`,{addressData})
+        const result = await userApi.put(`/edit_address/${id}`, { addressData })
         if (result) {
             return result
         }
@@ -285,7 +285,7 @@ const editAddress=async(addressData:AddressInterface,id:string)=>{
 
 // **********************8fetch Coupon***************
 
-const fetchCoupon=async(id:string)=>{
+const fetchCoupon = async (id: string) => {
     try {
         const result = await userApi.get(`/fetch_coupon/${id}`)
         if (result) {
@@ -298,18 +298,67 @@ const fetchCoupon=async(id:string)=>{
 }
 // *********************booking_confirm******************
 
-const BookingConfirm=async(bookingData:BookingFormData)=>{
+const BookingConfirm = async (bookingData: BookingFormData) => {
     try {
-        const result = await userApi.post(`/booking_confirm`,{bookingData})
-        if (result) {
-            return result
-        }
+        console.log(bookingData, "booking data")
+        const result = await userApi.post(`/booking_confirm`, bookingData);
+        return result;
     } catch (error) {
-        console.error(error as Error);
+        console.error("API Error:", error);
         errorHandler(error as Error);
+        throw error; // Propagate the error to handle it in handleSubmit
+    }
+};
+
+
+//   ************************userId stored in coupon****************
+const userIdStoredInCoupon = async (coupon: string, userId: string,) => {
+    try {
+        const result = await userApi.post(`/userid_in_coupon/${coupon}/${userId}`);
+        return result;
+    } catch (error) {
+        console.error("API Error:", error);
+        errorHandler(error as Error);
+        throw error;
+    }
+};
+
+// ****************************Booking Page ***************************
+const getBookingHistory=async(userId:string)=>{
+    try {
+        const result = await userApi.get(`/bookibg_history/${userId}`);
+        return result;
+    } catch (error) {
+        console.error("API Error:", error);
+        errorHandler(error as Error);
+        throw error;
     }
 }
-    
+
+// ****************************booking details of specilf order***************
+const specificBookingDetails=async(bookingId:string)=>{
+    try {
+        const result = await userApi.get(`/details_of_specifc_order/${bookingId}`);
+        return result;
+    } catch (error) {
+        console.error("API Error:", error);
+        errorHandler(error as Error);
+        throw error;
+    }
+}
+
+// ****************************cancel booking by user**********************
+const cancelBookingByUser =async(id:string)=>{
+    try {
+        const result = await userApi.get(`/cancel_booking/${id}`);
+        return result;
+    } catch (error) {
+        console.error("API Error:", error);
+        errorHandler(error as Error);
+        throw error;
+    }
+}
+
 export {
     signup,
     resend,
@@ -321,7 +370,7 @@ export {
     carDetail,
     applyFilters,
     searchCar,
-    getOffer,  
+    getOffer,
     checkProfile,
     saveProfileData,
     editProfile,
@@ -330,6 +379,9 @@ export {
     editAddress,
     fetchCoupon,
     BookingConfirm,
-    checkOffer
+    checkOffer,
+    userIdStoredInCoupon,
+    getBookingHistory,
+    specificBookingDetails,
+    cancelBookingByUser
 };
-             

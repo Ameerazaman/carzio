@@ -3,25 +3,18 @@ import mongoose from 'mongoose';
 const couponSchema = new mongoose.Schema({
     code: {
         type: String,
-       
     },
     discountPercentage: {
-        type: Number,
-       
-    },
-    maxDiscountAmount: {
-        type: Number,
+        type: Number,  
     },
     minRentalAmount: {
         type: Number,
     },
     startDate: {
         type: Date,
-        
     },
     endDate: {
         type: Date,
-       
     },
     isActive: {
         type: Boolean,

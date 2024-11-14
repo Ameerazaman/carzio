@@ -20,11 +20,7 @@ const profileSchema = new mongoose.Schema({
   gender:{
     type:String
   },
-//   password:{
-//     type:String
-//   }
-
-});
+},{timestamps:true});
 
 const UserProfileModel = mongoose.model('UserProfileModel', profileSchema);
 

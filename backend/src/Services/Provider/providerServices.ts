@@ -12,6 +12,7 @@ import providerAddress from '../../Model/Provider/ProviderAddressModel';
 import { CarDataInterface } from '../../Interface/CarInterface';
 import { CarAuthResponse } from '../../Interface/AuthServices/CarAuthInterface';
 import { uploadImageToCloudinary } from '../../Utlis/Uploads';
+import { BookingAuthResponse } from '../../Interface/AuthServices/BookingAuthInterface';
 
 export class ProviderServices {
     constructor(
@@ -253,7 +254,7 @@ export class ProviderServices {
             // 1. Upload image to Cloudinary (or another cloud service)
             const result = await uploadImageToCloudinary(file);
             console.log(result, "Cloudinary upload result");
-    
+
             // Type-check for results array
             if (!result.success || !result.results || result.results.length === 0) {
                 return {
@@ -264,11 +265,11 @@ export class ProviderServices {
                     },
                 };
             }
-    
+
             // Extract the URL from the first result in the results array
             const imageUrl = result.results[0].url;
             console.log(imageUrl, 'Image URL in profile update');
-    
+
             if (!imageUrl) {
                 return {
                     status: 400,
@@ -278,10 +279,10 @@ export class ProviderServices {
                     },
                 };
             }
-    
+
             // 3. Update provider profile in the database
             const provider = await this.providerRepostry.updateprofileImage(imageUrl, id);
-           
+
             if (!provider) {
                 return {
                     status: 404,
@@ -291,7 +292,7 @@ export class ProviderServices {
                     },
                 };
             }
-    
+
             return {
                 status: 200,
                 data: {
@@ -310,7 +311,7 @@ export class ProviderServices {
             };
         }
     }
-    
+
 
     // **********************************add car details***********************
     async addCarDetails<T>(files: T, carData: CarDataInterface): Promise<CarAuthResponse | undefined> {
@@ -498,6 +499,108 @@ export class ProviderServices {
         }
     }
 
+    // ************************* booking page************************
+
+    async getBookingHistory(providerId: string): Promise<BookingAuthResponse | undefined> {
+        try {
+            console.log("getbooking history", providerId)
+            const bookingHistory = await this.providerRepostry.getBookingHistory(providerId);
+            if (bookingHistory) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        data: bookingHistory,
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "Booking history is not get"
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error fetching updateCoupon:", (error as Error).message);
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
+    // ************************* specif booking details************************
+
+    async specificBookingDetails(bookingId: string): Promise<BookingAuthResponse | undefined> {
+        try {
+            console.log("getbooking history", bookingId)
+            const bookingHistory = await this.providerRepostry.specificBookingDetails(bookingId);
+            if (bookingHistory) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        data: bookingHistory,
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "Booking history is not get"
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error fetching updateCoupon:", (error as Error).message);
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
+    // *******************************update status for booking*****************
+
+    async updateStatusOfBooking(bookingId: string, status: string): Promise<BookingAuthResponse | undefined> {
+        try {
+            console.log("update booking status", bookingId)
+            const updateStatus = await this.providerRepostry.updateStatusOfBooking(bookingId, status);
+            if (updateStatus) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        data: updateStatus,
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "Status updation is failed"
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error fetching updateCoupon:", (error as Error).message);
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
 }
 
 

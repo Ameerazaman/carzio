@@ -62,7 +62,7 @@ const carNotificationSchema = new mongoose.Schema({
         type: Date,
         default: Date.now  
     }
-});
+},{timestamps:true});
 
 const CarNotification = mongoose.model('CarDocument', carNotificationSchema);
 

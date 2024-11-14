@@ -58,7 +58,7 @@ const carSchema = new mongoose.Schema({
     providerId:{
         type:String
     }
-});
+},{timestamps:true});
 
 const CarModel = mongoose.model('CarModel', carSchema);
 

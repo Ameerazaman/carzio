@@ -24,7 +24,7 @@ const addressSchema = new mongoose.Schema({
     type:String
   }
 
-});
+},{timestamps:true});
 
 const UserAddressModel = mongoose.model('UserAddressModel', addressSchema);
 

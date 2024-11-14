@@ -329,7 +329,41 @@ const updateProfileImage = async (formData: FormData, id: string) => {
       errorHandler(error as Error);
     }
   };
-  
+  // ****************************Booking Page ***************************
+const getBookingHistory=async(providerId:string)=>{
+    try {
+        const result = await providerAPI.get(`/provider/booking_history/${providerId}`);
+        return result;
+    } catch (error) {
+        console.error("API Error:", error);
+        errorHandler(error as Error);
+        throw error;
+    }
+}
+
+// ****************************booking details of specilf order***************
+const specificBookingDetails=async(bookingId:string)=>{
+    try {
+        const result = await providerAPI.get(`/provider/details_of_specifc_order/${bookingId}`);
+        return result;
+    } catch (error) {
+        console.error("API Error:", error);
+        errorHandler(error as Error);
+        throw error;
+    }
+}
+
+// ****************************cancel booking by user**********************
+const updateStatusOfBooking =async(bookingId:string,status:string)=>{
+    try {
+        const result = await providerAPI.get(`/provider/update_status/${bookingId}/${status}`);
+        return result;
+    } catch (error) {
+        console.error("API Error:", error);
+        errorHandler(error as Error);
+        throw error;
+    }
+}
   
 
 
@@ -349,6 +383,9 @@ export {
     editCar,
     editCarDetails,
     editCarImage,
-    updateProfileImage
+    updateProfileImage,
+    getBookingHistory,
+    specificBookingDetails,
+    updateStatusOfBooking,
 
 };
