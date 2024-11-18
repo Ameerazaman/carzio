@@ -1,3 +1,4 @@
+import { BookingDateInterface } from '../../Interface/AuthServices/BookingDateAuthInterface';
 import { BookingInterface } from '../../Interface/BookingInterface';
 import { CarDataInterface } from '../../Interface/CarInterface';
 import { CouponInterface } from '../../Interface/CouponInterface';
@@ -5,6 +6,7 @@ import { OfferDataInterface } from '../../Interface/OfferInterface';
 import { ProfileInterface } from '../../Interface/Profileinterface';
 import { UserAddressInterface } from '../../Interface/UserAddressInterface';
 import { UserInterface } from '../../Interface/UserInterface';
+import { WalletInterface } from '../../Interface/WalletInterface';
 import Coupon from '../../Model/Admin/CouponModel';
 import Offer from '../../Model/Admin/OfferModel';
 import CarModel from '../../Model/Provider/CarModel';
@@ -14,15 +16,21 @@ import { Otp } from '../../Model/User/OtpModel';
 import UserProfileModel from '../../Model/User/ProfileModel';
 import userModel from '../../Model/User/UserModel';
 import mongoose from 'mongoose';
+import WalletModel from '../../Model/User/WalletModel';
+import { ReviewDataInterface } from '../../Interface/ReviewInterface';
+import ReviewModel from '../../Model/User/ReviewModel';
 
 
 interface UserLoginResponse {
     exists: boolean;
-    userData?: any; // You can replace `any` with a more specific type if you have one
+    userData?: any;
 }
 
+
+
 export class UserRepository {
-    // Check if a user exists by email
+
+    // *************************email Exist**************************
     async emailExistCheck(email: string): Promise<UserInterface | null> {
         try {
             const existingUser = await userModel.findOne({ email });
@@ -33,8 +41,7 @@ export class UserRepository {
             return null;
         }
     }
-
-    // Save a new user
+    //********************** */ Save a new user***************************8
     async saveUser(userData: UserInterface): Promise<UserInterface | null> {
         try {
             const newUser = new userModel(userData);
@@ -47,7 +54,7 @@ export class UserRepository {
         }
     }
 
-    // Login logic (fetch the user by email)
+    //****************Login logic (fetch the user by email)*****************
     async userLogin(email: string): Promise<UserLoginResponse> {
         try {
             const existingUser = await userModel.findOne({ email });
@@ -57,7 +64,7 @@ export class UserRepository {
             return { exists: false };
         }
     }
-    // check username and password for login
+    //*****************check username and password for login*************
     async emailPasswordCheck(email: string): Promise<UserInterface | null> {
         try {
             const existingUser = await userModel.findOne({ email });
@@ -68,7 +75,7 @@ export class UserRepository {
         }
     }
 
-    // check user for tooken validation
+    //*****************check user for tooken validation**********************
 
     async getUserById(id: string): Promise<UserInterface | null> {
         try {
@@ -82,9 +89,15 @@ export class UserRepository {
     }
 
     // ******************************fetch car for card**********************
-    async fetchCars(): Promise<CarDataInterface[] | null> {
+
+    async fetchCars(page: number, limit: number): Promise<CarDataInterface[] | null> {
         try {
-            const carDocuments = await CarModel.find() as CarDataInterface[]; // Fetch car documents
+
+            const skip = (page - 1) * limit;
+            const carDocuments = await CarModel.find().skip(skip)
+                .limit(limit) as CarDataInterface[];
+
+
 
             const cars: CarDataInterface[] = carDocuments.map((car: CarDataInterface) => ({
                 car_name: car.car_name,
@@ -103,7 +116,8 @@ export class UserRepository {
                 providerId: car.providerId,
                 isStatus: car.isStatus,
                 createdAt: car.createdAt,
-                id: car.id
+                id: car.id,
+
             }));
 
             return cars;
@@ -112,42 +126,60 @@ export class UserRepository {
             return null;
         }
     }
+    // *******************************fetch cout for Total Page in FetchCar*****************
+    async countsOfCar(): Promise<number | null> {
+        try {
+            const total = await CarModel.countDocuments();
+            return total
+        } catch (error) {
+            console.error("Error fetching cars counts:", error);
+            return null;
+        }
+    }
     // ***********************************Car Details *************************
     async carDetails(carId: string): Promise<CarDataInterface | null> {
         try {
-            let car = await CarModel.findOne({ _id: carId, isBlocked: false });
-
-            console.log(car, "check");
-
-            if (car) {
-                return {
-                    car_name: car.car_name,
-                    model: car.model,
-                    rentalPrice: car.rentalPrice,
-                    engineType: car.engineType,
-                    fuelType: car.fuelType,
-                    color: car.color,
-                    images: car.images,
-                    rcNumber: car.rcNumber,
-                    rcExpiry: car.rcExpiry,
-                    insurancePolicyNumber: car.insurancePolicyNumber,
-                    insuranceExpiry: car.insuranceExpiry,
-                    pollutionCertificateNumber: car.pollutionCertificateNumber,
-                    pollutionExpiry: car.pollutionExpiry,
-                    providerId: car.providerId,
-                    isStatus: car.isStatus,
-                    createdAt: car.createdAt,
-                    id: car.id
-                } as CarDataInterface;
-            }
-            return null;
+            const result = await CarModel.findById(carId)
+            return result as CarDataInterface
         }
         catch (error) {
             console.error("Error fetching Car:", error);
             return null;
         }
     }
+
+    // ************************car ratings(star) in carDetails*****************
+    async getReviewAndRatings(carId: string): Promise<{ averageRating: number | null; reviews: string[] }> {
+        try {
+            console.log(carId, "carId");
+            const result = await ReviewModel.aggregate([
+                { $match: { carId: carId } },
+                {
+                    $group: {
+                        _id: null, // Group all matched documents
+                        averageRating: { $avg: "$rating" }, // Calculate average rating
+                        reviews: { $push: "$review" }, // Collect review texts
+                    },
+                },
+            ]);
+    
+            console.log(result[0], "result ratings");
+            if (result.length === 0) {
+                return { averageRating: null, reviews: [] };
+            }
+    
+            return {
+                averageRating: result[0].averageRating,
+                reviews: result[0].reviews,
+            };
+        } catch (error) {
+            console.error("Error fetching reviews and ratings:", error);
+            return { averageRating: null, reviews: [] };
+        }
+    }
+    
     // ***************************filter************************
+
     async carFilter(engineType?: string[], fuelType?: string[], sortPrice?: string): Promise<CarDataInterface[] | null> {
         try {
             // Create a filter object
@@ -191,7 +223,7 @@ export class UserRepository {
             return cars
         } catch (error) {
             console.error("Error fetching cars:", error);
-            return null; // Return null on error
+            return null;
         }
     }
     // ******************************search car**********************
@@ -402,10 +434,9 @@ export class UserRepository {
 
 
 
-    async getBookingHistory(userId: string): Promise<BookingInterface[] | null> {
+    async getBookingHistory(userId: string, page: number, limit: number): Promise<BookingInterface[] | null> {
         try {
             console.log(userId, "userId in get booking history");
-
             const bookingHistory = await BookingModel.aggregate([
                 { $match: { UserId: userId } },
                 {
@@ -415,22 +446,40 @@ export class UserRepository {
                 },
                 {
                     $lookup: {
-                        from: 'carmodels', // Collection name for CarModel (Mongoose pluralizes by default)
+                        from: 'carmodels', // Collection name for CarModel
                         localField: 'CarsObjectId', // Use the converted ObjectId field
                         foreignField: '_id',
                         as: 'bookingDetails',
                     },
                 },
-                { $unwind: '$bookingDetails' } // Flatten the bookingDetails array
+                { $unwind: '$bookingDetails' },
+                { $skip: (page - 1) * limit },
+                { $limit: limit },
             ]);
 
             console.log(bookingHistory, "booking history");
-            return bookingHistory.length ? bookingHistory : null;
+            return bookingHistory
         } catch (error) {
             console.error("Error fetching booking history with car details:", (error as Error).message);
             return null;
         }
     }
+
+    // ******************************count bookingHistory****************
+
+    async countBookingHistory(userId: string): Promise<number | null> {
+        try {
+            console.log(userId, "userId count booking history")
+            const total = await BookingModel.aggregate([
+                { $match: { UserId: userId } }])
+            console.log(total, "count of documnets")
+            return total.length;
+        } catch (error) {
+            console.error("Error counting booking history:", (error as Error).message);
+            return null;
+        }
+    }
+
     // ***************************specific booking details*****************
 
 
@@ -473,23 +522,164 @@ export class UserRepository {
             console.log(bookingHistory, "booking history");
             return bookingHistory[0] || null; // Return the first matched result or null if none found
         } catch (error) {
-            console.error("Error fetching booking history with car and address details:", (error as Error).message);
+            console.error("error specific booking details:", (error as Error).message);
             return null;
         }
     }
 
     // *******************************update status for booking*****************
-    
+
     async cancelBookingByUser(bookingId: string): Promise<BookingInterface | null> {
         try {
             const updatedBooking = await BookingModel.findByIdAndUpdate(
-                bookingId, 
-                { status: 'Cancelled' }, 
-                { new: true } 
+                bookingId,
+                { status: 'Cancelled' },
+                { new: true }
             );
             return updatedBooking as BookingInterface
         } catch (error) {
-            console.error("Error fetching booking history with car and address details:", (error as Error).message);
+            console.error("Error cancel booking by user:", (error as Error).message);
+            return null;
+        }
+    }
+
+    // ***************************canceled booking amount credited to walet**********8
+    async cancelBookingUpdateWallet(bookingId: string, userId: string, amount: number): Promise<WalletInterface | null> {
+        try {
+            const lastTransaction = await WalletModel.findOne({ UserId: userId }).sort({ createdAt: -1 });
+            const lastTotalAmt = lastTransaction && typeof lastTransaction.TotalAmt === 'number' ? lastTransaction.TotalAmt : 0;
+
+            if (isNaN(amount)) {
+                throw new Error("Invalid amount provided");
+            }
+
+            const updatedTotal = lastTotalAmt + amount;
+
+            // Create a new wallet transaction entry
+            const result = await WalletModel.create({
+                UserId: userId,
+                TransactionType: 'Credit',
+                Amount: amount,
+                Description: "Canceled booked car",
+
+                TotalAmt: updatedTotal,
+            });
+
+            console.log("Wallet Updated Successfully:", result);
+            return result as WalletInterface;
+
+        } catch (error) {
+            console.error("Error in cancelBookingUpdateWallet:", (error as Error).message);
+            return null;
+        }
+    }
+
+    // ****************************check booked or not **********************
+    async checkBookedOrNot(carId: string): Promise<BookingDateInterface[] | null> {
+        try {
+            const check = await BookingModel.find({ CarsId: carId })
+            console.log(check, "check")
+            const result = await BookingModel.find({ CarsId: carId }, { IssueDate: 1, ReturnDate: 1 }).lean();
+            console.log(result, "check booked or ")
+            const transformedResult = result.map(doc => ({
+                issueDate: doc.IssueDate,
+                returnDate: doc.ReturnDate
+            }));
+
+            return transformedResult;
+        } catch (error) {
+            console.error("Error check bookeed or not:", (error as Error).message);
+            return null;
+        }
+    }
+
+    // *************************check balnce and update*********************
+    async checkBalanceAndUpdateWallet(userId: string, amount: number): Promise<WalletInterface | null> {
+        try {
+            const lastTransaction = await WalletModel.findOne({ UserId: userId }).sort({ createdAt: -1 });
+            const lastTotalAmt = lastTransaction && typeof lastTransaction.TotalAmt === 'number' ? lastTransaction.TotalAmt : 0;
+
+            if (isNaN(amount) || amount <= 0) {
+                throw new Error("Invalid or negative amount provided");
+            }
+            if (lastTotalAmt >= amount) {
+                const updatedTotal = lastTotalAmt - amount;
+
+                const result = await WalletModel.create({
+                    UserId: userId,
+                    TransactionType: 'Debit',
+                    Amount: amount,
+                    Description: "Booked car using wallet amount",
+
+                    TotalAmt: updatedTotal,
+                });
+                console.log("Wallet successfully updated:", result);
+                return result as WalletInterface;
+            } else {
+                console.error("Insufficient balance in wallet.");
+                return null;
+            }
+
+        } catch (error) {
+            console.error("Error while checking balance and updating wallet:", (error as Error).message);
+            return null;
+        }
+    }
+
+
+
+    // ***************get Wallet********************************
+    async getWalletPage(userId: string, page: number, limit: number): Promise<WalletInterface[] | null> {
+        try {
+            console.log(userId, "userId in get booking history");
+            const walletData = await WalletModel.aggregate([
+                { $match: { UserId: userId } },
+                { $skip: (page - 1) * limit },
+                { $limit: limit },
+            ]);
+
+            console.log(walletData, "booking history");
+            return walletData
+        } catch (error) {
+            console.error("Error fetching booking history with car details:", (error as Error).message);
+            return null;
+        }
+    }
+
+    // ******************************count bookingHistory************************
+
+    async countWalletDocuments(userId: string): Promise<number | null> {
+        try {
+            console.log(userId, "userId count booking history")
+            const total = await WalletModel.aggregate([
+                { $match: { UserId: userId } }])
+            console.log(total, "count of documnets")
+            return total.length;
+        } catch (error) {
+            console.error("Error counting booking history:", (error as Error).message);
+            return null;
+        }
+    }
+
+    // **************************create Review and ratings*********************
+
+    async createReviewData(reviewData: ReviewDataInterface): Promise<ReviewDataInterface | null> {
+        try {
+            const saveReview = await ReviewModel.create(reviewData);
+            return saveReview as ReviewDataInterface;
+        } catch (error) {
+            console.error("Error saving profile:", (error as Error).message);
+            return null;
+        }
+    }
+
+    // **********************check bookId in review*******************
+    async checkBookidInReview(bookId: string): Promise<ReviewDataInterface | null> {
+        try {
+            let result = await ReviewModel.findOne({ bookingId: bookId })
+            return result as ReviewDataInterface
+        } catch (error) {
+            console.error("Error check bookId in review:", (error as Error).message);
             return null;
         }
     }

@@ -17,5 +17,5 @@ export interface CarDataInterface {
     providerId:string |undefined;
     createdAt:string;
     id?: string | undefined;
-  
+ 
 }

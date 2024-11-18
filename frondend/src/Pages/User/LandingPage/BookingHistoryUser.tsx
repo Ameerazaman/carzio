@@ -1,45 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { getBookingHistory } from '../../../Api/User';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../App/Store';
-import { User } from '../../Common/Navbar';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Booking } from '../../../Interface/BookinDetailsInterface';
 
+interface BookingHistoryUserProps {
+  bookingHistory: Booking[]; // Use the Booking interface for typing
+}
 
-
-function BookingHistoryUser() {
-  const user = useSelector((state: RootState) => state.user.currentUser) as User | null;
-  const [bookingHistory, setBookingHistory] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchBookingHistory = async () => {
-      if (user?._id) {
-        try {
-          const result = await getBookingHistory(user._id);
-          setBookingHistory(result.data.data);
-          setLoading(false);
-        } catch (error) {
-          setError("Error fetching booking history.");
-          setLoading(false);
-          console.error("Error fetching booking history:", error);
-        }
-      }
-    };
-
-    fetchBookingHistory();
-  }, [user]);
-  
-  if (loading) {
-    return <div className="text-center">Loading booking history...</div>;
-  }
-
-  if (error) {
-    return <div className="text-center text-red-500">{error}</div>;
-  }
-
+function BookingHistoryUser({ bookingHistory }: BookingHistoryUserProps) {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">Booking History</h1>
@@ -63,7 +30,6 @@ function BookingHistoryUser() {
               <tr key={order._id} className="border-b border-gray-200 hover:bg-gray-100">
                 <td className="py-3 px-6 text-left whitespace-nowrap">{order._id}</td>
                 <td className="py-3 px-6 text-left">{order.bookingDetails.car_name}</td>
-
                 <td className="py-3 px-6 text-left">
                   {order.bookingDetails?.images ? (
                     <img
@@ -81,20 +47,22 @@ function BookingHistoryUser() {
                 <td className="py-3 px-6 text-left">{order.Payment}</td>
                 <td className="py-3 px-6 text-left">
                   <span
-                    className={`py-1 px-3 rounded-full text-xs font-semibold ${order.status === 'success'
+                    className={`py-1 px-3 rounded-full text-xs font-semibold ${
+                      order.status === 'success'
                         ? 'bg-green-200 text-green-600'
                         : 'bg-yellow-200 text-yellow-600'
-                      }`}
+                    }`}
                   >
                     {order.status}
                   </span>
                 </td>
-                <Link to={`/view_details/${order._id}`}>
-                  <button className="text-blue-500 hover:text-blue-700 font-semibold">
-                    View Details
-                  </button>
-                </Link>
-
+                <td className="py-3 px-6 text-center">
+                  <Link to={`/view_details/${order._id}`}>
+                    <button className="text-blue-500 hover:text-blue-700 font-semibold">
+                      View Details
+                    </button>
+                  </Link>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -105,4 +73,3 @@ function BookingHistoryUser() {
 }
 
 export default BookingHistoryUser;
-

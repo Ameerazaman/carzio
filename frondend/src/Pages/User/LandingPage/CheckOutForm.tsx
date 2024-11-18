@@ -60,7 +60,9 @@ const CheckoutForm = () => {
         const result=await BookingConfirm(bookingData); 
         if(result){
           console.log(bookingData.Coupon,"coupon",bookingData.UserId,"userId")
-          await userIdStoredInCoupon(bookingData.Coupon,bookingData.UserId)
+          if(bookingData.Coupon){
+            const result=await userIdStoredInCoupon(bookingData.Coupon,bookingData.UserId)
+          }
           navigate('/success');  // Redirect to success page
         }
       }

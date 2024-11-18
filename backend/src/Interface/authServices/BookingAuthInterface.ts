@@ -6,6 +6,7 @@ export interface BookingAuthResponse {
         success: boolean;
         message?: string;
         data?: BookingInterface | BookingInterface[] | undefined
-     
+        page?:number,
+        totalPage?:number
     };
 }

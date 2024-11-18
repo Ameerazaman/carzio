@@ -4,7 +4,7 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../App/Store';
 import { User } from '../../Common/Navbar';
-import { carDetail, checkOffer, fetchCoupon, checkAddress, BookingConfirm } from '../../../Api/User';
+import { carDetail, checkOffer, fetchCoupon, checkAddress, BookingConfirm, checkingBookedOrNot, userIdStoredInCoupon, checkBalanceUpdateWallet } from '../../../Api/User';
 import { BookingFormData } from '../../../Interface/BookingInterface';
 import { CarDataInterface } from '../../../Interface/CarInterface';
 import { CouponFormData } from '../../../Interface/CouponFormData';
@@ -190,30 +190,59 @@ function BookingPage() {
       return;
     }
 
+    // Validate required fields before proceeding
+    if (!formData.UserId) {
+      toast.error("User ID is required.");
+      return;
+    }
+    if (!formData.CarsId) {
+      toast.error("Car ID is required.");
+      return;
+    }
+
     const adjustedFormData = {
       ...formData,
-      UserId: formData.UserId || '',
-      CarsId: formData.CarsId || '',
+      UserId: formData.UserId, // UserId is validated to be a string
+      CarsId: formData.CarsId, // CarsId is validated to be a string
       providerId: carData?.providerId || '',
       total_Amt: formData.AmtOnDays - formData.offerAmt - formData.CouponAmt,
       status: "pending",
     };
 
-    if (formData.Payment === "Online payment") {
-      adjustedFormData.status = "success"
-      navigate('/checkOut', { state: { bookingData: adjustedFormData } });
-      return;
-    }
-
     try {
-      const result = await BookingConfirm(adjustedFormData);
-      navigate('/success');
-      console.log("Form submitted successfully:", result);
+      const result = await checkingBookedOrNot(formData.IssueDate, formData.ReturnDate, formData.CarsId);
+      console.log(result, "result in checkingBookedOrNot");
+
+      if (result.data.data.success) {
+        if (formData.Payment === "Online payment") {
+          adjustedFormData.status = "success";
+          navigate('/checkOut', { state: { bookingData: adjustedFormData } });
+          return;
+        }
+        if (formData.Payment === "Wallet" && formData.UserId) {
+          const walletResult = await checkBalanceUpdateWallet(adjustedFormData.total_Amt, formData.UserId);
+          if (!walletResult.data.data.success) {
+            toast.error(walletResult.data.data.message);
+            return;
+          }
+        }
+        const bookingResult = await BookingConfirm(adjustedFormData);
+        if (bookingResult) {
+          if (adjustedFormData.Coupon) {
+            await userIdStoredInCoupon(adjustedFormData.Coupon, adjustedFormData.UserId);
+          }
+          navigate('/success');
+        }
+        console.log("Form submitted successfully:", bookingResult);
+      } else {
+        toast.error(result.data.data.message);
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error("Error submitting form. Please try again.");
     }
   };
+
 
   const handleAddressId = (id: string) => {
     setFormData((prevData) => ({
@@ -385,7 +414,7 @@ function BookingPage() {
           {/* Payment Section */}
           <div className="bg-white rounded-lg shadow-lg p-6 space-y-4">
             <label className="block text-lg font-semibold text-gray-800">Payment Method:</label>
-            {['Cash on issue date', 'Online payment', 'Cash on return date'].map((method) => (
+            {['Cash on issue date', 'Online payment', 'Cash on return date', "Wallet"].map((method) => (
               <div key={method} className="flex items-center">
                 <input
                   type="radio"

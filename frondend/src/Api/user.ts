@@ -9,6 +9,7 @@ import { string } from 'yargs';
 import { ProfileInterface } from '../Interface/ProfileInterface';
 import { AddressInterface } from '../Interface/AddressInterface';
 import { BookingFormData } from '../Interface/BookingInterface';
+import { reviewDataInterface } from '../Interface/ReviewInterface';
 
 // refresh Accesss token
 
@@ -122,10 +123,15 @@ const userLogout = async () => {
 
 
 // **************************fetch cars ******************************
-const fetchCars = async () => {
+const fetchCars = async (page: number, limit: number) => {
     try {
 
-        const result = await userApi.get(userRouter.fetchCar)
+        const result = await userApi.get(userRouter.fetchCar, {
+            params: {
+                page,
+                limit
+            }
+        })
         if (result) {
             return result
         }
@@ -324,9 +330,15 @@ const userIdStoredInCoupon = async (coupon: string, userId: string,) => {
 };
 
 // ****************************Booking Page ***************************
-const getBookingHistory=async(userId:string)=>{
+const getBookingHistory = async (userId: string, page: number, limit: number) => {
     try {
-        const result = await userApi.get(`/bookibg_history/${userId}`);
+        const result = await userApi.get(userRouter.bookingHistory, {
+            params: {
+                userId,
+                page,
+                limit
+            }
+        });
         return result;
     } catch (error) {
         console.error("API Error:", error);
@@ -335,8 +347,9 @@ const getBookingHistory=async(userId:string)=>{
     }
 }
 
+
 // ****************************booking details of specilf order***************
-const specificBookingDetails=async(bookingId:string)=>{
+const specificBookingDetails = async (bookingId: string) => {
     try {
         const result = await userApi.get(`/details_of_specifc_order/${bookingId}`);
         return result;
@@ -348,13 +361,109 @@ const specificBookingDetails=async(bookingId:string)=>{
 }
 
 // ****************************cancel booking by user**********************
-const cancelBookingByUser =async(id:string)=>{
+const cancelBookingByUser = async (bookingId: string, userId: string, amount: number) => {
     try {
-        const result = await userApi.get(`/cancel_booking/${id}`);
+        const result = await userApi.put('/cancel_booking', null, {
+            params: {
+                bookingId,
+                userId,
+                amount,
+            },
+        });
+        return result;
+    } catch (error) {
+        console.error("API Error:", error);
+        throw error;
+    }
+};
+
+
+//*****************/ cancelBookong update add amount to waalet***********************
+const storeCancelAmtToWallet = async (userId: string, amount: number) => {
+    try {
+        console.log(amount, "amount", userId, "userId");
+        const result = await userApi.put(`/cancel_amt_to_wallet/${userId}/${amount}`);
         return result;
     } catch (error) {
         console.error("API Error:", error);
         errorHandler(error as Error);
+        throw error;
+    }
+}
+// ****************************check booked or not *********************
+const checkingBookedOrNot = async (issueDate: string, returnDate: string, carId: string) => {
+    try {
+        console.log(issueDate, "issuedate", returnDate, "returndate");
+        const result = await userApi.get(`/check_booking`, {
+            params: {
+                issueDate,
+                returnDate,
+                carId
+            }
+        });
+        return result;
+    } catch (error) {
+        console.error("API Error:", error);
+        errorHandler(error as Error);
+        throw error;
+    }
+};
+//   *******************************check Wallet ****************
+const checkBalanceUpdateWallet = async (amount: number, userId: string) => {
+    try {
+        console.log(amount, "amount", userId, "userId");
+        const result = await userApi.put(`/check_update_wallet/${userId}/${amount}`);
+        return result;
+    } catch (error) {
+        console.error("API Error:", error);
+        errorHandler(error as Error);
+        throw error;
+    }
+};
+
+// ********************************get Wallet Page ***********************
+const getWalletPage = async (userId: string, page: number, limit: number) => {
+    try {
+        const result = await userApi.get(userRouter.getWallet, {
+            params: {
+                userId,
+                page,
+                limit
+            }
+        });
+        return result;
+    } catch (error) {
+        console.error("API Error:", error);
+        errorHandler(error as Error);
+        throw error;
+    }
+}
+
+// ****************************create review and ratings***************
+const createReviewAndRatings = async (reviewData: reviewDataInterface): Promise<any> => {
+    try {
+        const result = await userApi.post(userRouter.createReviewRatings, reviewData); // Send data in the body
+        return result.data; 
+    } catch (error) {
+        console.error("Error creating review and ratings:", error);
+        errorHandler(error as Error); // Use your error handler
+        throw error;
+    }
+};
+
+// *************************check bookId is exist in review ***********************
+
+const checkBookidInReview=async(bookId:string):Promise<any>=>{
+    try{
+        const result = await userApi.get(userRouter.checkBookIdInReview, {
+            params: {
+                bookId
+            }
+        });
+        return result;
+    } catch (error) {
+        console.error("Error bookId in review:", error);
+        errorHandler(error as Error); // Use your error handler
         throw error;
     }
 }
@@ -383,5 +492,12 @@ export {
     userIdStoredInCoupon,
     getBookingHistory,
     specificBookingDetails,
-    cancelBookingByUser
+    cancelBookingByUser,
+    checkingBookedOrNot,
+    checkBalanceUpdateWallet,
+    storeCancelAmtToWallet,
+    getWalletPage,
+    createReviewAndRatings,
+    checkBookidInReview
+
 };

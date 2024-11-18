@@ -9,7 +9,7 @@ const adminSchema = new mongoose.Schema({
     type: String
   }
 
-});
+},{timestamps:true});
 
 const adminModel = mongoose.model('adminModel', adminSchema);
 

@@ -6,13 +6,14 @@ import Profile from './Components/User/Profile';
 import CheckoutForm from './Pages/User/LandingPage/CheckOutForm';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
+import WalletPage from './Components/User/WalletPage';
 
 const stripePromise = loadStripe('pk_test_51QJq7aDRjWHiMHMFbKsTqHRDHPep0XNgdvdjLwN8gWxkZpn2mMKx4fKXm0fQLjusUKKqRfFPzd17w52FH9Koe07800Ce8IksDd');
 // Lazy loading components
-const HistoryDetailsInAdmin=lazy(()=>(import('./Components/Admin/HistoryDetailsInAdmin')))
-const BookingHistoryInAdmin=lazy(()=>(import('./Components/Admin/BookingHistoryInAdmin')))
-const HistoryDetailsInProvider=lazy(()=>import('./Components/Provider/HistoryDetailsInProvider'))
-const BookingHistoryInProvider=lazy(()=>import('./Components/Provider/BookingHistoryInProvider'))
+const HistoryDetailsInAdmin = lazy(() => (import('./Components/Admin/HistoryDetailsInAdmin')))
+const BookingHistoryInAdmin = lazy(() => (import('./Components/Admin/BookingHistoryInAdmin')))
+const HistoryDetailsInProvider = lazy(() => import('./Components/Provider/HistoryDetailsInProvider'))
+const BookingHistoryInProvider = lazy(() => import('./Components/Provider/BookingHistoryInProvider'))
 const UserHistoryDetails = lazy(() => import('./Components/User/UserHistoryDetails'))
 const BookingHistory = lazy(() => import('./Components/User/BookingHistory'))
 const SuccessPage = lazy(() => import('./Pages/User/LandingPage/Success'))
@@ -78,6 +79,7 @@ function App() {
             <Route path='/success' element={<SuccessPage />} />
             <Route path='/booking_history' element={<BookingHistory />} />
             <Route path='/view_details/:bookingId' element={<UserHistoryDetails />} />
+            <Route path='/wallet' element={<WalletPage />} />
 
             {/* ************************************Provider Side*************************** */}
 

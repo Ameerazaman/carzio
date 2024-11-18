@@ -152,30 +152,30 @@ function Navbar() {
               <a href="/provider/login">Provider Signup</a>
             </button> : ""
           }
-          {provider ?
-            <button className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition duration-300">
-              <a href="/provider/Home">Provider Home</a>
-            </button>:""}
-        </div>
-      </nav>
-      {user ? (
-        <div className="bg-black p-2">
-          <div className="container mx-auto flex justify-between items-center">
-            <div className="flex space-x-8">
-              <a href="/home" className="text-white hover:text-red-400 transition duration-300 font-semibold">Home</a>
-              <a href="/booking_history" className="text-white hover:text-red-400 transition duration-300 font-semibold">History</a>
-              <a href="/carList" className="text-white hover:text-red-400 transition duration-300 font-semibold">Cars</a>
-              <a href="/offers" className="text-white hover:text-red-400 transition duration-300 font-semibold flex items-center">
-
-                Offers
-              </a>
-            </div>
+          {provider && !user?
+            < button className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition duration-300">
+          <a href="/provider/Home">Provider Home</a>
+        </button> : ""}
+      </div>
+    </nav>
+      {
+    user ? (
+      <div className="bg-black p-2">
+        <div className="container mx-auto flex justify-between items-center">
+          <div className="flex space-x-8">
+            <a href="/home" className="text-white hover:text-red-400 transition duration-300 font-semibold">Home</a>
+            <a href="/booking_history" className="text-white hover:text-red-400 transition duration-300 font-semibold">History</a>
+            <a href="/carList" className="text-white hover:text-red-400 transition duration-300 font-semibold">Cars</a>
+            <a href="/offers" className="text-white hover:text-red-400 transition duration-300 font-semibold flex items-center">Offer </a>
+            <a href="/wallet" className="text-white hover:text-red-400 transition duration-300 font-semibold flex items-center"> Wallet </a>
           </div>
         </div>
-      ) : (
-        <hr style={{ backgroundColor: 'black', height: '2px' }} />
-      )}
-    </header>
+      </div>
+    ) : (
+      <hr style={{ backgroundColor: 'black', height: '2px' }} />
+    )
+  }
+    </header >
   )
 }
 

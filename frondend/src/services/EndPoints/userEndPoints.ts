@@ -13,7 +13,12 @@ const userRouter = {
     saveAddress:'/save_address',
     fetchCoupon:"/fetchCoupon",
     bookingConfirm:'/booking_confirm',
-    createPayment:'/create_payment'
+    createPayment:'/create_payment',
+    bookingHistory:'/booking_history',
+    getWallet:'/wallet',
+    cancelAmtToWallet:'/cancel_amt_to_wallet',
+    createReviewRatings:'/create_review_and_ratings',
+    checkBookIdInReview:'/check_bookid_in_Review'
   };
   
   export default userRouter;

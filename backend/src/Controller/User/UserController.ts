@@ -8,6 +8,7 @@ import { Otp } from '../../Model/User/OtpModel';
 import { verifyRefreshToken } from '../../Utlis/VerifyTokens';
 import { BookingInterface } from '../../Interface/BookingInterface';
 import Stripe from 'stripe';
+import { ReviewDataInterface } from '../../Interface/ReviewInterface';
 const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED, } = STATUS_CODES;
 
 export class UserController {
@@ -251,13 +252,22 @@ export class UserController {
     // ****************************fetch  car for card***************************
     async fetchCars(req: Request, res: Response): Promise<void> {
         try {
-            const result = await this.userServices.fetchCars(); // Fetch users from service
-            console.log(result, "rsult fetch car")
-            if (result) {
-                // Respond with the service result, no need to return
-                res.status(result.status).json(result.data);
+            console.log("fetch cars params", req.query)
+            const page = req.query.page ? Number(req.query.page) : undefined;
+            const limit = req.query.limit ? Number(req.query.limit) : undefined;
+
+            if (page !== undefined && limit !== undefined) {
+                console.log("fetch cars params", page, limit)
+                const result = await this.userServices.fetchCars(page, limit);
+                console.log(result, "result fetch car");
+                if (result) {
+                    console.log(result.data, "fetch cars")
+                    res.status(200).json(result.data);
+                } else {
+                    res.status(500).json({ message: "Internal server error" });
+                }
             } else {
-                res.status(500).json({ message: "Internal server error" });
+                res.status(400).json({ message: "Invalid page or limit" });
             }
         } catch (error) {
             console.error("Error during fetch cars:", error);
@@ -281,10 +291,10 @@ export class UserController {
             console.log(carExist, "exist car");
 
             if (!carExist) {
-                return res.status(400).json({ message: "Car not found or car is blockec" });
+                return res.status(400).json({ message: "Car not found or car is blocked" });
             }
 
-            return res.status(200).json(carExist);
+            return res.status(200).json(carExist.data);
         } catch (error) {
             console.error("Error during check Car exist:", error);
             return res.status(500).json({ message: "Internal server error" });
@@ -596,25 +606,35 @@ export class UserController {
     // ******************************get booking history**************************8
     async getBookingHistory(req: Request, res: Response): Promise<void> {
         try {
-            const userId = req.params.id
-            console.log(userId,"userid")
-            const result = await this.userServices.getBookingHistory(userId);
+            console.log(req.query, "get booking history query");
+            const userId = req.query.userId as string | undefined;
+            const page = req.query.page ? Number(req.query.page) : 1;
+            const limit = req.query.limit ? Number(req.query.limit) : 10;
+            console.log(userId, "userid");
+
+            if (!userId) {
+                res.status(400).json({ message: "User ID is required." });
+                return;
+            }
+
+            const result = await this.userServices.getBookingHistory(userId, page, limit);
             if (!result) {
-                res.status(500).json({ message: "Error booking history" });
-                return
+                res.status(500).json({ message: "Error fetching booking history" });
+                return;
             }
             res.status(200).json(result.data);
         } catch (error) {
-            console.error("Error saving profile:", error);
+            console.error("Error fetching booking history:", error);
             res.status(500).json({ message: "Internal server error" });
         }
     }
+
     // ******************************details of specic details**************************8
     async specificBookingDetails(req: Request, res: Response): Promise<void> {
         try {
             const bookingId = req.params.id
-            const status=req.params.status
-            console.log(bookingId,"bookingId")
+            const status = req.params.status
+            console.log(bookingId, "bookingId")
             const result = await this.userServices.specificBookingDetails(bookingId);
             if (!result) {
                 res.status(500).json({ message: "Error booking history" });
@@ -627,20 +647,177 @@ export class UserController {
         }
     }
 
-    // *********************cancel booking By user**********************
-    async cancelBookingByUser(req:Request,res:Response):Promise<void>{
+    // *********************cancel booking By user add amount to wallet**********************
+    async cancelBookingByUser(req: Request, res: Response): Promise<void> {
         try {
-            const bookingId = req.params.id
-            console.log(bookingId,"bookingId")
-            const result = await this.userServices.cancelBookingByUser(bookingId);
-            if (!result) {
-                res.status(500).json({ message: "Error Cancel Boooking" });
+            // Extract query parameters
+            const bookingId = req.query.bookingId as string | undefined;
+            const userId = req.query.userId as string | undefined;
+            const amount = req.query.amount ? Number(req.query.amount) : undefined;
+
+            // Log extracted parameters for debugging
+            console.log(bookingId, "bookingId", userId, "userId", amount, "amount");
+
+            // Validate required parameters
+            if (!bookingId || !userId || amount === undefined) {
+                res.status(400).json({ message: "Booking ID, User ID, and Amount are required" });
                 return
             }
-            res.status(200).json(result.data);
+
+            const result = await this.userServices.cancelBookingByUser(bookingId, userId, amount);
+
+            if (!result) {
+                res.status(500).json({ message: "Error Cancel Booking" });
+            }
+            res.status(200).json(result);
         } catch (error) {
             console.error("Error cancel booking:", error);
             res.status(500).json({ message: "Internal server error" });
         }
     }
+
+    // **********************************check Booked Or Not**********************************
+
+    async checkBookedOrNot(req: Request, res: Response): Promise<void> {
+        try {
+            const issueDate = req.query.issueDate as string | undefined;
+            const returnDate = req.query.returnDate as string | undefined;
+            const carId = req.query.carId as string | undefined || '';
+
+            if (!issueDate || !returnDate) {
+                res.status(400).json({ message: "Both issueDate and returnDate are required" });
+                return;
+            }
+            const result = await this.userServices.checkBookedOrNot(issueDate, returnDate, carId);
+            if (!result) {
+                res.status(404).json({ message: "No booking found for the given dates" });
+                return;
+            }
+            res.status(200).json(result);
+        } catch (error) {
+            console.error("Error checking booking availability:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+
+    // **********************************check and updtae wallet ***********************
+    async checkAndUpdateWallet(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = req.params.userId as string;
+            const amount = Number(req.params.amount); // Convert to a number
+            console.log("checkAndUpdateWallet", req.params);
+
+            console.log(userId, "userid", amount, "amount");
+            if (!userId || isNaN(amount)) {
+                res.status(400).json({ message: "Both userId and a valid amount are required" });
+                return;
+            }
+
+            const result = await this.userServices.checkWalletAndUpdate(userId, amount);
+            if (!result) {
+                res.status(400).json({ message: "Insufficient balance or user not found" });
+                return;
+            }
+
+            res.status(200).json(result);
+        } catch (error) {
+            console.error("Error in checkAndUpdateWallet:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+
+    // ************************ get wallet ***********************
+    async getWallet(req: Request, res: Response): Promise<void> {
+        try {
+            console.log(req.query, "get booking history query");
+            const userId = req.query.userId as string | undefined;
+            const page = req.query.page ? Number(req.query.page) : 1;
+            const limit = req.query.limit ? Number(req.query.limit) : 2;
+            console.log(userId, "userid");
+
+            if (!userId) {
+                res.status(400).json({ message: "User ID is required." });
+                return;
+            }
+
+            const result = await this.userServices.getWalletPage(userId, page, limit);
+            if (!result) {
+                res.status(500).json({ message: "Error fetching booking history" });
+                return;
+            }
+            res.status(200).json(result.data);
+        } catch (error) {
+            console.error("Error fetching booking history:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+
+    // *******************************create Review and ratings*************************
+    async createReviewAndRatings(req: Request, res: Response): Promise<void> {
+        try {
+            console.log("Initiating createReviewAndRatings...", req.body);
+
+            const reviewData = req.body as ReviewDataInterface | undefined;
+
+            if (!reviewData) {
+                res.status(400).json({ success: false, message: "Review data is required." });
+                return;
+            }
+
+            const result = await this.userServices.createReviewData(reviewData);
+
+            if (result?.data?.success) {
+                res.status(201).json({
+                    success: true,
+                    message: "Review and rating created successfully.",
+                    data: result.data.data,
+                });
+            } else {
+                res.status(400).json({
+                    success: false,
+                    message: "Failed to create review and rating. Please try again.",
+                });
+            }
+        } catch (error) {
+            console.error("Error in createReviewAndRatings:", error);
+            res.status(500).json({
+                success: false,
+                message: "An unexpected error occurred while creating the review and rating.",
+            });
+        }
+    }
+
+    // ***************************check BookId exist in review*****************
+    async checkBookIdinReview(req: Request, res: Response): Promise<void> {
+        try {
+            console.log("check bookId", req.query)
+            const bookId = req.query.bookId as string | undefined;
+            if (!bookId) {
+                res.status(400).json({ success: false, message: "BookId is required." });
+                return;
+            }
+
+            const result = await this.userServices.checkBookidInReview(bookId);
+
+            if (result?.data?.success) {
+                res.status(201).json({
+                    success: true,
+                    data: result.data.data,
+                });
+            } else {
+                res.status(200).json({
+                    success: false,
+                    
+                });
+            }
+        } catch (error) {
+            console.error("Error in bookId in review:", error);
+            res.status(500).json({
+                success: false,
+                message: "An unexpected error occurred while bookId in review",
+            });
+        }
+
+    }
+
 }

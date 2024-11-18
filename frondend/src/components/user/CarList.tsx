@@ -6,11 +6,16 @@ import { fetchCars } from "../../Api/User";
 import { CarDataInterface } from "../../Interface/CarInterface";
 import { useNavigate } from "react-router-dom";
 import { BiError } from "react-icons/bi";
+import Pagination from "../../Pages/Common/Pagination";
 
 function CarList() {
     const [carData, setCarData] = useState<CarDataInterface[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState<number>(1);
+    const limit = 2
     const navigate = useNavigate();
 
     const filterData = (data: CarDataInterface[] | { message: string }) => {
@@ -30,18 +35,21 @@ function CarList() {
             setError(data.message); // Set error from the response message
         }
     };
-    
+
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const result = await fetchCars();
+                const result = await fetchCars(page, limit);
+                console.log(result, 'Fetched car data');
 
                 if (result?.data?.data) {
                     setCarData(result.data.data);
+                    console.log(result.data.data.totalPage, "totalPage")
+                    setTotalPages(result.data.totalPage || 1);
                 } else {
-                    setError("No car data returned.");
+                    setError('No car data returned.');
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -52,7 +60,13 @@ function CarList() {
         };
 
         fetchData();
-    }, []);
+    }, [page]);
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+          setPage(newPage);
+        }
+      };
 
     return (
         <div>
@@ -78,8 +92,12 @@ function CarList() {
                         ))
                     )}
                 </div>
-
             </div>
+                <Pagination
+                    currentPage={page}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                />
         </div>
     );
 }

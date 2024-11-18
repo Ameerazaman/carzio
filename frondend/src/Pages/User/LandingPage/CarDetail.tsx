@@ -26,7 +26,8 @@ function CarDetail() {
     const [loading, setLoading] = useState(true);
     const [mainImage, setMainImage] = useState<string | null>(null); // Initialize mainImage as null
     const [error, setError] = useState('');
-
+    const [review, setReview] = useState<string[] | null>(null)
+    const [ratings, setRatings] = useState(0)
     let navigate = useNavigate();
 
     useEffect(() => {
@@ -36,12 +37,13 @@ function CarDetail() {
                 try {
                     const result = await carDetail(id);
                     console.log(result, "result detail") // Assuming `carDetails` is your fetch function, replace it with correct API call.
-                    let carData = result?.data;
+                    let carData = result?.data?.data;
                     const formatDate = (dateString: string) => {
                         const date = new Date(dateString);
                         return date.toISOString().split('T')[0]; // Formats to YYYY-MM-DD
                     };
-
+                    setRatings(result?.data?.ratings)
+                    setReview(result?.data?.review)
                     setCarDetails({
                         car_name: carData?.car_name || '',
                         model: carData?.model || '',
@@ -59,8 +61,8 @@ function CarDetail() {
                         providerId: carData?.providerId || ''
                     });
                     // Set main image only if images exist
-                    if (result?.data?.images && result.data.images.length > 0) {
-                        setMainImage(result.data.images[0]);
+                    if (result?.data?.data?.images && result.data.data.images.length > 0) {
+                        setMainImage(result.data.data.images[0]);
                     }
                     setLoading(false);
                 } catch (err) {
@@ -83,9 +85,9 @@ function CarDetail() {
 
     return (
         <div className="flex p-6 bg-gray-100">
-            {/* Right Side: Images and Booking */}
+
             <div className="w-1/2 pr-6">
-                {/* Main Image Display */}
+
                 <img
                     src={mainImage ?? ""}
                     alt={carDetails.car_name || "Car Image"}
@@ -106,16 +108,41 @@ function CarDetail() {
                 </div>
 
                 {/* Thank you message */}
-                <div className="bg-gray-200 p-4 rounded-lg shadow-lg text-center">
-                    <h3 className="text-xl font-semibold text-gray-700">Thank you for considering our car for your rental needs!</h3>
-                    <p className="text-gray-600">We appreciate your interest and hope to provide you with the best service.</p>
+                <div className="mt-6">
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4">Customer Reviews</h3>
+                    <ul className="space-y-4">
+                        {review && review.length > 0 ? (
+                            review.map((r, index) => (
+                                <li key={index} className="bg-gray-200 p-4 rounded-lg shadow-lg">
+                                    <p className="text-gray-800 font-medium">Review {index + 1}:</p>
+                                    <p className="text-gray-700 mt-2">{r}</p>
+                                </li>
+                            ))
+                        ) : (
+                            <p className="text-gray-600 italic">No reviews available for this car.</p>
+                        )}
+                    </ul>
                 </div>
+
             </div>
+
 
             {/* Left Side: Car Details */}
             <div className="w-1/2">
+
                 <div className="bg-white rounded-lg shadow-lg p-6">
                     <h2 className="text-3xl font-bold text-gray-800 mb-4">{carDetails.car_name}</h2>
+                    <div className="flex mb-4">
+                        {Array.from({ length: 5 }, (_, index) => (
+                            <span
+                                key={index}
+                                className={`text-2xl ${index < Math.round(ratings) ? "text-yellow-500" : "text-gray-300"
+                                    }`}
+                            >
+                                ★
+                            </span>
+                        ))}
+                    </div>
                     <div className="grid grid-cols-2 gap-4">
                         <p className="flex items-center">
                             <FaCar className="mr-2 text-blue-600" />
@@ -183,6 +210,11 @@ function CarDetail() {
                         </p>
                         <p>{new Date(carDetails.rcExpiry).toLocaleDateString()}</p>
                     </div>
+                    <div className="mt-6">
+
+
+                    </div>
+
 
                     <button className="bg-red-600 mt-4 text-white py-2 px-4 rounded-lg text-lg font-semibold hover:bg-red-500 transition duration-200 ease-in-out shadow-lg transform hover:scale-105">
                         Book Now

@@ -15,6 +15,12 @@ import { UserAddressAuthResponse } from '../../Interface/AuthServices/UserAddres
 import { CouponAuthResponse } from '../../Interface/AuthServices/CouponAuthInterface';
 import { BookingInterface } from '../../Interface/BookingInterface';
 import { BookingAuthResponse } from '../../Interface/AuthServices/BookingAuthInterface';
+import { BookingDateAuthInterface, BookingDateInterface } from '../../Interface/AuthServices/BookingDateAuthInterface';
+import { WalletInterface } from '../../Interface/WalletInterface';
+import { WalletAuthInterface } from '../../Interface/AuthServices/WalletAuthInterface';
+import { useDeprecatedInvertedScale } from 'framer-motion';
+import { ReviewDataInterface } from '../../Interface/ReviewInterface';
+import { ReviewAuthInterface } from '../../Interface/AuthServices/ReviewAuthResponse';
 
 
 
@@ -171,18 +177,21 @@ export class UserServices {
 
 
     // *****************************************fetch cars for card****************************
-    async fetchCars(): Promise<CarAuthResponse | undefined> {
+    async fetchCars(page: number, limit: number): Promise<CarAuthResponse | undefined> {
         try {
-            const carData = await this.userRepository.fetchCars();
+            const carData = await this.userRepository.fetchCars(page, limit);
+            const totalPage = await this.userRepository.countsOfCar()
             console.log(carData, "fetch cars services");
 
-            if (carData && carData.length > 0) {
+            if (carData && carData.length > 0 && totalPage) {
                 return {
                     status: OK,
                     data: {
                         success: true,
                         message: 'Success',
-                        data: carData, // Return all users
+                        data: carData,
+                        page: page,
+                        totalPage: Math.ceil(totalPage / limit) ?? 1
                     },
                 };
             } else {
@@ -207,15 +216,40 @@ export class UserServices {
         }
     }
     // ********************************car Details ********************
-    async carDetails(id: string): Promise<CarDataInterface | null> {
+    async carDetails(id: string): Promise<CarAuthResponse | null> {
         try {
-            console.log("exist car in services")
-            return await this.userRepository.carDetails(id); // Use the repository method for checking
+            console.log("Fetching car details in services");
+
+            const carDetails = await this.userRepository.carDetails(id);
+
+            if (!carDetails) {
+                return {
+                    status: 400,
+                    data: {
+                        success: false,
+                        message: "No car found with the given ID.",
+                    },
+                };
+            }
+
+            const { averageRating, reviews } = await this.userRepository.getReviewAndRatings(id);
+
+            return {
+                status: 200,
+                data: {
+                    success: true,
+                    message: "Car details fetched successfully.",
+                    data: carDetails,
+                    ratings: averageRating ?? 0, // Default to 0 if no average rating
+                    review: reviews.length > 0 ? reviews : [], // Default to an empty array if no reviews
+                },
+            };
         } catch (error) {
-            console.error("Error checking edit car via repository:", error);
+            console.error("Error fetching car details:", error);
             return null;
         }
     }
+
     // ******************************car filter*******************
     async carFilter(engineType?: string[], fuelType?: string[], sortPrice?: string): Promise<CarDataInterface[] | null> {
         try {
@@ -557,16 +591,21 @@ export class UserServices {
 
     // ************************* booking page************************
 
-    async getBookingHistory(userId: string): Promise<BookingAuthResponse | undefined> {
+    async getBookingHistory(userId: string, page: number, limit: number): Promise<BookingAuthResponse | undefined> {
         try {
             console.log("getbooking history", userId)
-            const bookingHistory = await this.userRepository.getBookingHistory(userId);
-            if (bookingHistory) {
+            const bookingHistory = await this.userRepository.getBookingHistory(userId, page, limit);
+            console.log(bookingHistory, "booking history and documents",)
+            const historyDocuments = await this.userRepository.countBookingHistory(userId)
+            console.log(historyDocuments, "documents")
+            if (bookingHistory && historyDocuments) {
                 return {
                     status: OK,
                     data: {
                         success: true,
                         data: bookingHistory,
+                        page: page,
+                        totalPage: Math.ceil(historyDocuments / limit) ?? 1
                     },
                 };
             } else {
@@ -626,11 +665,14 @@ export class UserServices {
 
     // *******************************update status for booking*****************
 
-    async cancelBookingByUser(bookingId: string): Promise<BookingAuthResponse | undefined> {
+    async cancelBookingByUser(bookingId: string, userId: string, amount: number): Promise<BookingAuthResponse | undefined> {
         try {
             console.log("update booking status", bookingId)
             const updateStatus = await this.userRepository.cancelBookingByUser(bookingId);
-            if (updateStatus) {
+            console.log(updateStatus, "updatestaus")
+            const updateWallet = await this.userRepository.cancelBookingUpdateWallet(bookingId, userId, amount)
+            console.log(updateWallet, 'update wallet')
+            if (updateStatus && updateWallet) {
                 return {
                     status: OK,
                     data: {
@@ -643,7 +685,7 @@ export class UserServices {
                     status: BAD_REQUEST,
                     data: {
                         success: false,
-                        message: "Boking cancel not working"
+                        message: "Booking cancel not working"
                     },
                 };
             }
@@ -659,4 +701,216 @@ export class UserServices {
         }
     }
 
-}
+    // ***************************check booked or not****************
+    async checkBookedOrNot(issueDate: string, returnDate: string, carId: string): Promise<BookingDateAuthInterface | undefined> {
+        try {
+            const checkBooking: BookingDateInterface[] | null = await this.userRepository.checkBookedOrNot(carId);
+            console.log(checkBooking, "checkBooking");
+
+            if (!checkBooking) {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "No booking data available.",
+                    },
+                };
+            }
+
+            const issueDateObj = new Date(issueDate);
+            const returnDateObj = new Date(returnDate);
+            const isBooked = checkBooking.some(booking => {
+                const bookingIssueDate = new Date(booking.issueDate);
+                const bookingReturnDate = new Date(booking.returnDate);
+
+                return (
+                    (issueDateObj <= bookingReturnDate && returnDateObj >= bookingIssueDate)
+                );
+            });
+
+            if (isBooked) {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "The selected booking dates are unavailable as they overlap with an existing reservation. Please choose different dates.",
+                    },
+                };
+            }
+
+            return {
+                status: OK,
+                data: {
+                    success: true,
+                    message: "The selected booking dates are available.",
+                    data: checkBooking,
+                },
+            };
+        } catch (error) {
+            console.error("Error fetching booking data:", (error as Error).message);
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: "Internal server error.",
+                },
+            };
+        }
+    }
+
+    // *************************check wallet and update ****************
+    async checkWalletAndUpdate(userId: string, amount: number): Promise<WalletAuthInterface | undefined> {
+        try {
+            let result = await this.userRepository.checkBalanceAndUpdateWallet(userId, amount)
+            console.log(result, "check wallet and update")
+            if (result) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        message: "Your booking amount is debited from your wallet",
+                        data: result,
+                    },
+                };
+            }
+            else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "Insufficent blance for booking,Please select another Payment option"
+                    },
+                };
+            }
+
+
+        } catch (error) {
+            console.error("Error fetching booking data:", (error as Error).message);
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: "Internal server error.",
+                },
+            };
+        }
+    }
+
+
+    // ************************* walle page************************
+
+    async getWalletPage(userId: string, page: number, limit: number): Promise<WalletAuthInterface | undefined> {
+        try {
+            const walletPage = await this.userRepository.getWalletPage(userId, page, limit);
+            const walletDocuments = await this.userRepository.countWalletDocuments(userId);
+
+            if (walletPage && walletDocuments) {
+                const lastTransaction = walletPage[walletPage.length - 1];
+                let totalPrice = lastTransaction?.TotalAmt ?? 0;  // Default to 0 if TotalAmt is null or undefined
+
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        data: walletPage,
+                        page: page,
+                        totalPage: Math.ceil(walletDocuments / limit) ?? 1,
+                        totalAmount: totalPrice,  // Ensure it's always a number
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "Booking history is not found",
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error fetching updateCoupon:", (error as Error).message);
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
+
+    // **************************create Review and ratings*********************
+
+    async createReviewData(reviewData: ReviewDataInterface): Promise<ReviewAuthInterface | undefined> {
+        try {
+            const reviewDocument = await this.userRepository.createReviewData(reviewData);
+
+            if (reviewDocument) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        data: reviewDocument,
+                        message: "Review added successfully.",
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "Failed to add review. Please check the provided data and try again.",
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error creating review:", (error as Error).message);
+
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: "An unexpected error occurred while processing your request. Please try again later.",
+                },
+            };
+        }
+    }
+
+    // **********************************check booki Id in reviewer***********************
+    async checkBookidInReview(bookId: string): Promise<ReviewAuthInterface | undefined> {
+        try {
+            const reviewDocument = await this.userRepository.checkBookidInReview(bookId);
+
+            if (reviewDocument) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        data: reviewDocument,
+                        message: "Review added successfully.",
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "Failed to add review. Please check the provided data and try again.",
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error creating review:", (error as Error).message);
+
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: "An unexpected error occurred while processing your request. Please try again later.",
+                },
+            };
+        }
+    }
+
+
+}    
