@@ -6,11 +6,11 @@ import { User } from '../../Common/Navbar';
 import { AddressInterface } from '../../../Interface/AddressInterface';
 import toast from 'react-hot-toast';
 
-interface AddressMgtInBookingProps {
+interface AddressMgtInProps {
     onAddressIdChange: (id: string) => void;
 }
 
-function AddressMgtInBooking({ onAddressIdChange }: AddressMgtInBookingProps) {
+function UserAddress({ onAddressIdChange }: AddressMgtInProps) {
     const user = useSelector((state: RootState) => state.user.currentUser) as User | null;
     const [addressId, setAddressId] = useState('');
     const [isEditingAddress, setIsEditingAddress] = useState(false);
@@ -153,6 +153,5 @@ function AddressMgtInBooking({ onAddressIdChange }: AddressMgtInBookingProps) {
     );
 }
 
-export default AddressMgtInBooking;
-
+export default UserAddress;
 

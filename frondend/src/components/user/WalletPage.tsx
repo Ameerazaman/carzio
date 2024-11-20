@@ -15,7 +15,7 @@ function WalletPage() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [total, setTotal] = useState(0);
+  const [total, setTotal] = useState<number>(0); // Ensure total is a number
   const limit = 10;
 
   useEffect(() => {
@@ -25,7 +25,7 @@ function WalletPage() {
           const result = await getWalletPage(user._id, page, limit); // Pass them as separate arguments
           setWallet(result.data.data);
           setTotalPages(result.data.totalPage || 1);
-          setTotal(result.data.totalAmount);
+          setTotal(result.data.totalAmount || 0); // Default to 0 if totalAmount is undefined
           setLoading(false);
         } catch (error) {
           setError("Error fetching booking history.");
@@ -54,27 +54,56 @@ function WalletPage() {
   return (
     <div>
       <Navbar />
-      
+
       {/* Total Wallet Balance Section with Yellow to Red Gradient Background */}
-      <div className="flex items-center justify-center bg-gradient-to-r from-yellow-400 to-red-500 text-white p-6 rounded-lg shadow-lg max-w-md mx-auto mt-10">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold mb-2">Total Wallet Balance</h2>
-          <div className="border-b-2 border-white mb-2"></div>
-          <p className="text-4xl font-bold">{`₹${total.toFixed(2)}`}</p>
+
+
+      {/* Loading or Empty Wallet Data */}
+      {loading ? (
+        <div className="text-center text-lg text-gray-500">Fetching your wallet data...</div>
+      ) : walletData && walletData.length > 0 ? (
+        <>
+          {/* Wallet Table */}
+          <br />
+          <div className="text-center flex flex-col items-center space-y-4">
+            {/* Cartoon Wallet Icon */}
+
+
+            {/* Wallet Balance Text */}
+            <h2 className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent animate-pulse">
+              Total Wallet Balance:{" "}
+              <span className="text-3xl font-extrabold">{`₹${total.toFixed(2)}`}</span>
+            </h2>
+          </div>
+
+
+
+          <WalletTable walletData={walletData} />
+
+          {/* Pagination */}
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </>
+      ) : (
+        <div className="flex items-center justify-center min-h-screen flex-col">
+          {/* Empty Wallet Message */}
+          <div className="text-2xl font-semibold text-gray-600 mb-4 animate-pulse">Your wallet is empty</div>
+          <div className="w-40 h-40 bg-gray-200 rounded-full flex items-center justify-center animate-bounce">
+            {/* Empty Wallet Icon */}
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4 3C4 2.44772 4.44772 2 5 2H15C15.5523 2 16 2.44772 16 3V17C16 17.5523 15.5523 18 15 18H5C4.44772 18 4 17.5523 4 17V3ZM5 4V16H15V4H5ZM6 6H14V7H6V6Z" clipRule="evenodd" />
+            </svg>
+
+          </div>
+          <p className="text-lg text-gray-500 mt-4 animate-fade-in">Looks like you haven't made any transactions yet. Start adding funds to your wallet to see your balance here!</p>
         </div>
-      </div>
-
-      {/* Wallet Table */}
-      <WalletTable walletData={walletData} />
-
-      {/* Pagination */}
-      <Pagination
-        currentPage={page}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+      )}
     </div>
   );
 }
 
 export default WalletPage;
+

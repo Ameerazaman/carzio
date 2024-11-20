@@ -7,145 +7,49 @@ import { ProfileInterface } from '../../../Interface/ProfileInterface';
 import { AddressInterface } from '../../../Interface/AddressInterface';
 import toast from 'react-hot-toast';
 import { editAddress, editProfile, checkAddress, checkProfile, saveAddressData, saveProfileData } from '../../../Api/User';
+import UserAddress from './UserAdress';
 
 const UserProfile = () => {
-    const user = useSelector((state: RootState) => state.user.currentUser) as User | null;
+    const user = useSelector((state: RootState) => state.user .currentUser) as User | null;
     const [isEditing, setIsEditing] = useState(false);
     const [errors, setErrors] = useState<Partial<ProfileInterface>>({});
-    const [addressId, setAddressId] = useState('');
-    const [isEditingAddress, setIsEditingAddress] = useState(false);
     const [profileId, setProfileId] = useState('');
+    const[addressId,setAddressId]=useState('')
     const [profile, setProfile] = useState<ProfileInterface>({
         name: '',
         email: '',
         phone: '',
         adharNo: '',
         gender: "",
-        id: user?._id
-    });
-    const [currentAddress, setCurrentAddress] = useState<AddressInterface>({
-        houseName: '',
-        street: '',
-        city: '',
-        state: '',
-        district: '',
-        zip: '',
         userId: user?._id
     });
-    const [addressErrors, setAddressErrors] = useState<Partial<AddressInterface>>({});
 
     useEffect(() => {
+        console.log("userid", user)
         const fetchProfile = async () => {
-            if (user && user._id) {
-                // Fetch and set profile data
+            if (user) {
+                console.log("userid", user._id)
                 try {
                     const result = await checkProfile(user._id);
+                    console.log(result, "profile")
                     if (result?.status === 200) {
                         setProfile(result.data);
                         setProfileId(result.data._id);
                         setIsEditing(true);
                     } else {
-                        setProfile({ name: '', email: '', phone: '', adharNo: '', gender: '', id: undefined });
+                        setProfile({ name: '', email: '', phone: '', adharNo: '', gender: '', userId: undefined });
                         toast.error('No profile found. Please create a new profile.');
                     }
                 } catch {
-                    toast.error('Error fetching profile');
-                }
-                try {
-                    const response = await checkAddress(user._id);
-                    if (response?.status === 200) {
-                        setCurrentAddress(response.data.data);
-
-                        setAddressId(response.data.data._id);
-                        setIsEditingAddress(true);
-
-                    } else {
-
-                        toast.error('No address found. Please create a new address.');
-                    }
-                } catch {
-                    toast.error('Error fetching address data.');
+                    toast.error('Error fetching profile data.');
 
                 }
             }
         };
-
         fetchProfile();
     }, [user]);
 
 
-
-    const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setCurrentAddress((prev) => ({ ...prev, [name]: value }));
-        // Clear errors when typing
-        if (addressErrors[name as keyof AddressInterface]) {
-            setAddressErrors((prev) => ({ ...prev, [name]: '' }));
-        }
-    };
-
-    const validateAddress = (): boolean => {
-        const newErrors: Partial<AddressInterface> = {};
-        if (!currentAddress.houseName) newErrors.houseName = 'House Name is required';
-        if (!currentAddress.street) newErrors.street = 'Street is required';
-        if (!currentAddress.city) newErrors.city = 'City is required';
-        if (!currentAddress.state) newErrors.state = 'State is required';
-        if (!currentAddress.district) newErrors.district = 'District is required';
-        if (!currentAddress.zip) {
-            newErrors.zip = 'ZIP is required';
-        } else if (!/^\d{5,6}$/.test(currentAddress.zip)) {
-            newErrors.zip = 'ZIP should be 5 or 6 digits';
-        }
-        setAddressErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const saveAddress = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!validateAddress()) {
-            toast.error('Please fill all fields correctly.');
-            return;
-        }
-        if (!user) {
-            toast.error('No provider data available.');
-            return;
-        }
-
-        const formData = {
-            houseName: currentAddress.houseName,
-            street: currentAddress.street,
-            city: currentAddress.city,
-            state: currentAddress.state,
-            district: currentAddress.district,
-            zip: currentAddress.zip,
-            userId: user?._id
-        };
-
-        try {
-            console.log(isEditingAddress, "edit address")
-            if (isEditingAddress) {
-
-                const result = await editAddress(formData, addressId);
-                if (result) {
-
-                    toast.success('Address updated successfully.');
-                } else {
-                    toast.error('Failed to update Address.');
-                }
-            } else {
-                const result = await saveAddressData(formData);
-                setIsEditingAddress(true)
-                if (result) {
-                    toast.success('Address saved successfully.');
-                } else {
-                    toast.error('Failed to save Address.');
-                }
-            }
-        } catch (error) {
-            toast.error('Error saving profile. Please try again.');
-        }
-
-    };
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -189,6 +93,10 @@ const UserProfile = () => {
         return Object.keys(newErrors).length === 0;
     };
 
+
+    const handleAddressId = (id: string) => {
+        setAddressId(id)
+    };
     const saveProfile = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validateForm()) {
@@ -206,11 +114,12 @@ const UserProfile = () => {
             email: profile.email,
             adharNo: profile.adharNo,
             gender: profile.gender,
-            id: user?._id
+            userId: user?._id
         };
 
         try {
-            if (isEditingAddress) {
+            if (isEditing) {
+                console.log("hai,edit")
                 const result = await editProfile(formData, profileId);
                 if (result) {
                     setIsEditing(true)
@@ -219,6 +128,7 @@ const UserProfile = () => {
                     toast.error('Failed to update profile.');
                 }
             } else {
+                console.log("hai,save")
                 const result = await saveProfileData(formData);
                 setIsEditing(true)
                 if (result) {
@@ -308,8 +218,10 @@ const UserProfile = () => {
                 </div>
 
             </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl mb-8">
+            <div>
+                <UserAddress onAddressIdChange={handleAddressId} />
+            </div>
+            {/* <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl mb-8">
                 <h1 className="text-xl font-bold mb-3 text-red-600">Manage Address</h1>
                 <form onSubmit={saveAddress}>
                     <div className="grid grid-cols-3 gap-4 text-sm text-gray-700">
@@ -346,7 +258,7 @@ const UserProfile = () => {
                         </button>
                     </div>
                 </form>
-            </div>
+            </div> */}
         </div>
     );
 };

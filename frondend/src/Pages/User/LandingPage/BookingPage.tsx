@@ -9,10 +9,10 @@ import { BookingFormData } from '../../../Interface/BookingInterface';
 import { CarDataInterface } from '../../../Interface/CarInterface';
 import { CouponFormData } from '../../../Interface/CouponFormData';
 import { AddressInterface } from '../../../Interface/AddressInterface';
-import AddressMgtInBooking from './AddressMgtInBooking';
 import { OfferFormData } from '../../../Interface/OfferInterface';
 import toast from 'react-hot-toast';
 import { MdError } from 'react-icons/md';
+import UserAddress from './UserAdress';
 
 interface BookingDetails {
   date: string;
@@ -58,7 +58,7 @@ function BookingPage() {
           const result = await carDetail(carId);
           console.log(result?.data, "result car data");
 
-          const carDetails = result?.data;
+          const carDetails = result?.data?.data;
           setCarData(carDetails);
 
           if (carDetails) {
@@ -95,7 +95,6 @@ function BookingPage() {
 
           const couponData = await fetchCoupon(user?._id);
           const couponsArray = couponData?.data?.data || [];
-
           const validCoupons = couponsArray.filter(
             (coupon: CouponFormData) => formData.AmtOnDays >= coupon.minRentalAmount
           );
@@ -376,7 +375,7 @@ function BookingPage() {
             </div>
           </div>
           <div>
-            <AddressMgtInBooking onAddressIdChange={handleAddressId} />
+            <UserAddress onAddressIdChange={handleAddressId} />
           </div>
           {couponData &&
             <div className="bg-white rounded-lg shadow-lg p-6 space-y-4">

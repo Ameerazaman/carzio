@@ -1,7 +1,7 @@
 import { Document } from "mongoose";
 import { ObjectId } from "mongoose";
 
-export interface ProfileInterface extends Document {
+export interface ProfileInterface  {
     userId?: string;
     name: string | null | undefined;
     email: string | null | undefined;

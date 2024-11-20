@@ -226,9 +226,9 @@ const saveProfileData = async (profileData: ProfileInterface) => {
 }
 
 // *****************Edit Profile********************
-const editProfile = async (profile: ProfileInterface, id: string) => {
+const editProfile = async (profileData: ProfileInterface, id: string) => {
     try {
-        const result = await userApi.put(`/edit_profile/${id}`)
+        const result = await userApi.put(`/edit_profile/${id}`, { profileData })
         if (result) {
             return result
         }
@@ -443,7 +443,7 @@ const getWalletPage = async (userId: string, page: number, limit: number) => {
 const createReviewAndRatings = async (reviewData: reviewDataInterface): Promise<any> => {
     try {
         const result = await userApi.post(userRouter.createReviewRatings, reviewData); // Send data in the body
-        return result.data; 
+        return result.data;
     } catch (error) {
         console.error("Error creating review and ratings:", error);
         errorHandler(error as Error); // Use your error handler
@@ -453,8 +453,8 @@ const createReviewAndRatings = async (reviewData: reviewDataInterface): Promise<
 
 // *************************check bookId is exist in review ***********************
 
-const checkBookidInReview=async(bookId:string):Promise<any>=>{
-    try{
+const checkBookidInReview = async (bookId: string): Promise<any> => {
+    try {
         const result = await userApi.get(userRouter.checkBookIdInReview, {
             params: {
                 bookId
@@ -467,6 +467,22 @@ const checkBookidInReview=async(bookId:string):Promise<any>=>{
         throw error;
     }
 }
+
+// **********************chat history***********************
+
+const fetchChat = async (userId: string, providerId: string): Promise<any> => {
+    try {
+    
+        const result = await userApi.get(`/chat_history/${userId}/${providerId}`)
+        return result.data;  
+        
+    } catch (error) {
+        console.error("Error fetching chat history:", error);
+        errorHandler(error as Error);
+        throw error; 
+    }
+};
+
 
 export {
     signup,
@@ -498,6 +514,7 @@ export {
     storeCancelAmtToWallet,
     getWalletPage,
     createReviewAndRatings,
-    checkBookidInReview
+    checkBookidInReview,
+    fetchChat
 
 };

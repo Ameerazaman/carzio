@@ -1,7 +1,7 @@
 import { Document } from "mongoose";
 import { ObjectId } from "mongoose";
 
-export interface UserAddressInterface extends Document {
+export interface UserAddressInterface  {
     street: string | null | undefined;
     city: string | null | undefined;
     state: string | null | undefined;

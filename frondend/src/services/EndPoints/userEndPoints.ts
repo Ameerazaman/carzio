@@ -18,7 +18,8 @@ const userRouter = {
     getWallet:'/wallet',
     cancelAmtToWallet:'/cancel_amt_to_wallet',
     createReviewRatings:'/create_review_and_ratings',
-    checkBookIdInReview:'/check_bookid_in_Review'
+    checkBookIdInReview:'/check_bookid_in_Review',
+    chatHistory:'/chat_history'
   };
   
   export default userRouter;

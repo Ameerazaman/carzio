@@ -360,12 +360,11 @@ export class UserController {
         try {
             const userId = req.params.id;
             const result = await this.userServices.checkProfile(userId);
-
+            console.log(result, "userProfile")
             if (!result) {
-                res.status(404).json({ message: "Profile not found" });
+                res.status(400);
                 return;
             }
-
             res.status(200).json(result);
         } catch (error) {
             console.error("Error during fetch profile:", error);
@@ -376,10 +375,10 @@ export class UserController {
 
     async saveProfile(req: Request, res: Response): Promise<void> {
         try {
-            // Extract profileData from the request body
+
             const profileData = req.body.profileData;
 
-            // Save the profile using your user service
+            console.log(profileData, "profileData")
             const result = await this.userServices.saveProfile(profileData);
 
             if (!result) {
@@ -401,11 +400,11 @@ export class UserController {
     // ******************************8Edit profile*******************
     async editProfile(req: Request, res: Response): Promise<void> {
         try {
-            // Extract profileData from the request body
             const profileData = req.body.profileData;
-            const userId = req.params.id
+            const profileId = req.params.id
             // Save the profile using your user service
-            const result = await this.userServices.editProfile(profileData, userId);
+            console.log(profileData, "profile")
+            const result = await this.userServices.editProfile(profileData, profileId);
 
             if (!result) {
                 res.status(500).json({ message: "Error editing profile" });
@@ -434,7 +433,7 @@ export class UserController {
                 res.status(500).json({ message: "Address not found" });
                 return
             }
-
+            console.log(result, 'address')
             res.status(200).json({
                 success: true,
                 data: result
@@ -449,18 +448,14 @@ export class UserController {
 
     async saveAddress(req: Request, res: Response): Promise<void> {
         try {
-            // Extract profileData from the request body
-            const addressData = req.body.addressData;
 
-            // Save the profile using your user service
+            const addressData = req.body.addressData
             const result = await this.userServices.saveAddress(addressData);
-
             if (!result) {
                 res.status(500).json({ message: "Error saving Address" });
                 return
             }
 
-            // Successfully saved, return the response
             res.status(200).json({
                 success: true,
                 message: 'Address saved successfully',
@@ -474,10 +469,10 @@ export class UserController {
     // ******************************8Edit Address*******************
     async editAddress(req: Request, res: Response): Promise<void> {
         try {
-            // Extract profileData from the request body
+
             const addressData = req.body.addressData;
             const addressId = req.params.id
-            // Save the profile using your user service
+
             const result = await this.userServices.editAddress(addressData, addressId);
 
             if (!result) {
@@ -485,7 +480,6 @@ export class UserController {
                 return
             }
 
-            // Successfully saved, return the response
             res.status(200).json({
                 success: true,
                 message: 'Address edit successfully',
@@ -807,7 +801,7 @@ export class UserController {
             } else {
                 res.status(200).json({
                     success: false,
-                    
+
                 });
             }
         } catch (error) {
@@ -818,6 +812,36 @@ export class UserController {
             });
         }
 
+    }
+    // *********************************fetch chat history***********************8
+    async fetchChatHistory(req: Request, res: Response): Promise<void> {
+        try {
+            console.log(req.params, "req.qhjuer for chat history")
+            const userId = req.params.userId as string | undefined | '';
+            const providerId = req.params.providerId as string | undefined | '';
+            if (!userId || !providerId) {
+                res.status(400).json({ success: false, message: "userId and providerId are required" });
+                return; 
+            }
+            const result = await this.userServices.fetchChatHistory(userId, providerId);
+            if (result?.data?.success) {
+                res.status(200).json({
+                    success: true,
+                    data: result.data.data, 
+                });
+            } else {
+                res.status(200).json({
+                    success: false,
+                    message: "No chat history found",
+                });
+            }
+        } catch (error) {
+            console.error("Error in fetch chat history:", error);
+            res.status(500).json({
+                success: false,
+                message: "An unexpected error occurred while fetching chat history",
+            });
+        }
     }
 
 }

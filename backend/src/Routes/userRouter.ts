@@ -22,6 +22,7 @@ userRouter.get('/logout', async (req, res) => userController.userLogout(req, res
 
 userRouter.get('/cars', userAuth, async (req, res) => userController.fetchCars(req, res))
 userRouter.get('/car_details/:id', userAuth, async (req, res) => userController.carDetails(req, res))
+userRouter.get('/chat_history/:userId/:providerId', userAuth, async (req, res) => userController.fetchChatHistory(req, res));
 userRouter.post('/filter', userAuth, async (req, res) => userController.filterCar(req, res))
 userRouter.post('/search', userAuth, async (req, res) => userController.searchCar(req, res))
 userRouter.get('/offers', userAuth, async (req, res) => userController.fetchOffer(req, res))

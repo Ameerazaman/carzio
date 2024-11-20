@@ -2,14 +2,18 @@ import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Suspense, lazy, } from 'react'; // Import Suspense and lazy
 import Loading from './Pages/Common/Loading';
-import Profile from './Components/User/Profile';
-import CheckoutForm from './Pages/User/LandingPage/CheckOutForm';
+
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import WalletPage from './Components/User/WalletPage';
 
 const stripePromise = loadStripe('pk_test_51QJq7aDRjWHiMHMFbKsTqHRDHPep0XNgdvdjLwN8gWxkZpn2mMKx4fKXm0fQLjusUKKqRfFPzd17w52FH9Koe07800Ce8IksDd');
+
 // Lazy loading components
+const  Chat =lazy(()=>import( './Components/Provider/Chat'));
+const CheckoutForm = lazy(() => import('./Pages/User/LandingPage/CheckOutForm'));
+const Profile = lazy(() => import('./Components/User/Profile'));
+const WalletPage = lazy(() => import('./Components/User/WalletPage'));
+
 const HistoryDetailsInAdmin = lazy(() => (import('./Components/Admin/HistoryDetailsInAdmin')))
 const BookingHistoryInAdmin = lazy(() => (import('./Components/Admin/BookingHistoryInAdmin')))
 const HistoryDetailsInProvider = lazy(() => import('./Components/Provider/HistoryDetailsInProvider'))
@@ -80,6 +84,8 @@ function App() {
             <Route path='/booking_history' element={<BookingHistory />} />
             <Route path='/view_details/:bookingId' element={<UserHistoryDetails />} />
             <Route path='/wallet' element={<WalletPage />} />
+         
+
 
             {/* ************************************Provider Side*************************** */}
 
@@ -92,6 +98,7 @@ function App() {
             <Route path="/provider/edit_car/:id" element={<EditCarMgt />} />
             <Route path="/provider/booking" element={<BookingHistoryInProvider />} />
             <Route path='/provider/view_details/:bookingId' element={<HistoryDetailsInProvider />} />
+            <Route path='/provider/chat' element={<Chat/>} />
 
             {/* *************************************Admin Side**************************** */}
 

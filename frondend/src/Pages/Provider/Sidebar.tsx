@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaUser, FaCar, FaCog, FaSignOutAlt, FaCalendarAlt } from 'react-icons/fa';
+import { FaUser, FaCar, FaCog, FaSignOutAlt, FaCalendarAlt, FaComments } from 'react-icons/fa';
 
 function Sidebar() {
   return (
@@ -30,6 +30,13 @@ function Sidebar() {
             Booking
           </a>
         </li>
+        <li>
+          <a href="/provider/chat" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-200">
+          <FaComments className="mr-2" />
+            Chat
+          </a>
+        </li>
+       
         <li>
           <a href="/logout" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-200">
             <FaSignOutAlt className="mr-2" />

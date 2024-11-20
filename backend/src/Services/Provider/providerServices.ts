@@ -13,6 +13,7 @@ import { CarDataInterface } from '../../Interface/CarInterface';
 import { CarAuthResponse } from '../../Interface/AuthServices/CarAuthInterface';
 import { uploadImageToCloudinary } from '../../Utlis/Uploads';
 import { BookingAuthResponse } from '../../Interface/AuthServices/BookingAuthInterface';
+import { chatAuthInterface } from '../../Interface/AuthServices/ChatAuthResponse';
 
 export class ProviderServices {
     constructor(
@@ -597,6 +598,81 @@ export class ProviderServices {
                 data: {
                     success: false,
                     message: 'Internal server error',
+                },
+            };
+        }
+    }
+    // ***********************************fetch users chat by provider********************
+    async fetchUsersChat(providerId: string): Promise<chatAuthInterface> {
+        try {
+            console.log("fetchUsersChat", providerId);
+
+            // Fetch chat from the repository
+            const usersChat = await this.providerRepostry.fetchUsersChat(providerId);
+
+            // If chat is found, return a success response
+            if (usersChat) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        data: usersChat,
+                    },
+                };
+            } else {
+                // If no chat is found, return a failure response
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "No chat history found for the given receiver ID.",
+                    },
+                };
+            }
+        } catch (error) {
+            // Handle unexpected errors
+            console.error("Error fetching chat history:", (error as Error).message);
+
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: "Internal server error occurred while fetching chat history.",
+                },
+            };
+        }
+    }
+    // ********************************fetch chat history***********************
+    async fetchChatHistory(userId: string, providerId: string): Promise<chatAuthInterface | undefined> {
+        try {
+            const reviewDocument = await this.providerRepostry.fetchChatHistory(userId, providerId);
+
+            if (reviewDocument) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        data: reviewDocument,
+                        message: "Fetch Chat History successfully",
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "Failed to fetch chat history",
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error creating review:", (error as Error).message);
+
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: "An unexpected error occurred while processing your request. Please try again later.",
                 },
             };
         }

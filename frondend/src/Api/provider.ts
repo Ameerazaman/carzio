@@ -276,7 +276,7 @@ const editCarDetails = async (carData: CarDataInterface, id: string) => {
         // });
 
         const result = await providerAPI.put(`/provider/edit_Car/${id}`, carData,
-             { headers: { 'Content-Type': 'application/json' } },);
+            { headers: { 'Content-Type': 'application/json' } },);
 
         return result.data;
     } catch (error) {
@@ -289,7 +289,7 @@ const editCarDetails = async (carData: CarDataInterface, id: string) => {
 const editCarImage = async (uploadedFiles: File[], id: string) => {
     try {
         const formData = new FormData();
-        
+
         // Append each file to formData
         uploadedFiles.forEach((file) => {
             if (file instanceof File) {
@@ -299,8 +299,8 @@ const editCarImage = async (uploadedFiles: File[], id: string) => {
             }
         });
         const result = await providerAPI.put(
-            `/provider/edit_car_image/${id}`, 
-            formData, 
+            `/provider/edit_car_image/${id}`,
+            formData,
             { headers: { 'Content-Type': 'multipart/form-data' } } // Ensure 'multipart/form-data'
         );
 
@@ -314,23 +314,23 @@ const editCarImage = async (uploadedFiles: File[], id: string) => {
 //************************ */ Frontend - updateProfileImage function**************************
 const updateProfileImage = async (formData: FormData, id: string) => {
     try {
-      const result = await providerAPI.put(
-        `/provider/edit_profile_image/${id}`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data', // Required for file upload
-          },
-        }
-      );
-      return result.data;
+        const result = await providerAPI.put(
+            `/provider/edit_profile_image/${id}`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data', // Required for file upload
+                },
+            }
+        );
+        return result.data;
     } catch (error) {
-      console.error('Error in updateProfileImage:', error);
-      errorHandler(error as Error);
+        console.error('Error in updateProfileImage:', error);
+        errorHandler(error as Error);
     }
-  };
-  // ****************************Booking Page ***************************
-const getBookingHistory=async(providerId:string)=>{
+};
+// ****************************Booking Page ***************************
+const getBookingHistory = async (providerId: string) => {
     try {
         const result = await providerAPI.get(`/provider/booking_history/${providerId}`);
         return result;
@@ -342,7 +342,7 @@ const getBookingHistory=async(providerId:string)=>{
 }
 
 // ****************************booking details of specilf order***************
-const specificBookingDetails=async(bookingId:string)=>{
+const specificBookingDetails = async (bookingId: string) => {
     try {
         const result = await providerAPI.get(`/provider/details_of_specifc_order/${bookingId}`);
         return result;
@@ -354,7 +354,7 @@ const specificBookingDetails=async(bookingId:string)=>{
 }
 
 // ****************************cancel booking by user**********************
-const updateStatusOfBooking =async(bookingId:string,status:string)=>{
+const updateStatusOfBooking = async (bookingId: string, status: string) => {
     try {
         const result = await providerAPI.get(`/provider/update_status/${bookingId}/${status}`);
         return result;
@@ -364,7 +364,37 @@ const updateStatusOfBooking =async(bookingId:string,status:string)=>{
         throw error;
     }
 }
-  
+
+// ********************************fetch users***********************8
+const fetchUsersChat = async (providerId: string) => {
+    try {
+        const response = await providerAPI.get(`/provider/fetch_users_chat/${providerId}`);
+        console.log("API Response:", response.data);
+        return response.data; // Return only the data portion
+    } catch (error) {
+        console.error("Error fetching user chat:", error);
+        errorHandler(error as Error); // Custom error handler
+        throw new Error("Failed to fetch user chat.");
+    }
+};
+
+
+// **********************chat history***********************
+
+const fetchChat = async (providerId: string, userId: string): Promise<any> => {
+    try {
+        console.log(`Fetching chat history for providerId: ${providerId}, userId: ${userId}`);
+        const url = `/provider/chat_history/${providerId}/${userId}`;
+        console.log("API URL:", url);
+        const result = await providerAPI.get(url);
+        console.log("API Response:", result);
+        return result.data;
+    } catch (error) {
+        console.error("Error fetching chat history:", error);
+        throw error; // Handle the error appropriately
+    }
+};
+
 
 
 export {
@@ -387,5 +417,6 @@ export {
     getBookingHistory,
     specificBookingDetails,
     updateStatusOfBooking,
-
+    fetchUsersChat,
+    fetchChat
 };

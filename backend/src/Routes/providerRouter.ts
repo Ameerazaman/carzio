@@ -38,6 +38,15 @@ providerRouter.put('/edit_car_image/:id',providerAuthenticate, upload.array('ima
 providerRouter.get('/booking_history/:id',providerAuthenticate,async(req,res)=>providerController.getBookingHistory(req,res))
 providerRouter.get('/details_of_specifc_order/:id',providerAuthenticate,async(req,res)=>providerController.specificBookingDetails(req,res))
 providerRouter.get('/update_status/:id/:status',providerAuthenticate,async(req,res)=>providerController.updateStatusOfBooking(req,res))
-
+providerRouter.get('/fetch_users_chat/:providerId',providerAuthenticate,async(req,res)=>providerController.fetchUsersChat(req,res))
+// providerRouter.get('/chat_history/:providerId/:userId', providerAuthenticate, async (req, res) => providerController.fetchChatHistory(req, res));
+providerRouter.get('/chat_history/:providerId/:userId', (req, res, next) => {
+    console.log("Route hit: /chat_history/:providerId/:userId");
+    console.log("Params:", req.params);
+    console.log("Headers:", req.headers);
+    next(); // Pass control to the middleware or controller
+}, providerAuthenticate, async (req, res) => {
+    await providerController.fetchChatHistory(req, res);
+});
 
 export default providerRouter;

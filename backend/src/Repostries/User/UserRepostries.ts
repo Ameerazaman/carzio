@@ -19,6 +19,7 @@ import mongoose from 'mongoose';
 import WalletModel from '../../Model/User/WalletModel';
 import { ReviewDataInterface } from '../../Interface/ReviewInterface';
 import ReviewModel from '../../Model/User/ReviewModel';
+import ChatModel, { IChat } from '../../Model/User/ChatModel';
 
 
 interface UserLoginResponse {
@@ -162,12 +163,12 @@ export class UserRepository {
                     },
                 },
             ]);
-    
+
             console.log(result[0], "result ratings");
             if (result.length === 0) {
                 return { averageRating: null, reviews: [] };
             }
-    
+
             return {
                 averageRating: result[0].averageRating,
                 reviews: result[0].reviews,
@@ -177,7 +178,7 @@ export class UserRepository {
             return { averageRating: null, reviews: [] };
         }
     }
-    
+
     // ***************************filter************************
 
     async carFilter(engineType?: string[], fuelType?: string[], sortPrice?: string): Promise<CarDataInterface[] | null> {
@@ -267,8 +268,10 @@ export class UserRepository {
 
     // ***********************check profile******************
     async checkProfile(userId: string): Promise<ProfileInterface | null> {
-        const data = await UserProfileModel.findOne({ userId: userId });
+        console.log(userId, "check profile userId")
+        const data = await UserProfileModel.findOne({ userId: userId })
 
+        console.log(data, "data")
         if (data) {
             return {
                 _id: data._id,
@@ -287,7 +290,8 @@ export class UserRepository {
     async saveProfile(profileData: ProfileInterface): Promise<ProfileInterface | null> {
         try {
 
-            const savedProfile = await UserProfileModel.create(profileData);
+            const savedProfile = await UserProfileModel.create(profileData)
+            console.log(savedProfile, "save profile")
             return savedProfile as ProfileInterface;
         } catch (error) {
             console.error("Error saving profile:", (error as Error).message);
@@ -296,20 +300,17 @@ export class UserRepository {
     }
     // *************************Edit profile************************
 
-    async editProfile(profileData: ProfileInterface, userId: string): Promise<ProfileInterface | null> {
+    async editProfile(profileData: ProfileInterface, profileId: string): Promise<ProfileInterface | null> {
         try {
+            console.log("editprofile", profileData)
             const updatedProfile = await UserProfileModel.findOneAndUpdate(
-                { userId: userId },
+                { _id: profileId },
                 profileData,
                 { new: true }
             );
-
-
             if (updatedProfile) {
                 return updatedProfile as ProfileInterface;
             }
-
-
             return null;
         } catch (error) {
             console.error("Error updating profile:", error);
@@ -320,18 +321,17 @@ export class UserRepository {
     //******************** */ check Address**************************
     async checkAddress(userId: string): Promise<UserAddressInterface | null> {
         try {
+            console.log(userId, "check address userId")
             const checkAddress = await UserAddressModel.findOne({ userId: userId })
-
+            console.log(checkAddress, "checkaddress")
             if (checkAddress) {
                 return checkAddress as UserAddressInterface;
             }
-
             return null;
         } catch (error) {
             console.error("Error updating profile:", error);
             return null;
         }
-
     }
 
     // ***************save address*********************8
@@ -683,5 +683,14 @@ export class UserRepository {
             return null;
         }
     }
-
+// *************************fetch chat History******************************
+async fetchChatHistory(userId:string,providerId:string): Promise<IChat[] | null> {
+    try {
+        let result = await ChatModel.find({userId : userId,providerId:providerId })
+        return  result as IChat[]
+    } catch (error) {
+        console.error("Error check bookId in review:", (error as Error).message);
+        return null;
+    }
+}
 }

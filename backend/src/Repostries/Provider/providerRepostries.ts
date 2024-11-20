@@ -10,6 +10,7 @@ import providerAddress from "../../Model/Provider/ProviderAddressModel";
 import providerModel from "../../Model/Provider/ProviderModel";
 import BookingModel from "../../Model/User/BookingModel";
 import { Otp, OtpDocument } from "../../Model/User/OtpModel"; // Assuming OtpDocument is defined for the Otp schema
+import ChatModel, { IChat } from "../../Model/User/ChatModel";
 
 
 export class ProviderRepository {
@@ -119,7 +120,7 @@ export class ProviderRepository {
         }
     }
 
-// ***********************************save profile for provider*****************************
+    // ***********************************save profile for provider*****************************
     async saveProfile(providerData: ProviderAdressInterface): Promise<ProviderAdressInterface | null> {
         try {
 
@@ -388,102 +389,127 @@ export class ProviderRepository {
             return null;
         }
     }
- // ***************************booking history*****************
+    // ***************************booking history*****************
 
 
 
- async getBookingHistory(providerId: string): Promise<BookingInterface[] | null> {
-    try {
-        console.log(providerId, "userId in get booking history");
+    async getBookingHistory(providerId: string): Promise<BookingInterface[] | null> {
+        try {
+            console.log(providerId, "userId in get booking history");
 
-        const bookingHistory = await BookingModel.aggregate([
-            { $match: { providerId: providerId } },
-            {
-                $addFields: {
-                    CarsObjectId: { $toObjectId: "$CarsId" } // Convert CarsId string to ObjectId
-                }
-            },
-            {
-                $lookup: {
-                    from: 'carmodels', // Collection name for CarModel (Mongoose pluralizes by default)
-                    localField: 'CarsObjectId', // Use the converted ObjectId field
-                    foreignField: '_id',
-                    as: 'bookingDetails',
+            const bookingHistory = await BookingModel.aggregate([
+                { $match: { providerId: providerId } },
+                {
+                    $addFields: {
+                        CarsObjectId: { $toObjectId: "$CarsId" } // Convert CarsId string to ObjectId
+                    }
                 },
-            },
-            { $unwind: '$bookingDetails' } // Flatten the bookingDetails array
-        ]);
+                {
+                    $lookup: {
+                        from: 'carmodels', // Collection name for CarModel (Mongoose pluralizes by default)
+                        localField: 'CarsObjectId', // Use the converted ObjectId field
+                        foreignField: '_id',
+                        as: 'bookingDetails',
+                    },
+                },
+                { $unwind: '$bookingDetails' } // Flatten the bookingDetails array
+            ]);
 
-        console.log(bookingHistory, "booking history");
-        return bookingHistory.length ? bookingHistory : null;
+            console.log(bookingHistory, "booking history");
+            return bookingHistory.length ? bookingHistory : null;
+        } catch (error) {
+            console.error("Error fetching booking history with car details:", (error as Error).message);
+            return null;
+        }
+    }
+    // ***************************specific booking details*****************
+
+    async specificBookingDetails(bookingId: string): Promise<BookingInterface | null> {
+        try {
+            console.log(bookingId, "bookingId in get booking history");
+
+            // Convert bookingId to an ObjectId
+            const objectId = new mongoose.Types.ObjectId(bookingId);
+
+            const bookingHistory = await BookingModel.aggregate([
+                { $match: { _id: objectId } }, // Match the specific booking by ObjectId
+                {
+                    $addFields: {
+                        CarsObjectId: { $toObjectId: "$CarsId" }, // Convert CarsId to ObjectId
+                        UserAddressObjectId: { $toObjectId: "$UserAddressId" } // Convert UserAddressId to ObjectId
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'carmodels', // Collection name for CarModel
+                        localField: 'CarsObjectId',
+                        foreignField: '_id',
+                        as: 'bookingDetails'
+                    }
+                },
+                { $unwind: '$bookingDetails' }, // Flatten bookingDetails array
+                {
+                    $lookup: {
+                        from: 'useraddressmodels', // Collection name for UserAddress
+                        localField: 'UserAddressObjectId',
+                        foreignField: '_id',
+                        as: 'userAddress'
+                    }
+                },
+                { $unwind: '$userAddress' } // Flatten userAddress array
+            ]);
+
+            console.log(bookingHistory, "booking history");
+            return bookingHistory[0] || null; // Return the first matched result or null if none found
+        } catch (error) {
+            console.error("Error fetching booking history with car and address details:", (error as Error).message);
+            return null;
+        }
+    }
+    //  // *******************************update status for booking*****************
+
+    async updateStatusOfBooking(bookingId: string, status: string): Promise<BookingInterface | null> {
+        try {
+            const updatedBooking = await BookingModel.findByIdAndUpdate(
+                bookingId,
+                { status: status },
+                { new: true }
+            );
+            return updatedBooking as BookingInterface
+        } catch (error) {
+            console.error("Error fetching booking history with car and address details:", (error as Error).message);
+            return null;
+
+
+        }
+
+    }
+
+
+    // *****************************fetch users chat by provider*********************
+    async fetchUsersChat(providerId: string): Promise<IChat[] | null> {
+        try {
+            const result = await ChatModel.find({ providerId: providerId })
+                .sort({ timestamp: -1 }); // Sort in descending order by timestamp (-1 for descending)
+            return result as IChat[];
+        } catch (error) {
+            console.error("Error fetching users chat:", (error as Error).message);
+            return null;
+        }
+    }
+
+    // *************************fetch chat History******************************
+   async fetchChatHistory(userId:string,providerId:string): Promise<IChat[] | null> {
+    try {
+        console.log(userId,"userid",providerId,"providerid")
+        let result = await ChatModel.find({ userId: userId,providerId:providerId })
+        console.log(result,"fetch chat history provider")
+        return  result as IChat[]
     } catch (error) {
-        console.error("Error fetching booking history with car details:", (error as Error).message);
+        console.error("Error check bookId in review:", (error as Error).message);
         return null;
     }
 }
-// ***************************specific booking details*****************
-
-async specificBookingDetails(bookingId: string): Promise<BookingInterface | null> {
-    try {
-        console.log(bookingId, "bookingId in get booking history");
-
-        // Convert bookingId to an ObjectId
-        const objectId = new mongoose.Types.ObjectId(bookingId);
-
-        const bookingHistory = await BookingModel.aggregate([
-            { $match: { _id: objectId } }, // Match the specific booking by ObjectId
-            {
-                $addFields: {
-                    CarsObjectId: { $toObjectId: "$CarsId" }, // Convert CarsId to ObjectId
-                    UserAddressObjectId: { $toObjectId: "$UserAddressId" } // Convert UserAddressId to ObjectId
-                }
-            },
-            {
-                $lookup: {
-                    from: 'carmodels', // Collection name for CarModel
-                    localField: 'CarsObjectId',
-                    foreignField: '_id',
-                    as: 'bookingDetails'
-                }
-            },
-            { $unwind: '$bookingDetails' }, // Flatten bookingDetails array
-            {
-                $lookup: {
-                    from: 'useraddressmodels', // Collection name for UserAddress
-                    localField: 'UserAddressObjectId',
-                    foreignField: '_id',
-                    as: 'userAddress'
-                }
-            },
-            { $unwind: '$userAddress' } // Flatten userAddress array
-        ]);
-
-        console.log(bookingHistory, "booking history");
-        return bookingHistory[0] || null; // Return the first matched result or null if none found
-    } catch (error) {
-        console.error("Error fetching booking history with car and address details:", (error as Error).message);
-        return null;
-    }
-}
-//  // *******************************update status for booking*****************
-
-async updateStatusOfBooking(bookingId: string, status: string): Promise<BookingInterface | null> {
-    try {
-      const updatedBooking = await BookingModel.findByIdAndUpdate(
-        bookingId,
-        { status: status },
-        { new: true }
-      );
-      return updatedBooking as BookingInterface
-    } catch (error) {
-      console.error("Error fetching booking history with car and address details:", (error as Error).message);
-      return null;
-
-
-    }
-
-}
-
 }
 
 

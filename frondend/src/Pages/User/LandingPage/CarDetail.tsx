@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { FaCar, FaCalendarCheck, FaFileAlt, FaCertificate, FaIdCard, FaMoneyBillWave } from 'react-icons/fa';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { FaCar, FaCalendarCheck, FaFileAlt, FaCertificate, FaIdCard, FaMoneyBillWave, FaBook, FaCommentDots } from 'react-icons/fa';
 import { carDetail } from '../../../Api/User';
 import { CarDataInterface } from '../../../Interface/CarInterface';
+import ChatPage from './ChatPage';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../App/Store';
+import { User } from '../../Common/Navbar';
 
 function CarDetail() {
+
     const { id } = useParams<{ id: string }>();
+    const user = useSelector((state: RootState) => state.user.currentUser) as User | null;
+    const username=user?.username??''
+    const userId = user?._id ?? '';
     const [carDetails, setCarDetails] = useState<CarDataInterface>({
         car_name: '',
         model: '',
@@ -21,29 +29,34 @@ function CarDetail() {
         pollutionCertificateNumber: '',
         pollutionExpiry: '',
         providerId: '',
-        id: ''// Ensure this value is set from the provider data
+        id: '' // Ensure this value is set from the provider data
     });
+    const providerId = carDetails?.providerId ?? ''
     const [loading, setLoading] = useState(true);
     const [mainImage, setMainImage] = useState<string | null>(null); // Initialize mainImage as null
     const [error, setError] = useState('');
-    const [review, setReview] = useState<string[] | null>(null)
-    const [ratings, setRatings] = useState(0)
+    const [review, setReview] = useState<string[] | null>(null);
+    const [ratings, setRatings] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false); // Modal state for chat
+    const toggleModal = () => {
+        setIsModalOpen((prevState) => !prevState);  // Toggle the modal visibility
+    };
+
     let navigate = useNavigate();
 
     useEffect(() => {
-
         const fetchCarDetails = async () => {
             if (id) {
                 try {
                     const result = await carDetail(id);
-                    console.log(result, "result detail") // Assuming `carDetails` is your fetch function, replace it with correct API call.
+                    console.log(result, 'result detail'); // Assuming `carDetails` is your fetch function, replace it with correct API call.
                     let carData = result?.data?.data;
                     const formatDate = (dateString: string) => {
                         const date = new Date(dateString);
                         return date.toISOString().split('T')[0]; // Formats to YYYY-MM-DD
                     };
-                    setRatings(result?.data?.ratings)
-                    setReview(result?.data?.review)
+                    setRatings(result?.data?.ratings);
+                    setReview(result?.data?.review);
                     setCarDetails({
                         car_name: carData?.car_name || '',
                         model: carData?.model || '',
@@ -82,6 +95,8 @@ function CarDetail() {
     if (error) {
         return <div>{error}</div>;
     }
+
+    // Handle opening and closing the modal
 
     return (
         <div className="flex p-6 bg-gray-100">
@@ -216,11 +231,50 @@ function CarDetail() {
                     </div>
 
 
-                    <button className="bg-red-600 mt-4 text-white py-2 px-4 rounded-lg text-lg font-semibold hover:bg-red-500 transition duration-200 ease-in-out shadow-lg transform hover:scale-105">
-                        Book Now
-                    </button>
+
+                    <div className="flex flex-row items-center justify-center space-x-6">
+                        {/* Book Now Button */}
+                        <Link to={`/booking_details/${id}`}>
+                            <button className="flex items-center bg-blue-600 text-white py-3 px-8 rounded-lg text-lg font-semibold hover:bg-red-700 transition duration-300 ease-in-out shadow-xl transform hover:scale-105 space-x-3">
+                                <FaBook className="text-white text-xl" /> {/* Book Icon */}
+                                <span>Book Now</span>
+                            </button>
+                        </Link>
+
+                        {/* Chat with Provider Button */}
+                        <button
+                            onClick={toggleModal}
+                            className="flex items-center bg-green-600 text-white py-3 px-8 rounded-lg text-lg font-semibold hover:bg-red-700 transition duration-300 ease-in-out shadow-xl transform hover:scale-105 space-x-3"
+                        >
+                            <FaCommentDots className="text-white text-xl" /> {/* Chat Icon */}
+                            <span>Chat with Provider</span>
+                        </button>
+                    </div>
+
+
+
                 </div>
             </div>
+
+
+
+            {/* Modal: Chat */}
+            {isModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                    <div className="bg-white rounded-lg shadow-lg w-96 p-6 relative space-between" style={{ backgroundImage: 'url("/images/chat.avif")' }}>
+                        {/* Close button */}
+                        <button
+                            onClick={toggleModal}  // Make sure to toggle modal state here
+                            className="absolute top-2 right-2 text-red-800 hover:text-red-900 font-bold z-60"
+                        >
+                            X
+                        </button>
+
+                        <ChatPage userId={userId} providerId={providerId} username={username} />
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }

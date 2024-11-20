@@ -21,6 +21,7 @@ import { WalletAuthInterface } from '../../Interface/AuthServices/WalletAuthInte
 import { useDeprecatedInvertedScale } from 'framer-motion';
 import { ReviewDataInterface } from '../../Interface/ReviewInterface';
 import { ReviewAuthInterface } from '../../Interface/AuthServices/ReviewAuthResponse';
+import { chatAuthInterface } from '../../Interface/AuthServices/ChatAuthResponse';
 
 
 
@@ -912,5 +913,40 @@ export class UserServices {
         }
     }
 
+    // ********************************fetch chat history***********************
+    async fetchChatHistory(userId: string, providerId: string): Promise<chatAuthInterface | undefined> {
+        try {
+            const reviewDocument = await this.userRepository.fetchChatHistory(userId, providerId);
+
+            if (reviewDocument) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        data: reviewDocument,
+                        message: "Fetch Chat History successfully",
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "Failed to fetch chat history",
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error creating review:", (error as Error).message);
+
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: "An unexpected error occurred while processing your request. Please try again later.",
+                },
+            };
+        }
+    }
 
 }    

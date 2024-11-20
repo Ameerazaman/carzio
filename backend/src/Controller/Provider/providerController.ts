@@ -507,12 +507,12 @@ export class ProviderController {
             return res.status(500).json({ message: "Internal server error" });
         }
     }
-    
+
     // ******************************get booking history**************************8
     async getBookingHistory(req: Request, res: Response): Promise<void> {
         try {
             const providerId = req.params.id
-            console.log(providerId,"providerId")
+            console.log(providerId, "providerId")
             const result = await this.providerServices.getBookingHistory(providerId);
             if (!result) {
                 res.status(500).json({ message: "Error booking history" });
@@ -528,7 +528,7 @@ export class ProviderController {
     async specificBookingDetails(req: Request, res: Response): Promise<void> {
         try {
             const bookingId = req.params.id
-            console.log(bookingId,"bookingId")
+            console.log(bookingId, "bookingId")
             const result = await this.providerServices.specificBookingDetails(bookingId);
             if (!result) {
                 res.status(500).json({ message: "Error booking history" });
@@ -540,21 +540,69 @@ export class ProviderController {
             res.status(500).json({ message: "Internal server error" });
         }
     }
-  // *********************update Status Of Booking**********************
-  async updateStatusOfBooking(req:Request,res:Response):Promise<void>{
-    try {
-        const bookingId = req.params.id
-        const status=req.params.status
-        console.log(bookingId,"bookingId",status,"status")
-        const result = await this.providerServices.updateStatusOfBooking(bookingId,status);
-        if (!result) {
-            res.status(500).json({ message: "Status updation failed" });
-            return
+    // *********************update Status Of Booking**********************
+    async updateStatusOfBooking(req: Request, res: Response): Promise<void> {
+        try {
+            const bookingId = req.params.id
+            const status = req.params.status
+            console.log(bookingId, "bookingId", status, "status")
+            const result = await this.providerServices.updateStatusOfBooking(bookingId, status);
+            if (!result) {
+                res.status(500).json({ message: "Status updation failed" });
+                return
+            }
+            res.status(200).json(result.data);
+        } catch (error) {
+            console.error("Error cancel booking:", error);
+            res.status(500).json({ message: "Internal server error" });
         }
-        res.status(200).json(result.data);
+    }
+
+    // *****************************fetch users chat by provider*****************
+    async fetchUsersChat(req: Request, res: Response): Promise<void> {
+        try {
+            console.log(req.params, "req.params")
+            const providerId = req.params.providerId
+            console.log(providerId, "receiverId")
+            const result = await this.providerServices.fetchUsersChat(providerId);
+            if (!result) {
+                res.status(500).json({ message: "Fetch users chat is failed" });
+                return
+            }
+            res.status(200).json(result.data);
+        } catch (error) {
+            console.error("Error fetch users:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+ // *********************************fetch chat history***********************8
+ async fetchChatHistory(req: Request, res: Response): Promise<void> {
+    try {
+        console.log(req.params, "req.qhjuer for chat history")
+        const providerId = req.params.providerId as string | undefined | '';
+        const userId = req.params.userId as string | undefined | '';
+        if (!userId || !providerId) {
+            res.status(400).json({ success: false, message: "userId and providerId are required" });
+            return; 
+        }
+        const result = await this.providerServices.fetchChatHistory(userId, providerId);
+        if (result?.data?.success) {
+            res.status(200).json({
+                success: true,
+                data: result.data.data, 
+            });
+        } else {
+            res.status(200).json({
+                success: false,
+                message: "No chat history found",
+            });
+        }
     } catch (error) {
-        console.error("Error cancel booking:", error);
-        res.status(500).json({ message: "Internal server error" });
+        console.error("Error in fetch chat history:", error);
+        res.status(500).json({
+            success: false,
+            message: "An unexpected error occurred while fetching chat history",
+        });
     }
 }
 }
