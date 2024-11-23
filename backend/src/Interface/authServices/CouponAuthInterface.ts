@@ -7,6 +7,7 @@ export interface CouponAuthResponse {
         success: boolean;
         message?: string;
         data?: CouponInterface | CouponInterface[] | undefined
-     
+        page?: number,
+        totalPage?: number,
     };
 }

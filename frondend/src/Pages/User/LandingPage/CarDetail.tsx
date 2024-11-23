@@ -270,7 +270,7 @@ function CarDetail() {
                             X
                         </button>
 
-                        <ChatPage userId={userId} providerId={providerId} username={username} />
+                        <ChatPage senderId={userId} receiverId={providerId} username={username} />
                     </div>
                 </div>
             )}

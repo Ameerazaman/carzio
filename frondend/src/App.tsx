@@ -6,9 +6,11 @@ import Loading from './Pages/Common/Loading';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
+
 const stripePromise = loadStripe('pk_test_51QJq7aDRjWHiMHMFbKsTqHRDHPep0XNgdvdjLwN8gWxkZpn2mMKx4fKXm0fQLjusUKKqRfFPzd17w52FH9Koe07800Ce8IksDd');
 
 // Lazy loading components
+const DashboardProvider =lazy(()=>import('./Components/Provider/DashboardProvider'));
 const  Chat =lazy(()=>import( './Components/Provider/Chat'));
 const CheckoutForm = lazy(() => import('./Pages/User/LandingPage/CheckOutForm'));
 const Profile = lazy(() => import('./Components/User/Profile'));
@@ -99,7 +101,7 @@ function App() {
             <Route path="/provider/booking" element={<BookingHistoryInProvider />} />
             <Route path='/provider/view_details/:bookingId' element={<HistoryDetailsInProvider />} />
             <Route path='/provider/chat' element={<Chat/>} />
-
+            <Route path="/provider/dashboard" element={<DashboardProvider />} />
             {/* *************************************Admin Side**************************** */}
 
             <Route path="/admin/login" element={<LoginAdmin />} />

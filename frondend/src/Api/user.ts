@@ -483,6 +483,24 @@ const fetchChat = async (userId: string, providerId: string): Promise<any> => {
     }
 };
 
+// *****************************search car availabilty*******************
+const searchCarAvailabilty = async (issueDate: string, returnDate: string): Promise<any> => {
+    try {
+      console.log(issueDate, returnDate);
+      const result = await userApi.get(userRouter.searchCarAvailabilty, {
+        params: {
+          issueDate,
+          returnDate,
+        },
+      });
+      return result;
+    } catch (error) {
+      console.error("Error bookId in review:", error);
+      errorHandler(error as Error); // Use your error handler
+      throw error;
+    }
+  };
+  
 
 export {
     signup,
@@ -515,6 +533,7 @@ export {
     getWalletPage,
     createReviewAndRatings,
     checkBookidInReview,
-    fetchChat
+    fetchChat,
+    searchCarAvailabilty
 
 };

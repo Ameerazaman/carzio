@@ -10,6 +10,7 @@ const adminRouter = {
     fetchOffer:"/admin/fetchOffer",
     addCoupon:'/admin/add_coupon',
     fetchCoupon:"/admin/fetchCoupon",
+    getDashboard:'/admin/dashboard'
   };
   
   export default adminRouter;

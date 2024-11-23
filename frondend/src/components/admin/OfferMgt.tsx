@@ -5,22 +5,27 @@ import Sidebar from '../../Pages/Admin/Commons/Sidebar';
 import Table from '../../Pages/Admin/Commons/Table';
 import { carManagementt, fetchOffer } from '../../Api/Admin';
 import { Link } from 'react-router-dom';
+import Pagination from '../../Pages/Common/Pagination';
 
 function OfferMgt() {
   const [tableData, setTableData] = useState<Array<{ [key: string]: any }>>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const limit = 1;
   const header: string = 'offers'; // Define whether this is for users or providers
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const result = await fetchOffer();
+        const result = await fetchOffer(page,limit);
         console.log(result, "Fetched car data");
   
         if (result && result.data && result.data.data) {
           setTableData(result.data.data);
+          setTotalPages(result.data.totalPage || 1);
         } else {
           setError("Cars are Empty");
         }
@@ -33,8 +38,16 @@ function OfferMgt() {
     };
   
     fetchData();
-  }, []);
+  }, [page]);
   
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
+
+
   return (
     <div className="flex">
       <Sidebar />
@@ -56,7 +69,14 @@ function OfferMgt() {
             ) : error ? (
               <p className="text-center py-4 text-red-600">{error}</p>
             ) : (
+              <>
               <Table tableData={tableData} header={header} />
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </>
             )}
           </div>
         </div>

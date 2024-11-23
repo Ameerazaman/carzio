@@ -52,6 +52,9 @@ export class AdminController {
     }
   }
 
+  // ***********************************admin Login**************************8
+
+
   async adminLogin(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
       const { email, password }: { email: string; password: string } = req.body;
@@ -88,6 +91,7 @@ export class AdminController {
     }
   }
 
+  // ***************************admin logout***************************
 
   async adminLogout(req: Request, res: Response): Promise<void> {
     try {
@@ -110,13 +114,15 @@ export class AdminController {
       res.status(500).json({ message: "Internal server error" });
     }
   }
-
+  // ******************************fetch users**************************
   async fetchUsers(req: Request, res: Response): Promise<void> {
     try {
-      const result = await this.adminServices.fetchUsers(); // Fetch users from service
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const result = await this.adminServices.fetchUsers(page, limit);
 
+      console.log(result, "result in fetch users")
       if (result) {
-        // Respond with the service result, no need to return
         res.status(result.status).json(result.data);
       } else {
         res.status(500).json({ message: "Internal server error" });
@@ -127,29 +133,15 @@ export class AdminController {
     }
   }
 
-  async fetchProviders(req: Request, res: Response): Promise<void> {
-    try {
-      const result = await this.adminServices.fetchProviders(); // Fetch users from service
 
-      if (result) {
-        // Respond with the service result, no need to return
-        res.status(result.status).json(result.data);
-      } else {
-        res.status(500).json({ message: "Internal server error" });
-      }
-    } catch (error) {
-      console.error("Error during fetch provider:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  }
-
+  // **********************************edit User******************************8
 
   async editUser(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-      const id = req.params.id; // Extract 'id' from req.params
+      const id = req.params.id;
       console.log(id, "edit user admin controller");
 
-      // Validate if ID is a string and a valid ObjectId
+
       if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid ID parameter" });
       }
@@ -169,44 +161,45 @@ export class AdminController {
     }
   }
 
-
+  // *****************************************update user****************************
 
   async updateUser(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-      // Log incoming data to debug
+
       console.log("Edit Uiser - Params:", req.params);
       console.log("user Data:", req.body);
 
-      const id = req.params.id;  // Get the id from params
+      const id = req.params.id;
       if (!id) {
         return res.status(400).json({ message: 'ID is missing' });
       }
 
-      const userData = req.body;  // Directly use req.body, assuming you're sending JSON
+      const userData = req.body;
       if (!userData) {
         return res.status(400).json({ message: 'Profile data is missing' });
       }
 
-      // Call the service to save the profile
       const result = await this.adminServices.updateUser(userData, id);
       console.log(result, "Edit user Result");
 
       if (result?.status === OK) {
-        return res.status(OK).json(result.data);  // Return success response
+        return res.status(OK).json(result.data);
       } else {
-        return res.status(INTERNAL_SERVER_ERROR).json(result?.data);  // Handle internal error from service
+        return res.status(INTERNAL_SERVER_ERROR).json(result?.data);
       }
     } catch (error) {
       console.error("Error during profile update:", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   }
+
+  // ********************************* update status of Userss*****************
+
   async updateStatus(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-      const id = req.params.id; // Extract 'id' from req.params
+      const id = req.params.id;
       console.log(id, "edit user admin controller");
 
-      // Validate if ID is a string and a valid ObjectId
       if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid ID parameter" });
       }
@@ -225,6 +218,28 @@ export class AdminController {
       return res.status(500).json({ message: "Internal server error" });
     }
   }
+  // ********************************fetch providers*********************
+
+  async fetchProviders(req: Request, res: Response): Promise<void> {
+    try {
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const result = await this.adminServices.fetchProviders(page, limit);
+
+      if (result) {
+
+        res.status(result.status).json(result.data);
+      } else {
+        res.status(500).json({ message: "Internal server error" });
+      }
+    } catch (error) {
+      console.error("Error during fetch provider:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
+  // ******************************edit provider****************************88
+
   async editProvider(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
       const id = req.params.id; // Extract 'id' from req.params
@@ -251,37 +266,40 @@ export class AdminController {
   }
 
 
-
+  // ***********************************update provider*********************88
   async updateProvider(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-      // Log incoming data to debug
+
       console.log("Edit provider - Params:", req.params);
       console.log("provider Data:", req.body);
 
-      const id = req.params.id;  // Get the id from params
+      const id = req.params.id;
       if (!id) {
         return res.status(400).json({ message: 'ID is missing' });
       }
 
-      const providerData = req.body;  // Directly use req.body, assuming you're sending JSON
+      const providerData = req.body;
       if (!providerData) {
         return res.status(400).json({ message: 'Profile data is missing' });
       }
 
-      // Call the service to save the profile
       const result = await this.adminServices.updateProvider(providerData, id);
       console.log(result, "Edit provider Result");
 
       if (result?.status === OK) {
-        return res.status(OK).json(result.data);  // Return success response
+        return res.status(OK).json(result.data);
       } else {
-        return res.status(INTERNAL_SERVER_ERROR).json(result?.data);  // Handle internal error from service
+        return res.status(INTERNAL_SERVER_ERROR).json(result?.data);
       }
     } catch (error) {
       console.error("Error during provider data update:", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   }
+
+  // *************************8888update status provider*************************
+
+
   async updateStatusProvider(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
       const id = req.params.id;
@@ -388,7 +406,9 @@ export class AdminController {
   // *************************fetch car for car management********************
   async fetchCars(req: Request, res: Response): Promise<void> {
     try {
-      const result = await this.adminServices.fetchCars(); // Fetch users from service
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const result = await this.adminServices.fetchCars(page,limit); // Fetch users from service
 
       if (result) {
         // Respond with the service result, no need to return
@@ -448,7 +468,9 @@ export class AdminController {
   // ***************************fetch Offer**********************
   async fetchOffer(req: Request, res: Response): Promise<void> {
     try {
-      const result = await this.adminServices.fetchOffer(); // Fetch offers from service
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const result = await this.adminServices.fetchOffer(page,limit); // Fetch offers from service
       console.log(result, "result in fetch offer")
       if (result) {
         // Send the response, no explicit return needed
@@ -564,7 +586,9 @@ export class AdminController {
   // ***************************fetch Coupon**********************
   async fetchCoupon(req: Request, res: Response): Promise<void> {
     try {
-      const result = await this.adminServices.fetchCoupon(); // Fetch offers from service
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const result = await this.adminServices.fetchCoupon(page,limit); // Fetch offers from service
       console.log(result, "result in fetch Coupon")
       if (result) {
         // Send the response, no explicit return needed
@@ -651,53 +675,77 @@ export class AdminController {
       return res.status(500).json({ message: "Internal server error" });
     }
   }
-    // ******************************get booking history**************************8
-    async getBookingHistory(req: Request, res: Response): Promise<void> {
-      try {
-        
-          const result = await this.adminServices.getBookingHistory();
-          if (!result) {
-              res.status(500).json({ message: "Error booking history" });
-              return
-          }
-          res.status(200).json(result.data);
-      } catch (error) {
-          console.error("Error saving profile:", error);
-          res.status(500).json({ message: "Internal server error" });
+  // ******************************get booking history**************************8
+  async getBookingHistory(req: Request, res: Response): Promise<void> {
+    try {
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const result = await this.adminServices.getBookingHistory(page,limit);
+      if (!result) {
+        res.status(500).json({ message: "Error booking history" });
+        return
       }
+      res.status(200).json(result.data);
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
   }
   // ******************************details of specic details**************************8
   async specificBookingDetails(req: Request, res: Response): Promise<void> {
-      try {
-          const bookingId = req.params.id
-          console.log(bookingId,"bookingId")
-          const result = await this.adminServices.specificBookingDetails(bookingId);
-          if (!result) {
-              res.status(500).json({ message: "Error booking history" });
-              return
-          }
-          res.status(200).json(result.data);
-      } catch (error) {
-          console.error("Error saving profile:", error);
-          res.status(500).json({ message: "Internal server error" });
-      }
-  }
-// *********************update Status Of Booking**********************
-async updateStatusOfBooking(req:Request,res:Response):Promise<void>{
-  try {
+    try {
       const bookingId = req.params.id
-      const status=req.params.status
-      console.log(bookingId,"bookingId",status,"status")
-      const result = await this.adminServices.updateStatusOfBooking(bookingId,status);
+      console.log(bookingId, "bookingId")
+      const result = await this.adminServices.specificBookingDetails(bookingId);
       if (!result) {
-          res.status(500).json({ message: "Status updation failed" });
-          return
+        res.status(500).json({ message: "Error booking history" });
+        return
       }
       res.status(200).json(result.data);
-  } catch (error) {
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+  // *********************update Status Of Booking**********************
+  async updateStatusOfBooking(req: Request, res: Response): Promise<void> {
+    try {
+      const bookingId = req.params.id
+      const status = req.params.status
+      console.log(bookingId, "bookingId", status, "status")
+      const result = await this.adminServices.updateStatusOfBooking(bookingId, status);
+      if (!result) {
+        res.status(500).json({ message: "Status updation failed" });
+        return
+      }
+      res.status(200).json(result.data);
+    } catch (error) {
       console.error("Error cancel booking:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
   }
-}
+
+  // **************************get dash board constsnt data**********************
+  async getDashboardConstData(req: Request, res: Response): Promise<void> {
+    try {
+      const result = await this.adminServices.getConstDashboardData()
+      if (!result) {
+        res.status(500).json({
+          message: "Dashboard data could not be retrieved"
+        }
+        );
+        return
+      }
+      res.status(200).json(result.data.data);
+
+
+    } catch (error) {
+      console.error("Error cancel booking:", error);
+      res.status(500).json({
+        "message": "Internal server error while fetching dashboard data"
+      }
+      );
+    }
+  }
 }
 

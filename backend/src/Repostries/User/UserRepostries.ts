@@ -95,7 +95,9 @@ export class UserRepository {
         try {
 
             const skip = (page - 1) * limit;
-            const carDocuments = await CarModel.find().skip(skip)
+            const carDocuments = await CarModel.find()
+                .sort({ createdAt: -1 })
+                .skip(skip)
                 .limit(limit) as CarDataInterface[];
 
 
@@ -244,7 +246,7 @@ export class UserRepository {
     async fetchOffer(): Promise<OfferDataInterface[] | null> {
         try {
             // Fetch offers from the database, with type assertion
-            const data = await Offer.find() as OfferDataInterface[]; // Array of OfferDataInterface documents
+            const data = await Offer.find().sort({ createdAt: -1 }) as OfferDataInterface[]; // Array of OfferDataInterface documents
 
             console.log("Offers in management:", data);
 
@@ -453,6 +455,7 @@ export class UserRepository {
                     },
                 },
                 { $unwind: '$bookingDetails' },
+                { $sort: { createdAt: -1 } },
                 { $skip: (page - 1) * limit },
                 { $limit: limit },
             ]);
@@ -683,14 +686,49 @@ export class UserRepository {
             return null;
         }
     }
-// *************************fetch chat History******************************
-async fetchChatHistory(userId:string,providerId:string): Promise<IChat[] | null> {
-    try {
-        let result = await ChatModel.find({userId : userId,providerId:providerId })
-        return  result as IChat[]
-    } catch (error) {
-        console.error("Error check bookId in review:", (error as Error).message);
-        return null;
+    // *************************fetch chat History******************************
+    async fetchChatHistory(userId: string, providerId: string): Promise<IChat[] | null> {
+        try {
+            let result = await ChatModel.find({
+                $or: [
+                    {
+                        receiverId: userId, senderId: providerId
+                    },
+                    {
+                        receiverId: providerId, senderId: userId
+                    },
+                ],
+            });
+            return result as IChat[]
+        } catch (error) {
+            console.error("Error check bookId in review:", (error as Error).message);
+            return null;
+        }
     }
-}
+
+    // ************************************car availabilty in date***************************
+    async searchCarAvailability(startDate: string, endDate: string): Promise<CarDataInterface | null> {
+        try {
+
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+
+            const bookedCars = await BookingModel.find({
+                $or: [
+                    { IssueDate: { $lte: endDate }, ReturnDate: { $gte: startDate } },
+                ],
+            }).select('CarsId');
+
+            const bookedCarIds = bookedCars.map((booking) => booking.CarsId);
+            const availableCars = await CarModel.find({
+                _id: { $nin: bookedCarIds },
+            });
+            console.log(availableCars, "cars available")
+            return availableCars;
+        } catch (error) {
+            console.error('Error checking car availability:', error);
+            throw error;
+        }
+    };
+
 }

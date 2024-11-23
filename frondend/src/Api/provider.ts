@@ -203,10 +203,16 @@ const addCarDetails = async (carData: CarDataInterface) => {
     }
 };
 // ****************************car mnagement**************************
-const carManagement = async () => {
+const carManagement = async (providerId:string,page:number,limit:number) => {
     try {
         console.log("fetch cars")
-        const result = await providerAPI.get(providerRouter.carMgt)
+        const result = await providerAPI.get(providerRouter.carMgt, {
+            params: {
+                page,
+                limit,
+                providerId
+            }
+        });
         if (result) {
             return result
         }
@@ -330,9 +336,15 @@ const updateProfileImage = async (formData: FormData, id: string) => {
     }
 };
 // ****************************Booking Page ***************************
-const getBookingHistory = async (providerId: string) => {
+const getBookingHistory = async (providerId: string, page: number, limit: number) => {
     try {
-        const result = await providerAPI.get(`/provider/booking_history/${providerId}`);
+        const result = await providerAPI.get(providerRouter.bookingHistory, {
+            params: {
+                providerId,
+                page,
+                limit
+            }
+        });
         return result;
     } catch (error) {
         console.error("API Error:", error);
@@ -340,6 +352,7 @@ const getBookingHistory = async (providerId: string) => {
         throw error;
     }
 }
+
 
 // ****************************booking details of specilf order***************
 const specificBookingDetails = async (bookingId: string) => {
@@ -394,6 +407,17 @@ const fetchChat = async (providerId: string, userId: string): Promise<any> => {
         throw error; // Handle the error appropriately
     }
 };
+// ******************************get DashboardData********************
+const getDashboardConstData=async(providerId:string)=>{
+    try {
+        const result = await providerAPI.get(`/provider/dashboard/${providerId}`);
+        return result;
+    } catch (error) {
+        console.error("API Error:", error);
+        errorHandler(error as Error);
+        throw error;
+    }
+}
 
 
 
@@ -418,5 +442,6 @@ export {
     specificBookingDetails,
     updateStatusOfBooking,
     fetchUsersChat,
-    fetchChat
+    fetchChat,
+    getDashboardConstData
 };

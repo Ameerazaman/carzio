@@ -52,11 +52,17 @@ const adminLogout = async () => {
     }
 };
 
-
-const userManagement = async () => {
+// **************************fetch users for user mgt*******************888
+const userManagement = async (page: number, limit: number) => {
     try {
         console.log("fetch users")
-        const result = await adminAPI.get(adminRouter.userMgt)
+        const result = await adminAPI.get(adminRouter.userMgt, {
+            params: {
+                page,
+                limit,
+
+            }
+        });
         if (result) {
             return result
         }
@@ -67,7 +73,7 @@ const userManagement = async () => {
     }
 
 }
-
+// ***************************edit user ***************
 const editUser = async (id: string) => {
     try {
 
@@ -84,26 +90,28 @@ const editUser = async (id: string) => {
     }
 }
 
-
+// *******************************update user******************
 
 const updateUser = async (userData: signupFormData, userId: string) => {
     try {
         console.log("Edit profile called with ID:", userId, "and Data:", userData);
 
-        // Make PUT request to update profile
+
         const result = await adminAPI.put(`/admin/edit_user/${userId}`, userData, {
             headers: { 'Content-Type': 'application/json' },
         });
         console.log(result, "user update result");
 
         if (result) {
-            return result;  // Return result to update state or handle further
+            return result;
         }
     } catch (error) {
         console.error("Error in edit user Data:", error);
         errorHandler(error as Error);
     }
 };
+
+// ***********************************update status********************
 
 const updateStatus = async (id: string) => {
     try {
@@ -120,11 +128,17 @@ const updateStatus = async (id: string) => {
 
     }
 }
-
-const providerManagement = async () => {
+// *****************************provider managemenet***********************8
+const providerManagement = async (page: number, limit: number) => {
     try {
         console.log("fetch provider")
-        const result = await adminAPI.get(adminRouter.providerMgt)
+        const result = await adminAPI.get(adminRouter.providerMgt, {
+            params: {
+                page,
+                limit,
+
+            }
+        });
         if (result) {
             return result
         }
@@ -136,6 +150,7 @@ const providerManagement = async () => {
 
 }
 
+// *************************edit provider************************88
 
 const editProvider = async (id: string) => {
     try {
@@ -154,24 +169,26 @@ const editProvider = async (id: string) => {
 }
 
 
-
+// **************************update provider***********************************
 
 const updateProvider = async (providerData: signupFormData, providerId: string) => {
     try {
-        // Make PUT request to update profile
+    
         const result = await adminAPI.put(`/admin/edit_provider/${providerId}`, providerData, {
             headers: { 'Content-Type': 'application/json' },
         });
         console.log(result, "user update result");
 
         if (result) {
-            return result;  // Return result to update state or handle further
+            return result;  
         }
     } catch (error) {
         console.error("Error in edit user Data:", error);
         errorHandler(error as Error);
     }
 };
+
+// *************************update sttus provider******************
 
 const updateStatusProvider = async (id: string) => {
     try {
@@ -194,10 +211,16 @@ const updateStatusProvider = async (id: string) => {
 
 
 // get notification
-const fetchNotification = async () => {
+const fetchNotification = async (page:number,limit:number) => {
     try {
 
-        const result = await adminAPI.get(adminRouter.notificationMgt);
+        const result = await adminAPI.get(adminRouter.notificationMgt, {
+            params: {
+                page,
+                limit,
+
+            }
+        });
         console.log(result, "fetch notifications")
         if (result) {
             return result
@@ -210,7 +233,7 @@ const fetchNotification = async () => {
 
 }
 
-// fetch notification details
+//******************** */ fetch notification details***********************
 const notificaionDetails = async (id: string) => {
     try {
 
@@ -228,7 +251,7 @@ const notificaionDetails = async (id: string) => {
 
 }
 
-// verified notification(Reject /acceppt)
+//*************************verified notification(Reject /acceppt)*******************
 const verifyNotification = async (id: string, value: string) => {
     try {
         console.log("Fetching notification details");
@@ -242,11 +265,17 @@ const verifyNotification = async (id: string, value: string) => {
     }
 };
 
-// car mgt..display cars in for car mgt
-const carManagementt = async () => {
+//**************************car mgt..display cars in for car mgt***********************
+const carManagementt = async (page:number,limit:number) => {
     try {
         console.log("fetch cars")
-        const result = await adminAPI.get(adminRouter.carMgt)
+        const result = await adminAPI.get(adminRouter.carMgt,{
+            params: {
+                page,
+                limit,
+
+            }
+        })
         if (result) {
             return result
         }
@@ -295,10 +324,16 @@ const addOffer = async (offer: OfferFormData) => {
     }
 }
 // *************************fetch Offer*****************
-const fetchOffer = async () => {
+const fetchOffer = async (page:number,limit:number) => {
     try {
 
-        const result = await adminAPI.get(adminRouter.fetchOffer);
+        const result = await adminAPI.get(adminRouter.fetchOffer,{
+            params: {
+                page,
+                limit,
+
+            }
+        })
         console.log(result, "fetch offer")
         if (result) {
             return result
@@ -332,14 +367,13 @@ const updateOffer = async (offerId: string, offerData: OfferFormData) => {
     try {
         console.log("Edit offer called with ID:", offerId, "and Data:", offerData);
 
-        // Make PUT request to update profile
         const result = await adminAPI.put(`/admin/edit_offers/${offerId}`, offerData, {
             headers: { 'Content-Type': 'application/json' },
         });
         console.log(result, "offerData update result");
 
         if (result) {
-            return result;  // Return result to update state or handle further
+            return result; 
         }
     } catch (error) {
         console.error("Error in edit offerData Data:", error);
@@ -381,10 +415,14 @@ const createCoupon = async (coupon: CouponFormData) => {
     }
 }
 // *************************fetch Coupon*****************
-const fetchCoupon = async () => {
+const fetchCoupon = async (page:number,limit:number) => {
     try {
-
-        const result = await adminAPI.get(adminRouter.fetchCoupon);
+        const result = await adminAPI.get(adminRouter.fetchCoupon,{
+            params: {
+                page,
+                limit,
+            }
+        })
         console.log(result, "fetch coupon")
         return result
     } catch (error) {
@@ -414,14 +452,13 @@ const updateCoupon = async (couponId: string, couponData: CouponFormData) => {
     try {
         console.log("Edit offer called with ID:", couponId, "and Data:", couponData);
 
-        // Make PUT request to update profile
         const result = await adminAPI.put(`/admin/edit_coupon/${couponId}`, couponData, {
             headers: { 'Content-Type': 'application/json' },
         });
         console.log(result, "couponData update result");
 
         if (result) {
-            return result;  // Return result to update state or handle further
+            return result; 
         }
     } catch (error) {
         console.error("Error in edit couponData Data:", error);
@@ -444,11 +481,17 @@ const updateStatusCoupon = async (id: string) => {
 
     }
 }
-  // ****************************Booking Page ***************************
-  const getBookingHistory=async()=>{
+// ****************************Booking Page ***************************
+const getBookingHistory = async (page:number,limit:number) => {
     try {
         console.log("booking history")
-        const result = await adminAPI.get(`/admin/booking_history`);
+        const result = await adminAPI.get(`/admin/booking_history`,{
+            params: {
+                page,
+                limit,
+
+            }
+        });
         return result;
     } catch (error) {
         console.error("API Error:", error);
@@ -458,7 +501,7 @@ const updateStatusCoupon = async (id: string) => {
 }
 
 // ****************************booking details of specilf order***************
-const specificBookingDetails=async(bookingId:string)=>{
+const specificBookingDetails = async (bookingId: string) => {
     try {
         const result = await adminAPI.get(`/admin/details_of_specifc_order/${bookingId}`);
         return result;
@@ -470,7 +513,7 @@ const specificBookingDetails=async(bookingId:string)=>{
 }
 
 // ****************************cancel booking by user**********************
-const updateStatusOfBooking =async(bookingId:string,status:string)=>{
+const updateStatusOfBooking = async (bookingId: string, status: string) => {
     try {
         const result = await adminAPI.get(`/admin/update_status/${bookingId}/${status}`);
         return result;
@@ -480,7 +523,20 @@ const updateStatusOfBooking =async(bookingId:string,status:string)=>{
         throw error;
     }
 }
-  
+
+// ***********************get Dashboard const datas***************
+
+const getDashboardConstData = async () => {
+    try {
+        const result = await adminAPI.get(adminRouter.getDashboard);
+        return result;
+    } catch (error) {
+        console.error("API Error:", error);
+        errorHandler(error as Error);
+        throw error;
+    }
+}
+
 
 export {
     adminLogout,
@@ -511,5 +567,6 @@ export {
     updateStatusCoupon,
     getBookingHistory,
     specificBookingDetails,
-    updateStatusOfBooking
+    updateStatusOfBooking,
+    getDashboardConstData
 }

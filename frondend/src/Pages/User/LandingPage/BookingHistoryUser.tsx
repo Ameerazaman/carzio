@@ -21,7 +21,7 @@ function BookingHistoryUser({ bookingHistory }: BookingHistoryUserProps) {
           <table className="min-w-full bg-white shadow-lg rounded-lg overflow-hidden">
             <thead>
               <tr className="bg-gray-800 text-white text-sm leading-normal">
-                <th className="py-3 px-6 text-left">Booking ID</th>
+
                 <th className="py-3 px-6 text-left">Car Name</th>
                 <th className="py-3 px-6 text-left">Car Image</th>
                 <th className="py-3 px-6 text-left">Issue Date</th>
@@ -38,9 +38,7 @@ function BookingHistoryUser({ bookingHistory }: BookingHistoryUserProps) {
                   key={order._id}
                   className="border-b border-gray-200 hover:bg-gray-100"
                 >
-                  <td className="py-3 px-6 text-left whitespace-nowrap">
-                    {order._id}
-                  </td>
+
                   <td className="py-3 px-6 text-left">
                     {order.bookingDetails.car_name}
                   </td>
@@ -61,11 +59,10 @@ function BookingHistoryUser({ bookingHistory }: BookingHistoryUserProps) {
                   <td className="py-3 px-6 text-left">{order.Payment}</td>
                   <td className="py-3 px-6 text-left">
                     <span
-                      className={`py-1 px-3 rounded-full text-xs font-semibold ${
-                        order.status === 'success'
+                      className={`py-1 px-3 rounded-full text-xs font-semibold ${order.status === 'success'
                           ? 'bg-green-200 text-green-600'
                           : 'bg-yellow-200 text-yellow-600'
-                      }`}
+                        }`}
                     >
                       {order.status}
                     </span>

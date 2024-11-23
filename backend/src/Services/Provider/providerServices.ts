@@ -14,6 +14,7 @@ import { CarAuthResponse } from '../../Interface/AuthServices/CarAuthInterface';
 import { uploadImageToCloudinary } from '../../Utlis/Uploads';
 import { BookingAuthResponse } from '../../Interface/AuthServices/BookingAuthInterface';
 import { chatAuthInterface } from '../../Interface/AuthServices/ChatAuthResponse';
+import { DashboardAuthInterface } from '../../Interface/AuthServices/DashboardAuthInterface';
 
 export class ProviderServices {
     constructor(
@@ -361,18 +362,21 @@ export class ProviderServices {
         }
     }
     // **************************fetch car for car managementa****************************
-    async fetchCars(): Promise<CarAuthResponse | undefined> {
+    async fetchCars(providerId: string, page: number, limit: number): Promise<CarAuthResponse | undefined> {
         try {
-            const carData = await this.providerRepostry.fetchCars();
+            const carData = await this.providerRepostry.fetchCars(page, limit);
+            const totalPage = await this.providerRepostry.countCars(providerId)
+            console.log(carData, "fetch cars services");
 
-
-            if (carData && carData.length > 0) {
+            if (carData && carData.length > 0 && totalPage) {
                 return {
                     status: OK,
                     data: {
                         success: true,
                         message: 'Success',
-                        data: carData, // Return all users
+                        data: carData,
+                        page: page,
+                        totalPage: Math.ceil(totalPage / limit) ?? 1
                     },
                 };
             } else {
@@ -396,7 +400,6 @@ export class ProviderServices {
             };
         }
     }
-
     //  **********************change car status***********************
     async updateStatusCar(id: string): Promise<CarDataInterface | null> {
         try {
@@ -502,16 +505,22 @@ export class ProviderServices {
 
     // ************************* booking page************************
 
-    async getBookingHistory(providerId: string): Promise<BookingAuthResponse | undefined> {
+
+    async getBookingHistory(providerId: string, page: number, limit: number): Promise<BookingAuthResponse | undefined> {
         try {
             console.log("getbooking history", providerId)
-            const bookingHistory = await this.providerRepostry.getBookingHistory(providerId);
-            if (bookingHistory) {
+            const bookingHistory = await this.providerRepostry.getBookingHistory(providerId, page, limit);
+            console.log(bookingHistory, "booking history and documents",)
+            const historyDocuments = await this.providerRepostry.countBooking(providerId)
+            console.log(historyDocuments, "documents")
+            if (bookingHistory && historyDocuments) {
                 return {
                     status: OK,
                     data: {
                         success: true,
                         data: bookingHistory,
+                        page: page,
+                        totalPage: Math.ceil(historyDocuments / limit) ?? 1
                     },
                 };
             } else {
@@ -677,6 +686,36 @@ export class ProviderServices {
             };
         }
     }
+
+    // *****************************get dashboard const data******************88
+    async getConstDashboardData(providerId: string): Promise<DashboardAuthInterface | null> {
+        try {
+            const totalCars = (await this.providerRepostry.countCars(providerId)) || 0;
+            const totalBookingCount = (await this.providerRepostry.CountBookingCar(providerId)) || [];
+            const revenue = (await this.providerRepostry.totalRevenue(providerId)) ?? 0;
+            const totalBooking = (await this.providerRepostry.countBooking(providerId)) ?? 0;
+            const revenueByCar = (await this.providerRepostry.revenueByCar(providerId)) ?? 0;
+            console.log(revenueByCar, "revunue by car")
+            return {
+                status: 200,
+                data: {
+                    success: true,
+                    data: {
+                        totalCars,
+                        revenue,
+                        totalBookingCount,
+                        totalBooking,
+                        revenueByCar
+                    },
+                },
+            };
+        } catch (error) {
+            console.error("Error fetching dashboard data:", (error as Error).message);
+            return null;
+        }
+    }
+
+
 }
 
 

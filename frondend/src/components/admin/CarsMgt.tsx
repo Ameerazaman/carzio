@@ -3,22 +3,28 @@ import Navbar from '../../Pages/Admin/Commons/Navbar';
 import Sidebar from '../../Pages/Admin/Commons/Sidebar';
 import Table from '../../Pages/Admin/Commons/Table';
 import { carManagementt, userManagement } from '../../Api/Admin';
+import Pagination from '../../Pages/Common/Pagination';
 
 function CarsMgt() {
   const [tableData, setTableData] = useState<Array<{ [key: string]: any }>>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const header: string = 'cars'; // Define whether this is for users or providers
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const limit = 2;
+  const header: string = 'cars'; // D]efine whether this is for users or providers
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const result = await carManagementt();
-        console.log(result?.data?.data, "Fetched car data");
+        console.log(page, limit,"page limit")
+        const result = await carManagementt(page, limit);
+        console.log(result?.data, "Fetched car data");
 
         if (result?.data?.data) {
           setTableData(result.data.data);
+          setTotalPages(result.data.totalPage || 1);
         } else {
           setError("Cars are Empty");
         }
@@ -31,7 +37,13 @@ function CarsMgt() {
     };
 
     fetchData();
-  }, []);
+  }, [page]);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
 
   return (
     <div className="flex">
@@ -46,7 +58,14 @@ function CarsMgt() {
             ) : error ? (
               <p className="text-center py-4 text-red-600">{error}</p>
             ) : (
-              <Table tableData={tableData} header={header} />
+              <>
+                <Table tableData={tableData} header={header} />
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </>
             )}
           </div>
         </div>

@@ -54,11 +54,6 @@ function WalletPage() {
   return (
     <div>
       <Navbar />
-
-      {/* Total Wallet Balance Section with Yellow to Red Gradient Background */}
-
-
-      {/* Loading or Empty Wallet Data */}
       {loading ? (
         <div className="text-center text-lg text-gray-500">Fetching your wallet data...</div>
       ) : walletData && walletData.length > 0 ? (

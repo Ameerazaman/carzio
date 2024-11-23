@@ -35,7 +35,7 @@ providerRouter.put('/update_status_car/:id',providerAuthenticate,async(req,res)=
 providerRouter.get('/edit_car/:id',providerAuthenticate,async(req,res)=>providerController.editCar(req,res))
 providerRouter.put('/edit_car/:id',providerAuthenticate,async(req,res)=>providerController.updateCar(req,res))
 providerRouter.put('/edit_car_image/:id',providerAuthenticate, upload.array('images', 4),async (req, res)=> providerController.updateCarImage(req,res))
-providerRouter.get('/booking_history/:id',providerAuthenticate,async(req,res)=>providerController.getBookingHistory(req,res))
+providerRouter.get('/booking_history',providerAuthenticate,async(req,res)=>providerController.getBookingHistory(req,res))
 providerRouter.get('/details_of_specifc_order/:id',providerAuthenticate,async(req,res)=>providerController.specificBookingDetails(req,res))
 providerRouter.get('/update_status/:id/:status',providerAuthenticate,async(req,res)=>providerController.updateStatusOfBooking(req,res))
 providerRouter.get('/fetch_users_chat/:providerId',providerAuthenticate,async(req,res)=>providerController.fetchUsersChat(req,res))
@@ -48,5 +48,8 @@ providerRouter.get('/chat_history/:providerId/:userId', (req, res, next) => {
 }, providerAuthenticate, async (req, res) => {
     await providerController.fetchChatHistory(req, res);
 });
+providerRouter.get('/dashboard/:providerId',providerAuthenticate,async(req,res)=>providerController.getDashboardConstData(req,res))
+
+
 
 export default providerRouter;

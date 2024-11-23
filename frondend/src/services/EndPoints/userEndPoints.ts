@@ -1,3 +1,5 @@
+import { searchCarAvailabilty } from "../../Api/User";
+
 const userRouter = {
     signup: '/signup',
     reSend: '/resend-otp',
@@ -19,7 +21,8 @@ const userRouter = {
     cancelAmtToWallet:'/cancel_amt_to_wallet',
     createReviewRatings:'/create_review_and_ratings',
     checkBookIdInReview:'/check_bookid_in_Review',
-    chatHistory:'/chat_history'
+    chatHistory:'/chat_history',
+    searchCarAvailabilty:'/search_car_availability'
   };
   
   export default userRouter;

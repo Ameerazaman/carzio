@@ -49,6 +49,7 @@ userRouter.put('/cancel_booking', userAuth, async (req, res) => userController.c
 userRouter.get('/wallet', userAuth, async (req, res) => userController.getWallet(req, res));
 userRouter.post('/create_review_and_ratings', userAuth, async (req, res) => userController.createReviewAndRatings(req, res));
 userRouter.get('/check_bookid_in_Review', userAuth, async (req, res) => userController.checkBookIdinReview(req, res));
+userRouter.get('/search_car_availability', userAuth, async (req, res) => userController.searchCarAvailability(req, res));
 
 
 export default userRouter;

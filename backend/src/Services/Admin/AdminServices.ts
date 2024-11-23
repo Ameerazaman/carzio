@@ -19,6 +19,7 @@ import { generateRandomCouponCode } from '../../Utlis/CouponGenerator';
 import { CouponInterface } from '../../Interface/CouponInterface';
 import { CouponAuthResponse } from '../../Interface/AuthServices/CouponAuthInterface';
 import { BookingAuthResponse } from '../../Interface/AuthServices/BookingAuthInterface';
+import { DashboardAuthInterface } from '../../Interface/AuthServices/DashboardAuthInterface';
 
 
 export class AdminServices {
@@ -64,12 +65,10 @@ export class AdminServices {
 
   }
 
-  // Signup logic
+  // ***************************Signup logic*********************************
 
   async adminSignIn(adminData: adminInterface): Promise<adminAuthResponse | undefined> {
     try {
-      // Call emailPasswordCheck from the repository to get the user by email
-
       const provider = await this.adminRepostry.emailExistCheck(adminData.email);
 
       if (!provider) {
@@ -81,7 +80,7 @@ export class AdminServices {
           }
         };
       }
-      // Validate the password
+    
       const isPasswordValid = await bcrypt.compare(adminData.password, provider.password);
       if (!isPasswordValid) {
         return {
@@ -121,18 +120,22 @@ export class AdminServices {
     }
   }
 
-  async fetchUsers(): Promise<UserAuthResponse | undefined> {
-    try {
-      const userData = await this.adminRepostry.fetchUsers();
-      console.log(userData, "fetch users services");
+// *****************************8fetch users*****************************
 
+  async fetchUsers(page: number, limit: number): Promise<UserAuthResponse | undefined> {
+    try {
+      const userData = await this.adminRepostry.fetchUsers(page, limit);
+      console.log(userData, "fetch users services");
+      const totalPage = (await this.adminRepostry.countUsers()) || 0;
       if (userData && userData.length > 0) {
         return {
           status: OK,
           data: {
             success: true,
             message: 'Success',
-            data: userData, // Return all users
+            data: userData,
+            page: page,
+            totalPage: Math.ceil(totalPage / limit) ?? 1 
           },
         };
       } else {
@@ -156,9 +159,65 @@ export class AdminServices {
     }
   }
 
-  async fetchProviders(): Promise<UserAuthResponse | undefined> {
+ 
+
+// ***************************edit user*****************************
+
+  async editUser(id: string): Promise<UserInterface | null> {
     try {
-      const providerData = await this.adminRepostry.fetchProviders();
+      console.log("exist user in services")
+      return await this.adminRepostry.editUser(id);
+    } catch (error) {
+      console.error("Error checking provider address via repository:", error);
+      return null;
+    }
+  }
+
+  // ****************************update users*********************
+
+  async updateUser(userData: UserInterface, id: string): Promise<UserAuthResponse | undefined> {
+    try {
+      console.log("edit user is services")
+      const provider = await this.adminRepostry.updateUser(userData, id);
+      return {
+        status: 200,
+        data: {
+          success: true,
+          message: 'user update successfully',
+        
+        },
+      };
+
+    } catch (error) {
+      console.error("Error upadting user Data:", (error as Error).message);
+      return {
+        status: 500, // Internal server error
+        data: {
+          success: false,
+          message: 'Internal server error',
+        },
+      };
+    }
+  }
+
+  // ********************************update status**********************
+
+  async updateStatus(id: string): Promise<UserInterface | null> {
+    try {
+      console.log("exist user in services")
+      return await this.adminRepostry.updateStatus(id); 
+    } catch (error) {
+      console.error("Error checking provider address via repository:", error);
+      return null;
+    }
+  }
+
+   // **********************************fetch providers**********************
+
+   async fetchProviders(page:number,limit:number): Promise<UserAuthResponse | undefined> {
+    try {
+      const providerData = await this.adminRepostry.fetchProviders(page,limit);
+      const totalPage = (await this.adminRepostry.countProviders()) || 0;
       console.log(providerData, "fetch users services");
 
       if (providerData && providerData.length > 0) {
@@ -167,7 +226,9 @@ export class AdminServices {
           data: {
             success: true,
             message: 'Success',
-            data: providerData, // Return all users
+            data: providerData,
+            page: page,
+            totalPage: Math.ceil(totalPage / limit) ?? 1 
           },
         };
       } else {
@@ -191,85 +252,36 @@ export class AdminServices {
     }
   }
 
-
-  async editUser(id: string): Promise<UserInterface | null> {
-    try {
-      console.log("exist user in services")
-      return await this.adminRepostry.editUser(id); // Use the repository method for checking
-    } catch (error) {
-      console.error("Error checking provider address via repository:", error);
-      return null;
-    }
-  }
-
-
-  async updateUser(userData: UserInterface, id: string): Promise<UserAuthResponse | undefined> {
-    try {
-      console.log("edit user is services")
-      const provider = await this.adminRepostry.updateUser(userData, id);
-      // Log the saved provider data
-
-      return {
-        status: 200, // Successful save
-        data: {
-          success: true,
-          message: 'user update successfully',
-          // data: provider, // Optionally include saved data
-        },
-      };
-
-    } catch (error) {
-      console.error("Error upadting user Data:", (error as Error).message);
-      return {
-        status: 500, // Internal server error
-        data: {
-          success: false,
-          message: 'Internal server error',
-        },
-      };
-    }
-  }
-
-  async updateStatus(id: string): Promise<UserInterface | null> {
-    try {
-      console.log("exist user in services")
-      return await this.adminRepostry.updateStatus(id); // Use the repository method for checking
-    } catch (error) {
-      console.error("Error checking provider address via repository:", error);
-      return null;
-    }
-  }
-
+  // *****************************edit provider*************************
   async editProvider(id: string): Promise<ProviderInterface | null> {
     try {
       console.log("exist provider in services")
-      return await this.adminRepostry.editProvider(id); // Use the repository method for checking
+      return await this.adminRepostry.editProvider(id); 
     } catch (error) {
       console.error("Error checking edit provider via repository:", error);
       return null;
     }
   }
 
+// *******************************update providers**********************
 
   async updateProvider(providerData: ProviderInterface, id: string): Promise<UserAuthResponse | undefined> {
     try {
       console.log("edit user is services")
       const provider = await this.adminRepostry.updateProvider(providerData, id);
-      // Log the saved provider data
-
+    
       return {
-        status: 200, // Successful save
+        status: 200, 
         data: {
           success: true,
           message: 'provider update successfully',
-          // data: provider, // Optionally include saved data
         },
       };
 
     } catch (error) {
       console.error("Error upadting provider Data:", (error as Error).message);
       return {
-        status: 500, // Internal server error
+        status: 500, 
         data: {
           success: false,
           message: 'Internal server error',
@@ -278,10 +290,12 @@ export class AdminServices {
     }
   }
 
+// *******************************update status of providers*******************
+
   async updateStatusProvider(id: string): Promise<ProviderInterface | null> {
     try {
       console.log("exist provider in services")
-      return await this.adminRepostry.updateStatusprovider(id); // Use the repository method for checking
+      return await this.adminRepostry.updateStatusprovider(id); 
     } catch (error) {
       console.error("Error checking provider data via repository:", error);
       return null;
@@ -350,10 +364,11 @@ export class AdminServices {
   }
 
   // **************************fetch car for car managementa****************************
-  async fetchCars(): Promise<CarAuthResponse | undefined> {
+  async fetchCars(page:number,limit:number): Promise<CarAuthResponse | undefined> {
     try {
-      const carData = await this.adminRepostry.fetchCars();
-      console.log(carData, "fetch cars services");
+      const carData = await this.adminRepostry.fetchCars(page,limit);
+      const totalPage = (await this.adminRepostry.countCars()) || 0;
+      console.log(carData, "fetch users services");
 
       if (carData && carData.length > 0) {
         return {
@@ -361,7 +376,9 @@ export class AdminServices {
           data: {
             success: true,
             message: 'Success',
-            data: carData, // Return all users
+            data: carData,
+            page: page,
+            totalPage: Math.ceil(totalPage / limit) ?? 1 
           },
         };
       } else {
@@ -433,10 +450,11 @@ export class AdminServices {
     }
   }
   // *******************88fetch User*******************8
-  async fetchOffer(): Promise<OfferAuthResponse | undefined> {
+  async fetchOffer(page:number,limit:number): Promise<OfferAuthResponse | undefined> {
     try {
-      const offerData = await this.adminRepostry.fetchOffer();
-      console.log(offerData, "fetch offerData services");
+      const offerData = await this.adminRepostry.fetchOffer(page,limit);
+      const totalPage = (await this.adminRepostry.countOffers()) || 0;
+      console.log(offerData, "fetch users services");
 
       if (offerData && offerData.length > 0) {
         return {
@@ -444,7 +462,9 @@ export class AdminServices {
           data: {
             success: true,
             message: 'Success',
-            data: offerData, // Return all users
+            data: offerData,
+            page: page,
+            totalPage: Math.ceil(totalPage / limit) ?? 1 
           },
         };
       } else {
@@ -490,7 +510,7 @@ export class AdminServices {
         data: {
           success: true,
           message: 'Offer update successfully',
-         
+
         },
       };
 
@@ -556,11 +576,12 @@ export class AdminServices {
     }
   }
 
-   // *******************88fetch Coupon*******************8
-   async fetchCoupon(): Promise<CouponAuthResponse| undefined> {
+  // *******************88fetch Coupon*******************8
+  async fetchCoupon(page:number,limit:number): Promise<CouponAuthResponse | undefined> {
     try {
-      const couponData = await this.adminRepostry.fetchCoupon();
-      console.log(couponData, "fetch offerData services");
+      const couponData = await this.adminRepostry.fetchCoupon(page,limit);
+      const totalPage = (await this.adminRepostry.countCoupon()) || 0;
+      console.log(couponData, "fetch users services");
 
       if (couponData && couponData.length > 0) {
         return {
@@ -568,7 +589,9 @@ export class AdminServices {
           data: {
             success: true,
             message: 'Success',
-            data: couponData, 
+            data: couponData,
+            page: page,
+            totalPage: Math.ceil(totalPage / limit) ?? 1 
           },
         };
       } else {
@@ -604,8 +627,8 @@ export class AdminServices {
     }
   }
 
-   // ************************update Coupon*************8888
-   async updateCoupon(couponData: CouponInterface, id: string): Promise<CouponAuthResponse | undefined> {
+  // ************************update Coupon*************8888
+  async updateCoupon(couponData: CouponInterface, id: string): Promise<CouponAuthResponse | undefined> {
     try {
       const updatedCoupon = await this.adminRepostry.updateCoupon(couponData, id);
 
@@ -640,107 +663,149 @@ export class AdminServices {
     }
   }
 
-     // ************************* booking page************************
+  // ************************* booking page************************
 
-     async getBookingHistory(): Promise<BookingAuthResponse | undefined> {
-      try {
-          
-          const bookingHistory = await this.adminRepostry.getBookingHistory();
-          if (bookingHistory) {
-              return {
-                  status: OK,
-                  data: {
-                      success: true,
-                      data: bookingHistory,
-                  },
-              };
-          } else {
-              return {
-                  status: BAD_REQUEST,
-                  data: {
-                      success: false,
-                      message: "Booking history is not get"
-                  },
-              };
-          }
-      } catch (error) {
-          console.error("Error fetching updateCoupon:", (error as Error).message);
-          return {
-              status: INTERNAL_SERVER_ERROR,
-              data: {
-                  success: false,
-                  message: 'Internal server error',
-              },
-          };
+  async getBookingHistory(page:number,limit:number): Promise<BookingAuthResponse | undefined> {
+    try {
+
+      const bookingHistory = await this.adminRepostry.getBookingHistory(page,limit);
+      const totalPage = (await this.adminRepostry.countBooking()) || 0;
+      console.log(bookingHistory, "fetch users services");
+
+      if (bookingHistory && bookingHistory.length > 0) {
+        return {
+          status: OK,
+          data: {
+            success: true,
+            message: 'Success',
+            data: bookingHistory,
+            page: page,
+            totalPage: Math.ceil(totalPage / limit) ?? 1 
+          },
+        };
+      } else {
+        return {
+          status: BAD_REQUEST,
+          data: {
+            success: false,
+            message: "Booking history is not get"
+          },
+        };
       }
+    } catch (error) {
+      console.error("Error fetching updateCoupon:", (error as Error).message);
+      return {
+        status: INTERNAL_SERVER_ERROR,
+        data: {
+          success: false,
+          message: 'Internal server error',
+        },
+      };
+    }
   }
   // ************************* specif booking details************************
 
   async specificBookingDetails(bookingId: string): Promise<BookingAuthResponse | undefined> {
-      try {
-          console.log("getbooking history", bookingId)
-          const bookingHistory = await this.adminRepostry.specificBookingDetails(bookingId);
-          if (bookingHistory) {
-              return {
-                  status: OK,
-                  data: {
-                      success: true,
-                      data: bookingHistory,
-                  },
-              };
-          } else {
-              return {
-                  status: BAD_REQUEST,
-                  data: {
-                      success: false,
-                      message: "Booking history is not get"
-                  },
-              };
-          }
-      } catch (error) {
-          console.error("Error fetching updateCoupon:", (error as Error).message);
-          return {
-              status: INTERNAL_SERVER_ERROR,
-              data: {
-                  success: false,
-                  message: 'Internal server error',
-              },
-          };
+    try {
+      console.log("getbooking history", bookingId)
+      const bookingHistory = await this.adminRepostry.specificBookingDetails(bookingId);
+      if (bookingHistory) {
+        return {
+          status: OK,
+          data: {
+            success: true,
+            data: bookingHistory,
+          },
+        };
+      } else {
+        return {
+          status: BAD_REQUEST,
+          data: {
+            success: false,
+            message: "Booking history is not get"
+          },
+        };
       }
+    } catch (error) {
+      console.error("Error fetching updateCoupon:", (error as Error).message);
+      return {
+        status: INTERNAL_SERVER_ERROR,
+        data: {
+          success: false,
+          message: 'Internal server error',
+        },
+      };
+    }
   }
   // *******************************update status for booking*****************
 
   async updateStatusOfBooking(bookingId: string, status: string): Promise<BookingAuthResponse | undefined> {
-      try {
-          console.log("update booking status", bookingId)
-          const updateStatus = await this.adminRepostry.updateStatusOfBooking(bookingId, status);
-          if (updateStatus) {
-              return {
-                  status: OK,
-                  data: {
-                      success: true,
-                      data: updateStatus,
-                  },
-              };
-          } else {
-              return {
-                  status: BAD_REQUEST,
-                  data: {
-                      success: false,
-                      message: "Status updation is failed"
-                  },
-              };
-          }
-      } catch (error) {
-          console.error("Error fetching updateCoupon:", (error as Error).message);
-          return {
-              status: INTERNAL_SERVER_ERROR,
-              data: {
-                  success: false,
-                  message: 'Internal server error',
-              },
-          };
+    try {
+      console.log("update booking status", bookingId)
+      const updateStatus = await this.adminRepostry.updateStatusOfBooking(bookingId, status);
+      if (updateStatus) {
+        return {
+          status: OK,
+          data: {
+            success: true,
+            data: updateStatus,
+          },
+        };
+      } else {
+        return {
+          status: BAD_REQUEST,
+          data: {
+            success: false,
+            message: "Status updation is failed"
+          },
+        };
       }
+    } catch (error) {
+      console.error("Error fetching updateCoupon:", (error as Error).message);
+      return {
+        status: INTERNAL_SERVER_ERROR,
+        data: {
+          success: false,
+          message: 'Internal server error',
+        },
+      };
+    }
   }
+
+
+  // *****************************get dashboard const data******************88
+  async getConstDashboardData(): Promise<DashboardAuthInterface | null> {
+    try {
+      const totalCars = (await this.adminRepostry.countCars()) || 0;
+      const totalProviders = (await this.adminRepostry.countProviders()) || 0;
+      const totalUsers = (await this.adminRepostry.countUsers()) || 0;
+      const totalBookingCount = await this.adminRepostry.CountBookingCar();
+      const revenue = (await this.adminRepostry.totalRevenue()) ?? 0;
+      const totalBooking = (await this.adminRepostry.countBooking()) ?? 0;
+      const revenueByCar = (await this.adminRepostry.revenueByCar()) ?? 0;
+      console.log(revenueByCar, "revunue by car")
+      return {
+        status: 200,
+        data: {
+          success: true,
+          data: {
+            totalCars,
+            totalProviders,
+            totalUsers,
+            revenue,
+            totalBookingCount,
+            totalBooking,
+            revenueByCar
+          },
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching dashboard data:", (error as Error).message);
+      return null;
+    }
+  }
+
+
+
 }
 

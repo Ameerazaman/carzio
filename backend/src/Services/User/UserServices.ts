@@ -949,4 +949,40 @@ export class UserServices {
         }
     }
 
+    // ******************************check car availabilty****************************
+    async searchCarAvailability(issueDate: string, returnDate: string): Promise<CarAuthResponse | undefined> {
+        try {
+            const carData = await this.userRepository.searchCarAvailability(issueDate, returnDate);
+          
+            if (carData ) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        message: 'Success',
+                        data: carData,
+                
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: 'No cars found',
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error fetching cars:", (error as Error).message);
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
 }    

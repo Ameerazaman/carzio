@@ -24,6 +24,8 @@ adminRouter.post('/login', (req, res) => adminController.adminLogin(req, res))
 
 adminRouter.post('/refresh-token', (req, res, next) => adminController.refreshToken(req, res, next))
 
+adminRouter.get('/dashboard',adminAuthenticate,async(req,res)=>adminController.getDashboardConstData(req,res))
+
 adminRouter.get('/users', adminAuthenticate, async (req, res) => adminController.fetchUsers(req, res))
 adminRouter.put('/edit_user/:id', adminAuthenticate, async (req, res) => adminController.updateUser(req, res));
 adminRouter.get('/edit_user/:id', adminAuthenticate, async (req, res) => adminController.editUser(req, res))

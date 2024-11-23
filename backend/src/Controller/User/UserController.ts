@@ -843,5 +843,34 @@ export class UserController {
             });
         }
     }
-
+// ******************************check car availabilty********************
+async searchCarAvailability(req: Request, res: Response): Promise<void> {
+    try {
+    
+      console.log("fetch cars params", req.query);
+  
+      const issueDate = req.query.issueDate ? String(req.query.issueDate) : undefined;
+      const returnDate = req.query.returnDate ? String(req.query.returnDate) : undefined;
+  
+      if (issueDate && returnDate) {
+        console.log("fetch cars params", issueDate, returnDate);
+  
+       
+        const result = await this.userServices.searchCarAvailability(issueDate, returnDate);
+  
+        if (result) {
+          console.log(result.data, "fetch cars");
+          res.status(200).json(result.data);
+        } else {
+          res.status(500).json({ message: "Internal server error" });
+        }
+      } else {
+        res.status(400).json({ message: "Invalid issueDate or returnDate" });
+      }
+    } catch (error) {
+      console.error("Error during fetch cars:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+  
 }

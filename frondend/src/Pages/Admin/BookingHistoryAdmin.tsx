@@ -2,40 +2,15 @@ import React, { useEffect, useState } from 'react';
 
 import { Link } from 'react-router-dom';
 
-import { Booking } from '../../Interface/BookinDetailsInterface';
 
-import { getBookingHistory } from '../../Api/Admin';
+interface TableProps {
+  bookingHistory: Array<{ [key: string]: any }>;
 
+}
 
-
-function BookingHistoryAdmin() {
-  const [bookingHistory, setBookingHistory] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchBookingHistory = async () => {
-      try {
-        const result = await getBookingHistory();
-        setBookingHistory(result.data.data);
-        setLoading(false);
-      } catch (error) {
-        setError("Error fetching booking history.");
-        setLoading(false);
-        console.error("Error fetching booking history:", error);
-      }
-    };
-
-    fetchBookingHistory();
-  },);
-
-  if (loading) {
-    return <div className="text-center">Loading booking history...</div>;
-  }
-
-  if (error) {
-    return <div className="text-center text-red-500">{error}</div>;
-  }
+const BookingHistoryAdmin : React.FC<TableProps> = ({ bookingHistory: initialTableData }) => {
+ 
+  const [bookingHistory, setBookingHistory] = useState(initialTableData);
 
   return (
     <div className="container mx-auto p-6">

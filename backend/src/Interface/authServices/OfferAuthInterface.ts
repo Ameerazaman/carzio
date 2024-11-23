@@ -7,6 +7,7 @@ export interface OfferAuthResponse {
         message?: string;
         data?: OfferDataInterface | OfferDataInterface[]| undefined,
         providerId?: string;
-     
+        page?: number,
+        totalPage?: number,
     };
 }

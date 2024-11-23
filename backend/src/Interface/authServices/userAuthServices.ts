@@ -17,5 +17,7 @@ export interface UserAuthResponse {
         userId?: string;
         token?: string;
         refreshToken?: string;
+        page?: number|1,
+        totalPage?: number |1,
     };
 }

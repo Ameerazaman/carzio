@@ -36,59 +36,53 @@ export class AdminRepository {
       return null;
     }
   }
-
-  async fetchUsers(): Promise<UserInterface[] | null> {
+  // ***************************fetch users*************************
+  async fetchUsers(page: number, limit: number): Promise<UserInterface[] | null> {
     try {
-      // Fetch users from the database, providing the expected document type
-      const data = await userModel.find() as UserDocument[]; // This returns an array of Mongoose documents
+      const skip = (page - 1) * limit;
 
-      console.log("Users in management", data);
+      // Use .lean() to return plain JavaScript objects
+      const data = await userModel
+        .find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean() as UserInterface[];
 
-      // Map the documents to UserInterface
-      const users: UserInterface[] = data.map((user: UserDocument) => ({
-        id: user._id.toString(), // Convert ObjectId to string for 'id'
-        email: user.email, // Access fields directly, since they're strongly typed
-        password: user.password,
-        username: user.username || undefined,
-        isBlocked: user.isBlocked  // Optional field
-      }));
 
-      return users;
+      return data as UserInterface[]
     } catch (error) {
       console.error("Error fetching users:", error);
       return null;
     }
   }
 
-  async fetchProviders(): Promise<UserInterface[] | null> {
+  // ***************************fetch providers******************
+  async fetchProviders(page: number, limit: number): Promise<UserInterface[] | null> {
     try {
-      // Fetch users from the database, providing the expected document type
-      const data = await providerModel.find() as UserDocument[]; // This returns an array of Mongoose documents
+      const skip = (page - 1) * limit;
 
+      const data = await providerModel
+        .find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean() as UserInterface[];
 
-      console.log()
-      // Map the documents to UserInterface
-      const providers: UserInterface[] = data.map((provider: UserDocument) => ({
-        id: provider._id.toString(), // Convert ObjectId to string for 'id'
-        email: provider.email, // Access fields directly, since they're strongly typed
-        password: provider.password,
-        username: provider.username || undefined,
-        isBlocked: provider.isBlocked // Optional field
-      }));
-
-      return providers;
+      return data as UserInterface[]
     } catch (error) {
-      console.error("Error fetching provider:", error);
+      console.error("Error fetching users:", error);
       return null;
     }
   }
 
+  // **********************edit users***********************
+
   async editUser(userId: string): Promise<UserInterface | null> {
     try {
-      // Log the userId to ensure it's passed correctly
+
       console.log(userId, "userId in editUser");
 
-      // Pass userId directly to findById (no need for an object)
       let check = await userModel.findById(userId);
 
       console.log(check, "check");
@@ -108,7 +102,7 @@ export class AdminRepository {
       return null;
     }
   }
-
+  // *************************update user************************
 
   async updateUser(userData: UserInterface, id: string): Promise<UserInterface | null> {
     try {
@@ -120,23 +114,24 @@ export class AdminRepository {
           email: userData.email,
 
         },
-        { new: true } // To return the updated document
-      ).lean<UserInterface>(); // Convert to plain JS object
+        { new: true }
+      ).lean<UserInterface>();
 
       console.log(editUser, "editUser after saving");
-      return editUser; // Return the updated object as the correct type
+      return editUser;
     } catch (error) {
       console.error("Error saving user:", error);
-      return null; // Return null on error
+      return null;
     }
   }
 
+  // *********************8update status*******************
+
   async updateStatus(userId: string): Promise<UserInterface | null> {
     try {
-      // Log the userId to ensure it's passed correctly
+
       console.log(userId, "userId in updateStatus");
 
-      // Find the user by ID
       let user = await userModel.findById(userId);
 
       if (!user) {
@@ -144,11 +139,10 @@ export class AdminRepository {
         return null;
       }
 
-      // Toggle the `isBlocked` status
       const updateUser = await userModel.findByIdAndUpdate(
         { _id: userId },
-        { isBlocked: !user.isBlocked }, // Flip the isBlocked status
-        { new: true } // Return the updated user document
+        { isBlocked: !user.isBlocked },
+        { new: true }
       );
 
       return updateUser as UserInterface;
@@ -158,13 +152,13 @@ export class AdminRepository {
     }
   }
 
+  // **********************edit provider*********************
 
   async editProvider(providerId: string): Promise<ProviderInterface | null> {
     try {
-      // Log the providerId to ensure it's passed correctly
+
       console.log(providerId, "provider in editUser");
 
-      // Pass userId directly to findById (no need for an object)
       let check = await providerModel.findById(providerId);
 
       console.log(check, "check");
@@ -184,7 +178,7 @@ export class AdminRepository {
       return null;
     }
   }
-
+  // ***************************update provider************************
 
   async updateProvider(providerData: ProviderInterface, id: string): Promise<ProviderInterface | null> {
     try {
@@ -196,35 +190,34 @@ export class AdminRepository {
           email: providerData.email,
 
         },
-        { new: true } // To return the updated document
-      ).lean<ProviderInterface>(); // Convert to plain JS object
+        { new: true }
+      ).lean<ProviderInterface>();
 
       console.log(editProvider, "editProvider after saving");
-      return editProvider; // Return the updated object as the correct type
+      return editProvider;
     } catch (error) {
       console.error("Error saving provider:", error);
-      return null; // Return null on error
+      return null;
     }
   }
 
+  // *****************************update ststus provider**************
+
   async updateStatusprovider(providerId: string): Promise<ProviderInterface | null> {
     try {
-      // Log the userId to ensure it's passed correctly
+
       console.log(providerId, "providerId in updateStatus");
 
-      // Find the provider by ID
       let provider = await providerModel.findById(providerId);
       console.log(provider, "provider when find")
       if (!provider) {
         console.error("provider not found");
         return null;
       }
-
-
       const updateProvider = await providerModel.findByIdAndUpdate(
-        providerId, // pass the providerId directly
-        { isBlocked: !provider.isBlocked }, // Flip the isBlocked status
-        { new: true } // Return the updated provider document
+        providerId,
+        { isBlocked: !provider.isBlocked },
+        { new: true }
       );
 
       console.log(updateProvider, "update provider")
@@ -235,6 +228,8 @@ export class AdminRepository {
       return null;
     }
   }
+
+  // *****************8get adminby Id*********************8
 
   async getAdminById(id: string): Promise<adminInterface | null> {
     try {
@@ -251,19 +246,18 @@ export class AdminRepository {
   // *******************fetch Notifications from Car Documents***************
   async fetchNotification(): Promise<CarDataInterface[] | null> {
     try {
-      // Fetch car documents from the database
-      const data = await CarNotification.find() as CarDataInterface[]; // This returns an array of Mongoose documents
 
-      // Map the car documents to CarDataInterface
+      const data = await CarNotification.find() as CarDataInterface[];
+
       const notification: CarDataInterface[] = data.map((carDocument: any) => ({
-        id: carDocument._id?.toString(), // Ensure _id exists, and convert it to string
+        id: carDocument._id?.toString(),
         car_name: carDocument.car_name,
         model: carDocument.model,
         rentalPrice: carDocument.rentalPrice,
         engineType: carDocument.engineType,
         fuelType: carDocument.fuelType,
         color: carDocument.color,
-        images: carDocument.images, // Assuming 'images' is an array
+        images: carDocument.images,
         rcNumber: carDocument.rcNumber,
         rcExpiry: carDocument.rcExpiry,
         insurancePolicyNumber: carDocument.insurancePolicyNumber,
@@ -271,7 +265,7 @@ export class AdminRepository {
         pollutionCertificateNumber: carDocument.pollutionCertificateNumber,
         pollutionExpiry: carDocument.pollutionExpiry,
         isStatus: carDocument.isStatus,
-        providerId: carDocument.providerId ? carDocument.providerId.toString() : undefined, // Handle optional providerId
+        providerId: carDocument.providerId ? carDocument.providerId.toString() : undefined,
         createdAt: carDocument.createdAt,
       }));
       console.log(notification, "notifications")
@@ -303,7 +297,7 @@ export class AdminRepository {
         console.log(carDocument, "car document in notification");
 
         if (carDocument) {
-          // Create a new CarModel document, mapping only the relevant fields
+
           const newCar = new CarModel({
             car_name: carDocument.car_name,
             model: carDocument.model,
@@ -319,15 +313,13 @@ export class AdminRepository {
             pollutionCertificateNumber: carDocument.pollutionCertificateNumber,
             pollutionExpiry: carDocument.pollutionExpiry,
             providerId: carDocument.providerId,
-            isBlocked: false, // Default value as per your schema
+            isBlocked: false,
           });
 
-          // Save the new car document to CarModel
           await newCar.save();
         }
       }
 
-      // Delete the notification once the process is complete
       const result = await CarNotification.deleteOne({ _id: id });
 
       return result;
@@ -339,9 +331,14 @@ export class AdminRepository {
 
 
   // ******************************fetch car for car management**********************
-  async fetchCars(): Promise<CarDataInterface[] | null> {
+  async fetchCars(page: number, limit: number): Promise<CarDataInterface[] | null> {
     try {
-      const carDocuments = await CarModel.find() as CarDataInterface[]; // Fetch car documents
+      const skip = (page - 1) * limit;
+      const carDocuments = await CarModel
+        .find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit) as CarDataInterface[];  
 
       const cars: CarDataInterface[] = carDocuments.map((car: CarDataInterface) => ({
         car_name: car.car_name,
@@ -373,10 +370,10 @@ export class AdminRepository {
   // *******************************change status of car*****************
   async updateStatusCar(carId: string): Promise<CarDataInterface | null> {
     try {
-      // Log the carId to ensure it's passed correctly
+
       console.log(carId, "providerId in updateStatus");
 
-      // Find the provider by ID
+
       let car = await CarModel.findById(carId);
       console.log(car, "provider when find")
       if (!car) {
@@ -386,9 +383,9 @@ export class AdminRepository {
 
 
       const updateCar = await CarModel.findByIdAndUpdate(
-        car, // pass the providerId directly
-        { isBlocked: !car.isBlocked }, // Flip the isBlocked status
-        { new: true } // Return the updated provider document
+        car,
+        { isBlocked: !car.isBlocked },
+        { new: true }
       );
 
       console.log(updateCar, "update car")
@@ -427,14 +424,19 @@ export class AdminRepository {
     }
   }
   // ********************************fetch offers*********************
-  async fetchOffer(): Promise<OfferDataInterface[] | null> {
+  async fetchOffer(page: number, limit: number): Promise<OfferDataInterface[] | null> {
     try {
-      // Fetch offers from the database, with type assertion
-      const data = await Offer.find() as OfferDataInterface[]; // Array of OfferDataInterface documents
+     
+      const skip = (page - 1) * limit;
+      const data = await Offer
+        .find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit) as OfferDataInterface[];
+
 
       console.log("Offers in management:", data);
 
-      // Map the documents to the OfferReturnData type
       const offers: OfferDataInterface[] = data.map((offer: OfferDataInterface) => ({
         carName: offer.carName,
         offerTitle: offer.offerTitle,
@@ -454,10 +456,9 @@ export class AdminRepository {
   // **************************edit Offer*************************8
   async editOffer(offerId: string): Promise<OfferDataInterface | null> {
     try {
-      // Log the providerId to ensure it's passed correctly
+
       console.log(offerId, "offer in offer mgt");
 
-      // Pass userId directly to findById (no need for an object)
       let check = await Offer.findById(offerId);
 
       console.log(check, "check");
@@ -486,9 +487,9 @@ export class AdminRepository {
     try {
       console.log("Updating offer data:", offerData);
 
-      // Update the offer using its ID
+
       const updatedOffer = await Offer.findByIdAndUpdate(
-        id, // Pass the ID directly
+        id,
         {
           carName: offerData.carName,
           offerTitle: offerData.offerTitle,
@@ -496,23 +497,23 @@ export class AdminRepository {
           endDate: offerData.endDate,
           discountPercentage: offerData.discountPercentage,
         },
-        { new: true } // To return the updated document
-      ).lean<OfferDataInterface>(); // Convert to plain JS object
+        { new: true }
+      ).lean<OfferDataInterface>();
 
       console.log(updatedOffer, "Updated offer after saving");
-      return updatedOffer; // Return the updated offer as the correct type
+      return updatedOffer;
     } catch (error) {
       console.error("Error updating offer:", error);
-      return null; // Return null on error
+      return null;
     }
   }
   // ***********************updateStatus offer********************88
   async updateStatusOffer(offerId: string): Promise<OfferDataInterface | null> {
     try {
-      // Log the carId to ensure it's passed correctly
+
       console.log(offerId, "offerId in updateStatus");
 
-      // Find the provider by ID
+
       let offer = await Offer.findById(offerId);
       console.log(offer, "offer when find")
       if (!offer) {
@@ -522,9 +523,9 @@ export class AdminRepository {
 
 
       const updateOffer = await Offer.findByIdAndUpdate(
-        offer, // pass the providerId directly
-        { isActive: !offer.isActive }, // Flip the isBlocked status
-        { new: true } // Return the updated provider document
+        offer,
+        { isActive: !offer.isActive },
+        { new: true }
       );
 
       console.log(updateOffer, "update car")
@@ -540,7 +541,6 @@ export class AdminRepository {
     try {
       console.log(coupon, "coupon in repository");
 
-      // Create a new Coupon instance based on the provided data
       const newCoupon = new Coupon({
         discountPercentage: coupon.discountPercentage ?? 0,
         minRentalAmount: coupon.minRentalAmount ?? 0,
@@ -555,7 +555,6 @@ export class AdminRepository {
       const savedCoupon = (await newCoupon.save()) as unknown as CouponInterface
       console.log(savedCoupon);
 
-      // Return the saved coupon data
       return {
         code: savedCoupon.code ?? "",
         discountPercentage: savedCoupon.discountPercentage,
@@ -572,22 +571,27 @@ export class AdminRepository {
     }
   }
   // ********************************fetch coupon*********************
-  async fetchCoupon(): Promise<CouponInterface[] | null> {
+  async fetchCoupon(page: number, limit: number): Promise<CouponInterface[] | null> {
     try {
-      const data = await Coupon.find() as CouponInterface[];
+      const skip = (page - 1) * limit;
+
+      const data = await Coupon.find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean();
 
       console.log("coupon in management:", data);
 
-      // Map the documents to the OfferReturnData type
-      const coupons: CouponInterface[] = data.map((coupon: CouponInterface) => ({
-        code: coupon.code,
-        discountPercentage: coupon.discountPercentage,
-        startDate: coupon.startDate,
-        endDate: coupon.endDate,
-        isActive: coupon.isActive,
-        minRentalAmount: coupon.minRentalAmount,
-        userId: coupon.userId,
-        id: coupon.id?.toString() || "", // Convert `_id` to string if present
+      const coupons: CouponInterface[] = data.map((coupon: any) => ({
+        code: coupon.code ?? null,
+        discountPercentage: coupon.discountPercentage ?? null,
+        startDate: coupon.startDate ?? null,
+        endDate: coupon.endDate ?? null,
+        isActive: coupon.isActive ?? false,
+        minRentalAmount: coupon.minRentalAmount ?? null,
+        userId: coupon.userId ?? [],
+        id: coupon._id?.toString() || "", // Convert `_id` to string
       }));
 
       return coupons;
@@ -626,9 +630,8 @@ export class AdminRepository {
     try {
       console.log("Updating couponData", couponData);
 
-      // Update the offer using its ID
       const updatedCoupon = await Coupon.findByIdAndUpdate(
-        id, // Pass the ID directly
+        id,
         {
           code: couponData.code ?? "",
           discountPercentage: couponData.discountPercentage ?? 0,
@@ -687,40 +690,45 @@ export class AdminRepository {
   }
   // ***************************booking history*****************
 
- async getBookingHistory(): Promise<BookingInterface[] | null> {
-  try {
+  async getBookingHistory(page: number, limit: number): Promise<BookingInterface[] | null> {
+    try {
+      const skip = (page - 1) * limit;
+
       const bookingHistory = await BookingModel.aggregate([
-          {
-              $addFields: {
-                  CarsObjectId: { $toObjectId: "$CarsId" } 
-              }
+        {
+          $addFields: {
+            CarsObjectId: { $toObjectId: "$CarsId" }
+          }
+        },
+        {
+          $lookup: {
+            from: 'carmodels',
+            localField: 'CarsObjectId',
+            foreignField: '_id',
+            as: 'bookingDetails',
           },
-          {
-              $lookup: {
-                  from: 'carmodels', 
-                  localField: 'CarsObjectId',
-                  foreignField: '_id',
-                  as: 'bookingDetails',
-              },
-          },
-          { $unwind: '$bookingDetails' } 
+        },
+        { $unwind: '$bookingDetails' },
+        { $sort: { createdAt: -1 } },
+        { $skip: (page - 1) * limit },
+        { $limit: limit }
       ]);
       console.log(bookingHistory, "booking history");
       return bookingHistory.length ? bookingHistory : null;
-  } catch (error) {
+    } catch (error) {
       console.error("Error fetching booking history with car details:", (error as Error).message);
       return null;
+    }
   }
-}
   // / ***************************specific booking details*****************
 
-  async specificBookingDetails(bookingId:string): Promise<BookingInterface | null> {
+  async specificBookingDetails(bookingId: string): Promise<BookingInterface | null> {
     try {
-       // Convert bookingId to an ObjectId
+      // Convert bookingId to an ObjectId
       const objectId = new mongoose.Types.ObjectId(bookingId);
 
       const bookingHistory = await BookingModel.aggregate([
-        { $match: { _id: objectId } }, 
+        { $match: { _id: objectId } },
         {
           $addFields: {
             CarsObjectId: { $toObjectId: "$CarsId" }, // Convert CarsId to ObjectId
@@ -772,4 +780,207 @@ export class AdminRepository {
     }
 
   }
+
+  // ******************************get total cars********************
+  async countCars(): Promise<number | null> {
+    try {
+      const countCars = await CarModel.find().countDocuments();;
+      return countCars;
+    } catch (error) {
+      console.error("Error fetching car count:", (error as Error).message);
+      return null;
+    }
+  }
+  // ********************************count users**********************
+
+  async countUsers(): Promise<number | null> {
+    try {
+      const countUsers = await userModel.countDocuments();
+      return countUsers;
+    } catch (error) {
+      console.error("Error fetching user count:", (error as Error).message);
+      return null;
+    }
+  }
+
+  //**********************/ Count Providers*******************
+  async countProviders(): Promise<number | null> {
+    try {
+      const countProviders = await providerModel.countDocuments();
+      return countProviders;
+    } catch (error) {
+      console.error("Error fetching provider count:", (error as Error).message);
+      return null;
+    }
+  }
+  // **************************car bookings based one car***********************
+
+
+  async CountBookingCar(): Promise<{ carName: string, count: number }[]> {
+    try {
+      const bookingCountByCar = await BookingModel.aggregate([
+        {
+          $addFields: {
+            CarsId: { $toObjectId: '$CarsId' },
+          },
+        },
+        {
+          $lookup: {
+            from: 'carmodels',          // The collection to join with
+            localField: 'CarsId',       // The field in bookings to match with cars
+            foreignField: '_id',        // The field in cars to match with
+            as: 'carDetails',           // The alias for the joined data
+          },
+        },
+        {
+          $unwind: '$carDetails',
+        },
+        {
+          $group: {
+            _id: '$carDetails.car_name',
+            count: { $sum: 1 },
+          },
+        },
+
+        {
+          $project: {
+            carName: '$_id',
+            count: 1,
+            _id: 0,
+          },
+        },
+
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+      ]);
+
+      console.log(bookingCountByCar, "bookingCountByCar"); // Log the results
+
+      return bookingCountByCar;
+    } catch (error) {
+      console.error("Error fetching booking count by car:", (error as Error).message);
+      return [];
+    }
+  }
+
+  // ********************************revenue based on each car*******************
+  async totalRevenue(): Promise<number | null> {
+    try {
+      const bookings = await BookingModel.find();
+      const totalCompletedAmount = bookings
+        .filter((booking) => booking.status === "Completed")  // Filter by status
+        .reduce((sum, booking) => sum + booking.total_Amt, 0);
+      return totalCompletedAmount / 2;
+    } catch (error) {
+      console.error("Error fetching provider count:", (error as Error).message);
+      return null;
+    }
+  }
+  // ***************************total Bookings*******************************
+  async countBooking(): Promise<number | null> {
+    try {
+      const countBooking = await BookingModel.countDocuments();
+      return countBooking;
+    } catch (error) {
+      console.error("Error fetching provider count:", (error as Error).message);
+      return null;
+    }
+  }
+  // ***************************total opffers*******************************
+  async countOffers(): Promise<number | null> {
+    try {
+      const countOffers = await Offer.countDocuments();
+      return countOffers;
+    } catch (error) {
+      console.error("Error fetching provider count:", (error as Error).message);
+      return null;
+    }
+  }
+  // ***************************total opffers*******************************
+  async countNotification(): Promise<number | null> {
+    try {
+      const countNotification = await CarNotification.countDocuments();
+      return countNotification;
+    } catch (error) {
+      console.error("Error fetching provider count:", (error as Error).message);
+      return null;
+    }
+  }
+  // ***************************total Coupons*******************************
+  async countCoupon(): Promise<number | null> {
+    try {
+      const countCoupon = await Coupon.countDocuments();
+      return countCoupon;
+    } catch (error) {
+      console.error("Error fetching provider count:", (error as Error).message);
+      return null;
+    }
+  }
+  // **************************revenue based on car*********************
+
+  async revenueByCar(): Promise<{ carName: string, amount: number }[]> {
+    try {
+      const bookingCountByCar = await BookingModel.aggregate([
+
+        {
+          $match: {
+            status: 'Completed',
+          },
+        },
+
+        {
+          $addFields: {
+            CarsId: { $toObjectId: '$CarsId' },
+          },
+        },
+
+        {
+          $lookup: {
+            from: 'carmodels',
+            localField: 'CarsId',
+            foreignField: '_id',
+            as: 'carDetails',
+          },
+        },
+
+        {
+          $unwind: '$carDetails',
+        },
+
+        {
+          $group: {
+            _id: '$carDetails.car_name',
+            count: { $sum: 1 },
+            amount: { $sum: '$total_Amt' },
+          },
+        },
+
+        {
+          $project: {
+            carName: '$_id',
+            count: 1,
+            amount: 1,
+            _id: 0,
+          },
+        },
+
+        {
+          $sort: {
+            amount: -1,
+          },
+        },
+      ]);
+
+      console.log(bookingCountByCar, "bookingCountByCar");
+
+      return bookingCountByCar;
+    } catch (error) {
+      console.error("Error fetching booking count by car:", (error as Error).message);
+      return [];
+    }
+  }
+
 }

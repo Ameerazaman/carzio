@@ -15,8 +15,7 @@ import ChatModel, { IChat } from "../../Model/User/ChatModel";
 
 export class ProviderRepository {
 
-
-    // check provider for tooken validation
+    //*******************check provider for tooken validation*************
 
     async getProviderById(id: string): Promise<ProviderInterface | null> {
         try {
@@ -29,7 +28,7 @@ export class ProviderRepository {
             return null;
         }
     }
-    // This function checks if an email exists in the provider database
+    //****This function checks if an email exists in the provider database********
     async emailExistCheck(email: string): Promise<ProviderInterface | null> {
         try {
             const existingUser = await providerModel.findOne({ email });
@@ -41,17 +40,17 @@ export class ProviderRepository {
         }
     }
 
-    // This function creates or updates an OTP for a given email
+    //*******This function creates or updates an OTP for a given email*************
     async createOtp(otp: number, email: string): Promise<OtpDocument | null> {
         try {
             let existUserOtp = await Otp.findOne({ email });
 
             if (existUserOtp) {
-                // Use findOneAndUpdate to get the updated document
+
                 const updatedOtp = await Otp.findOneAndUpdate(
                     { email },
                     { otp },
-                    { new: true } // Return the updated document
+                    { new: true }
                 );
                 return updatedOtp;
             } else {
@@ -64,24 +63,25 @@ export class ProviderRepository {
         }
     }
 
-
+    // ***********************find Otp*****************************88
     async findOtp(email: string, otp: string): Promise<OtpDocument | null> {
         try {
             const existProviderOtp = await Otp.findOne({ email });
             console.log(existProviderOtp, otp, "check otp")
-            // Check if existProviderOtp is not null and compare OTPs
+
             if (existProviderOtp && existProviderOtp.otp.toString() === otp) {
                 await Otp.deleteOne({ email })
                 return existProviderOtp;
             }
 
-            return null; // If no match or null, return null
+            return null;
         } catch (error) {
             console.log("Error checking email existence:", error);
             return null;
         }
     }
 
+    // *************************Save provider***************************
 
     async saveProvider(providerData: ProviderInterface): Promise<ProviderInterface | null> {
         try {
@@ -94,7 +94,7 @@ export class ProviderRepository {
             return null;
         }
     }
-
+    // *******************************check provider Address********************
     async checkProviderAddress(providerId: string): Promise<ProviderAdressInterface | null> {
         try {
 
@@ -124,10 +124,9 @@ export class ProviderRepository {
     async saveProfile(providerData: ProviderAdressInterface): Promise<ProviderAdressInterface | null> {
         try {
 
-            // Create a new instance of your Mongoose model
             const newUser = new providerProfile({
                 name: providerData.name,
-                providerId: providerData.providerId, // Use providerData._id directly
+                providerId: providerData.providerId,
                 email: providerData.email,
                 city: providerData.city,
                 state: providerData.state,
@@ -135,23 +134,21 @@ export class ProviderRepository {
                 phone: providerData.phone,
             });
 
-            // Save the new user to the database
             const savedUser = await newUser.save();
-            // Log what was saved
 
             return {
-                _id: savedUser._id.toString(), // Convert ObjectId to string
+                _id: savedUser._id.toString(),
                 name: savedUser.name,
                 email: savedUser.email,
                 phone: savedUser.phone,
                 city: savedUser.city,
                 state: savedUser.state,
                 pinNumber: savedUser.pinNumber,
-                // isBlocked: savedUser.isBlocked || false // Handle optional
-            } as ProviderAdressInterface; // Return the saved object as the correct type
+
+            } as ProviderAdressInterface;
         } catch (error) {
             console.error("Error saving user:", error);
-            return null; // Return null on error
+            return null;
         }
     }
     async editProfile(providerData: ProviderAdressInterface, id: string): Promise<ProviderAdressInterface | null> {
@@ -168,14 +165,14 @@ export class ProviderRepository {
                     pinNumber: providerData.pinNumber,
                     phone: providerData.phone,
                 },
-                { new: true } // To return the updated document
-            ).lean<ProviderAdressInterface>(); // Convert to plain JS object
+                { new: true }
+            ).lean<ProviderAdressInterface>();
 
             console.log(editAddress, "editAddress after saving");
-            return editAddress; // Return the updated object as the correct type
+            return editAddress;
         } catch (error) {
             console.error("Error saving user:", error);
-            return null; // Return null on error
+            return null;
         }
     }
     // *********************************update Image**********************
@@ -187,11 +184,10 @@ export class ProviderRepository {
                 return null;
             }
 
-            // Update the car's images (array of strings)
             const updatedProfile = await providerProfile.findByIdAndUpdate(
                 id,
-                { image: images }, // Assign the array of images
-                { new: true } // Return the updated car document
+                { image: images },
+                { new: true }
             );
             console.log(updatedProfile, "update profile")
             return updatedProfile as ProviderAdressInterface;
@@ -213,41 +209,47 @@ export class ProviderRepository {
 
             if (carExist) {
 
-                return undefined; // Return undefined instead of null
+                return undefined;
             }
 
             const newCar = new CarNotification({
                 car_name: carData.car_name,
                 model: carData.model,
-                rentalPrice: Number(carData.rentalPrice), // Convert to Number
+                rentalPrice: Number(carData.rentalPrice),
                 engineType: carData.engineType,
                 fuelType: carData.fuelType,
                 color: carData.color,
-                images: carData.images.length > 0 ? carData.images : [], // Ensure images are populated
-                rcExpiry: new Date(carData.rcExpiry), // Ensure it's a Date
+                images: carData.images.length > 0 ? carData.images : [],
+                rcExpiry: new Date(carData.rcExpiry),
                 rcNumber: carData.rcNumber,
                 insurancePolicyNumber: carData.insurancePolicyNumber,
-                insuranceExpiry: new Date(carData.insuranceExpiry), // Ensure it's a Date
+                insuranceExpiry: new Date(carData.insuranceExpiry),
                 pollutionCertificateNumber: carData.pollutionCertificateNumber,
-                pollutionExpiry: new Date(carData.pollutionExpiry), // Ensure it's a Date
+                pollutionExpiry: new Date(carData.pollutionExpiry),
                 providerId: carData.providerId,
             });
 
-            // Save the car
             const car = await newCar.save();
-            // Log saved car
-            return car.toObject() as CarDataInterface; // Return as CarDataInterface
+
+            return car.toObject() as CarDataInterface;
 
         } catch (error) {
             console.error("Error saving car:", error instanceof Error ? error.message : error);
-            return undefined; // Return undefined on error instead of null
+            return undefined;
         }
     }
 
     // ******************************fetch car for car management**********************
-    async fetchCars(): Promise<CarDataInterface[] | null> {
+    async fetchCars(page: number, limit: number): Promise<CarDataInterface[] | null> {
         try {
-            const carDocuments = await CarModel.find() as CarDataInterface[]; // Fetch car documents
+
+            const skip = (page - 1) * limit;
+            const carDocuments = await CarModel.find()
+            .sort({ createdAt: -1 }) 
+            .skip(skip)
+            .limit(limit) as CarDataInterface[];
+
+
 
             const cars: CarDataInterface[] = carDocuments.map((car: CarDataInterface) => ({
                 car_name: car.car_name,
@@ -266,7 +268,8 @@ export class ProviderRepository {
                 providerId: car.providerId,
                 isStatus: car.isStatus,
                 createdAt: car.createdAt,
-                id: car.id
+                id: car.id,
+
             }));
 
             return cars;
@@ -289,9 +292,9 @@ export class ProviderRepository {
 
 
             const updateCar = await CarModel.findByIdAndUpdate(
-                car, // pass the providerId directly
-                { isBlocked: !car.isBlocked }, // Flip the isBlocked status
-                { new: true } // Return the updated provider document
+                car,
+                { isBlocked: !car.isBlocked },
+                { new: true }
             );
 
 
@@ -355,7 +358,7 @@ export class ProviderRepository {
                 pollutionCertificateNumber: carData.pollutionCertificateNumber,
                 pollutionExpiry: carData.pollutionExpiry,
                 providerId: carData.providerId,
-                // Include any additional fields as needed
+
             };
 
             const editCar = await CarModel.findByIdAndUpdate(id, updateData, { new: true }).lean();
@@ -364,7 +367,7 @@ export class ProviderRepository {
             return editCar as CarDataInterface;
         } catch (error) {
             console.error("Error saving provider:", error);
-            return null; // Return null on error
+            return null;
         }
     }
     // **********************************update Car image*************************
@@ -376,11 +379,10 @@ export class ProviderRepository {
                 return null;
             }
 
-            // Update the car's images (array of strings)
             const updatedCar = await CarModel.findByIdAndUpdate(
                 id,
-                { images: images }, // Assign the array of images
-                { new: true } // Return the updated car document
+                { images: images },
+                { new: true }
             );
 
             return updatedCar;
@@ -393,10 +395,9 @@ export class ProviderRepository {
 
 
 
-    async getBookingHistory(providerId: string): Promise<BookingInterface[] | null> {
+    async getBookingHistory(providerId: string, page: number, limit: number): Promise<BookingInterface[] | null> {
         try {
-            console.log(providerId, "userId in get booking history");
-
+            console.log(providerId, "providerId in get booking history");
             const bookingHistory = await BookingModel.aggregate([
                 { $match: { providerId: providerId } },
                 {
@@ -406,17 +407,20 @@ export class ProviderRepository {
                 },
                 {
                     $lookup: {
-                        from: 'carmodels', // Collection name for CarModel (Mongoose pluralizes by default)
+                        from: 'carmodels', // Collection name for CarModel
                         localField: 'CarsObjectId', // Use the converted ObjectId field
                         foreignField: '_id',
                         as: 'bookingDetails',
                     },
                 },
-                { $unwind: '$bookingDetails' } // Flatten the bookingDetails array
+                { $unwind: '$bookingDetails' },
+                { $sort: { createdAt: -1 } },
+                { $skip: (page - 1) * limit },
+                { $limit: limit },
             ]);
 
             console.log(bookingHistory, "booking history");
-            return bookingHistory.length ? bookingHistory : null;
+            return bookingHistory
         } catch (error) {
             console.error("Error fetching booking history with car details:", (error as Error).message);
             return null;
@@ -428,39 +432,39 @@ export class ProviderRepository {
         try {
             console.log(bookingId, "bookingId in get booking history");
 
-            // Convert bookingId to an ObjectId
+
             const objectId = new mongoose.Types.ObjectId(bookingId);
 
             const bookingHistory = await BookingModel.aggregate([
-                { $match: { _id: objectId } }, // Match the specific booking by ObjectId
+                { $match: { _id: objectId } },
                 {
                     $addFields: {
-                        CarsObjectId: { $toObjectId: "$CarsId" }, // Convert CarsId to ObjectId
-                        UserAddressObjectId: { $toObjectId: "$UserAddressId" } // Convert UserAddressId to ObjectId
+                        CarsObjectId: { $toObjectId: "$CarsId" },
+                        UserAddressObjectId: { $toObjectId: "$UserAddressId" }
                     }
                 },
                 {
                     $lookup: {
-                        from: 'carmodels', // Collection name for CarModel
+                        from: 'carmodels',
                         localField: 'CarsObjectId',
                         foreignField: '_id',
                         as: 'bookingDetails'
                     }
                 },
-                { $unwind: '$bookingDetails' }, // Flatten bookingDetails array
+                { $unwind: '$bookingDetails' },
                 {
                     $lookup: {
-                        from: 'useraddressmodels', // Collection name for UserAddress
+                        from: 'useraddressmodels',
                         localField: 'UserAddressObjectId',
                         foreignField: '_id',
                         as: 'userAddress'
                     }
                 },
-                { $unwind: '$userAddress' } // Flatten userAddress array
+                { $unwind: '$userAddress' }
             ]);
 
             console.log(bookingHistory, "booking history");
-            return bookingHistory[0] || null; // Return the first matched result or null if none found
+            return bookingHistory[0] || null;
         } catch (error) {
             console.error("Error fetching booking history with car and address details:", (error as Error).message);
             return null;
@@ -489,8 +493,10 @@ export class ProviderRepository {
     // *****************************fetch users chat by provider*********************
     async fetchUsersChat(providerId: string): Promise<IChat[] | null> {
         try {
-            const result = await ChatModel.find({ providerId: providerId })
-                .sort({ timestamp: -1 }); // Sort in descending order by timestamp (-1 for descending)
+            const result = await ChatModel.find({
+                receiverId: providerId
+            })
+                .sort({ timestamp: -1 });
             return result as IChat[];
         } catch (error) {
             console.error("Error fetching users chat:", (error as Error).message);
@@ -499,17 +505,186 @@ export class ProviderRepository {
     }
 
     // *************************fetch chat History******************************
-   async fetchChatHistory(userId:string,providerId:string): Promise<IChat[] | null> {
-    try {
-        console.log(userId,"userid",providerId,"providerid")
-        let result = await ChatModel.find({ userId: userId,providerId:providerId })
-        console.log(result,"fetch chat history provider")
-        return  result as IChat[]
-    } catch (error) {
-        console.error("Error check bookId in review:", (error as Error).message);
-        return null;
+    async fetchChatHistory(recieverId: string, senderId: string): Promise<IChat[] | null> {
+        try {
+            console.log(recieverId, "userid", senderId, "providerid");
+
+            let result = await ChatModel.find({
+                $or: [
+                    {
+                        receiverId: senderId, senderId: recieverId
+                    },
+                    {
+                        receiverId: recieverId, senderId: senderId
+                    },
+                ],
+            });
+
+            console.log(result, "fetch chat history provider");
+            return result as IChat[];
+        } catch (error) {
+            console.error("Error fetching chat history:", (error as Error).message);
+            return null;
+        }
     }
-}
+    // **********************************count cars****************************
+    async countCars(providerId:string): Promise<number | null> {
+        try {
+            const countCars = await CarModel.find({providerId:providerId}).countDocuments();;
+            return countCars;
+        } catch (error) {
+            console.error("Error fetching car count:", (error as Error).message);
+            return null;
+        }
+    }
+
+    // **************************car bookings based one car***********************
+    async CountBookingCar(providerId: string): Promise<{ carName: string, count: number }[]> {
+        try {
+            const bookingCountByCar = await BookingModel.aggregate([
+
+                {
+                    $match: {
+                        providerId: providerId,
+                    },
+                },
+                {
+                    $addFields: {
+                        CarsId: { $toObjectId: '$CarsId' },
+                    },
+                },
+                {
+                    $lookup: {
+                        from: 'carmodels',
+                        localField: 'CarsId',
+                        foreignField: '_id',
+                        as: 'carDetails',
+                    },
+                },
+                {
+                    $unwind: '$carDetails',
+                },
+                {
+                    $group: {
+                        _id: '$carDetails.car_name',
+                        count: { $sum: 1 },
+                    },
+                },
+                {
+                    $project: {
+                        carName: '$_id',
+                        count: 1,
+                        _id: 0,
+                    },
+                },
+                {
+                    $sort: {
+                        count: -1,
+                    },
+                },
+            ]);
+
+            console.log(bookingCountByCar, 'bookingCountByCar');
+
+            return bookingCountByCar;
+        } catch (error) {
+            console.error('Error fetching booking count by car:', (error as Error).message);
+            return [];
+        }
+    }
+
+
+    // ********************************revenue based on each car*******************
+    async totalRevenue(providerId: string): Promise<number | null> {
+        try {
+
+            const bookings = await BookingModel.find({
+                providerId: providerId,
+                status: "Completed"
+            });
+
+
+            const totalCompletedAmount = bookings.reduce(
+                (sum, booking) => sum + booking.total_Amt,
+                0
+            );
+
+            return totalCompletedAmount / 2;
+        } catch (error) {
+            console.error("Error calculating total revenue:", (error as Error).message);
+            return null;
+        }
+    }
+
+    // ***************************total Bookings*******************************
+    async countBooking(providerId: string): Promise<number | null> {
+        try {
+
+            const countBooking = await BookingModel.countDocuments({ providerId: providerId });
+            return countBooking;
+        } catch (error) {
+            console.error("Error fetching booking count for provider:", (error as Error).message);
+            return null;
+        }
+    }
+
+    // *************************************revenue based on car**********************
+
+    async revenueByCar(providerId: string): Promise<{ carName: string, amount: number }[]> {
+        try {
+            const bookingCountByCar = await BookingModel.aggregate([
+                {
+                    $match: {
+                        status: 'Completed',
+                        providerId: providerId,
+                    },
+                },
+                {
+                    $addFields: {
+                        CarsId: { $toObjectId: '$CarsId' },
+                    },
+                },
+                {
+                    $lookup: {
+                        from: 'carmodels',
+                        localField: 'CarsId',
+                        foreignField: '_id',
+                        as: 'carDetails',
+                    },
+                },
+                {
+                    $unwind: '$carDetails',
+                },
+                {
+                    $group: {
+                        _id: '$carDetails.car_name',
+                        count: { $sum: 1 },
+                        amount: { $sum: '$total_Amt' },
+                    },
+                },
+                {
+                    $project: {
+                        carName: '$_id',
+                        count: 1,
+                        amount: 1,
+                        _id: 0,
+                    },
+                },
+                {
+                    $sort: {
+                        amount: -1,
+                    },
+                },
+            ]);
+
+            console.log(bookingCountByCar, "bookingCountByCar");
+
+            return bookingCountByCar;
+        } catch (error) {
+            console.error("Error fetching revenue by car for provider:", (error as Error).message);
+            return [];
+        }
+    }
 }
 
 

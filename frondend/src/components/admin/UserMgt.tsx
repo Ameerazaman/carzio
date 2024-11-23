@@ -3,22 +3,27 @@ import Navbar from '../../Pages/Admin/Commons/Navbar';
 import Sidebar from '../../Pages/Admin/Commons/Sidebar';
 import Table from '../../Pages/Admin/Commons/Table';
 import { userManagement } from '../../Api/Admin';
+import Pagination from '../../Pages/Common/Pagination';
 
 function UserMgt() {
   const [tableData, setTableData] = useState<Array<{ [key: string]: any }>>([]);
+  const header: string = 'user'; // Define whether this is for users or providers
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const header: string = 'user'; // Define whether this is for users or providers
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const limit = 1;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const result = await userManagement();
-        console.log(result?.data?.data, "Fetched user data");
+        const result = await userManagement(page, limit);
+        console.log(result, "Fetched user data");
 
         if (result?.data?.data) {
           setTableData(result.data.data);
+          setTotalPages(result.data.totalPage || 1); // Ensure `totalPages` is set from the response
         } else {
           setError("No user data returned.");
         }
@@ -31,7 +36,13 @@ function UserMgt() {
     };
 
     fetchData();
-  }, []);
+  }, [page]); // Re-fetch data when `page` changes
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
 
   return (
     <div className="flex">
@@ -46,7 +57,14 @@ function UserMgt() {
             ) : error ? (
               <p className="text-center py-4 text-red-600">{error}</p>
             ) : (
-              <Table tableData={tableData} header={header} />
+              <>
+                <Table tableData={tableData} header={header} />
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </>
             )}
           </div>
         </div>
@@ -56,3 +74,4 @@ function UserMgt() {
 }
 
 export default UserMgt;
+

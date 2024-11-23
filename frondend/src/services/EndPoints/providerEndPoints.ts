@@ -8,7 +8,9 @@ const providerRouter = {
     saveProfile:'/provider/save_profile',
     editProfile:'/provider/edit_profile',
     add_car:"/provider/add_car",
-    carMgt:'/provider/cars'
+    carMgt:'/provider/cars',
+    getDashboard:'/provider/dashboard',
+    bookingHistory:'/provider/booking_history',
   };
   
   export default providerRouter;

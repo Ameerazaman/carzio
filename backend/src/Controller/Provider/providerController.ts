@@ -377,23 +377,30 @@ export class ProviderController {
 
 
     // *************************fetch car for car management********************
-    async fetchCars(req: Request, res: Response): Promise<void> {
+      async fetchCars(req: Request, res: Response): Promise<void> {
         try {
-            const result = await this.providerServices.fetchCars(); // Fetch users from service
-
-            if (result) {
-                // Respond with the service result, no need to return
-                res.status(result.status).json(result.data);
+            console.log("fetch cars params", req.query)
+            const page = req.query.page ? Number(req.query.page) : undefined;
+            const limit = req.query.limit ? Number(req.query.limit) : undefined;
+            const providerId = req.query.providerId as string ;
+            if (page !== undefined && limit !== undefined) {
+                console.log("fetch cars params", page, limit)
+                const result = await this.providerServices.fetchCars(providerId,page, limit);
+                console.log(result, "result fetch car");
+                if (result) {
+                    console.log(result.data, "fetch cars")
+                    res.status(200).json(result.data);
+                } else {
+                    res.status(500).json({ message: "Internal server error" });
+                }
             } else {
-                res.status(500).json({ message: "Internal server error" });
+                res.status(400).json({ message: "Invalid page or limit" });
             }
         } catch (error) {
             console.error("Error during fetch cars:", error);
             res.status(500).json({ message: "Internal server error" });
         }
     }
-
-
     // ******************************Change car status*****************************
 
     async updateStatusCar(req: Request, res: Response): Promise<Response> {
@@ -511,9 +518,10 @@ export class ProviderController {
     // ******************************get booking history**************************8
     async getBookingHistory(req: Request, res: Response): Promise<void> {
         try {
-            const providerId = req.params.id
-            console.log(providerId, "providerId")
-            const result = await this.providerServices.getBookingHistory(providerId);
+            const providerId = req.query.providerId as string ;
+            const page = req.query.page ? Number(req.query.page) : 1;
+            const limit = req.query.limit ? Number(req.query.limit) : 10;
+            const result = await this.providerServices.getBookingHistory(providerId, page, limit);
             if (!result) {
                 res.status(500).json({ message: "Error booking history" });
                 return
@@ -605,4 +613,28 @@ export class ProviderController {
         });
     }
 }
+
+ // **************************get dash board constsnt data**********************
+ async getDashboardConstData(req: Request, res: Response): Promise<void> {
+    try {
+        const providerId=req.params.providerId
+      const result = await this.providerServices.getConstDashboardData(providerId)
+      if (!result) {
+        res.status(500).json({
+          message: "Dashboard data could not be retrieved"
+        }
+        );
+        return
+      }
+      res.status(200).json(result.data.data);
+
+
+    } catch (error) {
+      console.error("Error cancel booking:", error);
+      res.status(500).json({
+        "message": "Internal server error while fetching dashboard data"
+      }
+      );
+    }
+  }
 }
