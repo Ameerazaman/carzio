@@ -44,8 +44,16 @@ userRouter.post('/userid_in_coupon/:coupon/:userId', userAuth, async (req, res) 
 userRouter.put('/check_update_wallet/:userId/:amount', userAuth, async (req, res) => userController.checkAndUpdateWallet(req, res));
 
 userRouter.get('/booking_history', userAuth, async (req, res) => userController.getBookingHistory(req, res))
-userRouter.get('/details_of_specifc_order/:id', userAuth, async (req, res) => userController.specificBookingDetails(req, res))
+userRouter.get('/details_of_specifc_order/:id', userAuth, async (req, res) => {
+    console.log("Route accessed: /details_of_specifc_order/:id");
+    console.log("Request Params:", req.params);
+    console.log("Request Query:", req.query);
+    userController.specificBookingDetails(req, res);
+});
+
 userRouter.put('/cancel_booking', userAuth, async (req, res) => userController.cancelBookingByUser(req, res));
+userRouter.put('/credit_to_wallet', userAuth, async (req, res) => userController.creditToWallet(req, res));
+
 userRouter.get('/wallet', userAuth, async (req, res) => userController.getWallet(req, res));
 userRouter.post('/create_review_and_ratings', userAuth, async (req, res) => userController.createReviewAndRatings(req, res));
 userRouter.get('/check_bookid_in_Review', userAuth, async (req, res) => userController.checkBookIdinReview(req, res));

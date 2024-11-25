@@ -626,20 +626,23 @@ export class UserController {
     // ******************************details of specic details**************************8
     async specificBookingDetails(req: Request, res: Response): Promise<void> {
         try {
-            const bookingId = req.params.id
-            const status = req.params.status
-            console.log(bookingId, "bookingId")
+            const bookingId = req.params.id; // Correctly fetch id from route params
+            console.log(bookingId, "bookingId");
+    
             const result = await this.userServices.specificBookingDetails(bookingId);
+    
             if (!result) {
-                res.status(500).json({ message: "Error booking history" });
-                return
+                res.status(404).json({ message: "Booking not found" }); // Return 404 for no result
+                return;
             }
-            res.status(200).json(result.data);
+    
+            res.status(200).json(result.data); // Send back the result
         } catch (error) {
-            console.error("Error saving profile:", error);
+            console.error("Error fetching booking details:", error);
             res.status(500).json({ message: "Internal server error" });
         }
     }
+    
 
     // *********************cancel booking By user add amount to wallet**********************
     async cancelBookingByUser(req: Request, res: Response): Promise<void> {
@@ -669,7 +672,28 @@ export class UserController {
             res.status(500).json({ message: "Internal server error" });
         }
     }
-
+    // *********************cancel booking By user add amount to wallet**********************
+    async creditToWallet(req: Request, res: Response): Promise<void> {
+        try {
+            const { userId, amount } = req.body;
+    
+            if (!userId || amount === undefined) {
+                res.status(400).json({ message: "User ID and Amount are required" });
+                return;
+            }
+    
+            const result = await this.userServices.creditToWallet(userId, amount);
+            if (!result) {
+                res.status(500).json({ message: "Error Credit to Wallet" });
+                return;
+            }
+    
+            res.status(200).json(result);
+        } catch (error) {
+            console.error("Error credit to wallet:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
     // **********************************check Booked Or Not**********************************
 
     async checkBookedOrNot(req: Request, res: Response): Promise<void> {
@@ -821,13 +845,13 @@ export class UserController {
             const providerId = req.params.providerId as string | undefined | '';
             if (!userId || !providerId) {
                 res.status(400).json({ success: false, message: "userId and providerId are required" });
-                return; 
+                return;
             }
             const result = await this.userServices.fetchChatHistory(userId, providerId);
             if (result?.data?.success) {
                 res.status(200).json({
                     success: true,
-                    data: result.data.data, 
+                    data: result.data.data,
                 });
             } else {
                 res.status(200).json({
@@ -843,34 +867,34 @@ export class UserController {
             });
         }
     }
-// ******************************check car availabilty********************
-async searchCarAvailability(req: Request, res: Response): Promise<void> {
-    try {
-    
-      console.log("fetch cars params", req.query);
-  
-      const issueDate = req.query.issueDate ? String(req.query.issueDate) : undefined;
-      const returnDate = req.query.returnDate ? String(req.query.returnDate) : undefined;
-  
-      if (issueDate && returnDate) {
-        console.log("fetch cars params", issueDate, returnDate);
-  
-       
-        const result = await this.userServices.searchCarAvailability(issueDate, returnDate);
-  
-        if (result) {
-          console.log(result.data, "fetch cars");
-          res.status(200).json(result.data);
-        } else {
-          res.status(500).json({ message: "Internal server error" });
+    // ******************************check car availabilty********************
+    async searchCarAvailability(req: Request, res: Response): Promise<void> {
+        try {
+
+            console.log("fetch cars params", req.query);
+
+            const issueDate = req.query.issueDate ? String(req.query.issueDate) : undefined;
+            const returnDate = req.query.returnDate ? String(req.query.returnDate) : undefined;
+
+            if (issueDate && returnDate) {
+                console.log("fetch cars params", issueDate, returnDate);
+
+
+                const result = await this.userServices.searchCarAvailability(issueDate, returnDate);
+
+                if (result) {
+                    console.log(result.data, "fetch cars");
+                    res.status(200).json(result.data);
+                } else {
+                    res.status(500).json({ message: "Internal server error" });
+                }
+            } else {
+                res.status(400).json({ message: "Invalid issueDate or returnDate" });
+            }
+        } catch (error) {
+            console.error("Error during fetch cars:", error);
+            res.status(500).json({ message: "Internal server error" });
         }
-      } else {
-        res.status(400).json({ message: "Invalid issueDate or returnDate" });
-      }
-    } catch (error) {
-      console.error("Error during fetch cars:", error);
-      res.status(500).json({ message: "Internal server error" });
     }
-  }
-  
+
 }

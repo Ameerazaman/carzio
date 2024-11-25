@@ -418,8 +418,21 @@ const getDashboardConstData=async(providerId:string)=>{
         throw error;
     }
 }
+// ************************fetch sales resport***********************
 
-
+const fetchSalesReport = async (page: number, limit: number,providerId:string): Promise<any> => {
+    try {
+        const result = await providerAPI.get(providerRouter.salesReport, {
+            params: { page, limit, providerId },
+          });
+          
+      return result.data;
+    } catch (error) {
+      console.error("API Error:", (error as Error).message);
+      errorHandler(error as Error);
+      throw error;
+    }
+  };
 
 export {
     signup,
@@ -443,5 +456,6 @@ export {
     updateStatusOfBooking,
     fetchUsersChat,
     fetchChat,
-    getDashboardConstData
+    getDashboardConstData,
+    fetchSalesReport
 };

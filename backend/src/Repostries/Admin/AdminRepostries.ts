@@ -338,7 +338,7 @@ export class AdminRepository {
         .find()
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(limit) as CarDataInterface[];  
+        .limit(limit) as CarDataInterface[];
 
       const cars: CarDataInterface[] = carDocuments.map((car: CarDataInterface) => ({
         car_name: car.car_name,
@@ -426,7 +426,7 @@ export class AdminRepository {
   // ********************************fetch offers*********************
   async fetchOffer(page: number, limit: number): Promise<OfferDataInterface[] | null> {
     try {
-     
+
       const skip = (page - 1) * limit;
       const data = await Offer
         .find()
@@ -978,9 +978,26 @@ export class AdminRepository {
 
       return bookingCountByCar;
     } catch (error) {
-      console.error("Error fetching booking count by car:", (error as Error).message);
+      console.error("Error fetching revenue by car", (error as Error).message);
       return [];
     }
   }
+
+  // **********************************Sales Report****************
+  async  fetchSalesReport(page: number, limit: number): Promise<BookingInterface[] | null> {
+    try {
+      const skip = (page - 1) * limit;
+      const completedBookings = await BookingModel.find({ status: 'Completed' })
+        .sort({ createdAt: -1 }) 
+        .skip(skip)
+        .limit(limit) as BookingInterface[];
+      return completedBookings; 
+    } catch (error) {
+      console.error("Error fetching sales report", (error as Error).message);
+      return null; 
+    }
+  }
+  
+
 
 }

@@ -18,7 +18,6 @@ export class AdminController {
   async refreshToken(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
 
     const refreshToken = req.cookies.refresh_token;
-    console.log("inside controllr for accesstoken", refreshToken);
 
     if (!refreshToken)
       res
@@ -27,24 +26,19 @@ export class AdminController {
 
     try {
       const decoded = verifyRefreshToken(refreshToken);
-      console.log(decoded, "decoded data")
+
       if (!decoded || !decoded.data) {
-        console.log("hai")
+    
         res.status(401).json({ success: false, message: "Refresh Token Expired" });
       }
-
       const result = await this.adminServices.adminGetById(decoded.data);
-      console.log(result, "result after create neew token")
-
       const accessTokenMaxAge = 5 * 60 * 1000;
-      const newAccessToken = result?.data?.token
-      console.log(newAccessToken, "new token")
+      const newAccessToken = result?.data?.token  
       res.cookie('access_token', newAccessToken, {
         maxAge: accessTokenMaxAge,
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
       })
-      console.log(res.cookie, "cookie")
       res.status(200).json({ success: true, message: "Token Updated" });
     }
     catch (error) {
@@ -58,18 +52,16 @@ export class AdminController {
   async adminLogin(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
       const { email, password }: { email: string; password: string } = req.body;
-
-      console.log("controllerresult");
+     
       const result = await this.adminServices.adminSignIn({ email, password });
 
-      console.log("result", result);
       if (result?.data.success) {
         const access_token = result.data.token;
         const refresh_token = result.data.refreshToken;
-        const accessTokenMaxAge = 5 * 60 * 1000; // 5 minutes
-        const refreshTokenMaxAge = 48 * 60 * 60 * 1000; // 48 hours
-        console.log("login successfully");
-        return res.status(OK) // Change OK to 200 for clarity
+        const accessTokenMaxAge = 5 * 60 * 1000; 
+        const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+
+        return res.status(OK)
           .cookie('access_token', access_token, {
             maxAge: accessTokenMaxAge,
             httpOnly: true,
@@ -82,11 +74,11 @@ export class AdminController {
           })
           .json({ success: true, user: result.data, message: result.data.message });
       } else {
-        console.log("login failed");
+       
         return res.status(BAD_REQUEST).json({ success: false, message: result?.data.message });
       }
     } catch (error) {
-      console.error("Error during sign-in:", error);
+    
       return res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
     }
   }
@@ -95,9 +87,6 @@ export class AdminController {
 
   async adminLogout(req: Request, res: Response): Promise<void> {
     try {
-      console.log("logout");
-
-      // Clear the cookies by setting them with an empty value and setting the `maxAge` to 0
       res.clearCookie('access_token', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production'
@@ -106,8 +95,6 @@ export class AdminController {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production'
       });
-      console.log("admin loggout successfully")
-      // Send success response
       res.status(200).json({ success: true, message: "Logged out successfully" });
     } catch (error) {
       console.error("Error during admin logout:", error);
@@ -121,14 +108,12 @@ export class AdminController {
       const limit = req.query.limit ? Number(req.query.limit) : 10;
       const result = await this.adminServices.fetchUsers(page, limit);
 
-      console.log(result, "result in fetch users")
       if (result) {
         res.status(result.status).json(result.data);
       } else {
         res.status(500).json({ message: "Internal server error" });
       }
     } catch (error) {
-      console.error("Error during fetch users:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -139,7 +124,6 @@ export class AdminController {
   async editUser(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
       const id = req.params.id;
-      console.log(id, "edit user admin controller");
 
 
       if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
@@ -148,7 +132,6 @@ export class AdminController {
 
       const userExist = await this.adminServices.editUser(id);
 
-      console.log(userExist, "exist user");
 
       if (!userExist) {
         return res.status(404).json({ message: "User not found" });
@@ -156,7 +139,6 @@ export class AdminController {
 
       return res.status(200).json(userExist);
     } catch (error) {
-      console.error("Error during check user exist:", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -165,9 +147,6 @@ export class AdminController {
 
   async updateUser(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-
-      console.log("Edit Uiser - Params:", req.params);
-      console.log("user Data:", req.body);
 
       const id = req.params.id;
       if (!id) {
@@ -180,7 +159,6 @@ export class AdminController {
       }
 
       const result = await this.adminServices.updateUser(userData, id);
-      console.log(result, "Edit user Result");
 
       if (result?.status === OK) {
         return res.status(OK).json(result.data);
@@ -188,7 +166,7 @@ export class AdminController {
         return res.status(INTERNAL_SERVER_ERROR).json(result?.data);
       }
     } catch (error) {
-      console.error("Error during profile update:", error);
+  
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -198,15 +176,11 @@ export class AdminController {
   async updateStatus(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
       const id = req.params.id;
-      console.log(id, "edit user admin controller");
-
       if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid ID parameter" });
       }
 
       const userExist = await this.adminServices.updateStatus(id);
-
-      console.log(userExist, "exist user");
 
       if (!userExist) {
         return res.status(404).json({ message: "User not found" });
@@ -214,7 +188,6 @@ export class AdminController {
 
       return res.status(200).json(userExist);
     } catch (error) {
-      console.error("Error during check user exist:", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -242,17 +215,13 @@ export class AdminController {
 
   async editProvider(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-      const id = req.params.id; // Extract 'id' from req.params
-      console.log(id, "edit provider admin controller");
-
-      // Validate if ID is a string and a valid ObjectId
+      const id = req.params.id;
+   
       if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid ID parameter" });
       }
 
       const providerExist = await this.adminServices.editProvider(id);
-
-      console.log(providerExist, "exist user");
 
       if (!providerExist) {
         return res.status(404).json({ message: "provider not found" });
@@ -260,7 +229,6 @@ export class AdminController {
 
       return res.status(200).json(providerExist);
     } catch (error) {
-      console.error("Error during check provider exist:", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -269,9 +237,6 @@ export class AdminController {
   // ***********************************update provider*********************88
   async updateProvider(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-
-      console.log("Edit provider - Params:", req.params);
-      console.log("provider Data:", req.body);
 
       const id = req.params.id;
       if (!id) {
@@ -284,7 +249,6 @@ export class AdminController {
       }
 
       const result = await this.adminServices.updateProvider(providerData, id);
-      console.log(result, "Edit provider Result");
 
       if (result?.status === OK) {
         return res.status(OK).json(result.data);
@@ -292,7 +256,6 @@ export class AdminController {
         return res.status(INTERNAL_SERVER_ERROR).json(result?.data);
       }
     } catch (error) {
-      console.error("Error during provider data update:", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -303,15 +266,11 @@ export class AdminController {
   async updateStatusProvider(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
       const id = req.params.id;
-      console.log(id, "edit provider admin controller");
-
       if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid ID parameter" });
       }
 
       const providerExist = await this.adminServices.updateStatusProvider(id);
-
-      console.log(providerExist, "exist provider");
 
       if (!providerExist) {
         return res.status(404).json({ message: "provider not found" });
@@ -319,7 +278,7 @@ export class AdminController {
 
       return res.status(200).json(providerExist);
     } catch (error) {
-      console.error("Error during check provider exist:", error);
+
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -328,17 +287,17 @@ export class AdminController {
   // *************************fetch notification that send by providers****************
   async fetchNotification(req: Request, res: Response): Promise<void> {
     try {
-      console.log("fetch notificationos")
-      const result = await this.adminServices.fetchNotification(); // Fetch users from service
-      console.log(result, "fetch notificaion result")
+   
+      const result = await this.adminServices.fetchNotification(); 
+      
       if (result) {
-        // Respond with the service result, no need to return
+       
         res.status(result.status).json(result.data);
       } else {
         res.status(500).json({ message: "Internal server error" });
       }
     } catch (error) {
-      console.error("Error during fetch provider:", error);
+
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -347,16 +306,13 @@ export class AdminController {
 
   async notificationDetails(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-      const id = req.params.id; // Extract 'id' from req.params
+      const id = req.params.id; 
 
-
-      // Validate if ID is a string and a valid ObjectId
       if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid ID parameter" });
       }
 
       const carDocumentExist = await this.adminServices.notificationDetails(id);
-
 
       if (!carDocumentExist) {
         return res.status(404).json({ message: "provider not found" });
@@ -364,7 +320,7 @@ export class AdminController {
 
       return res.status(200).json(carDocumentExist);
     } catch (error) {
-      console.error("Error during check provider exist:", error);
+    
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -373,19 +329,16 @@ export class AdminController {
 
   async verifyNotification(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-      console.log("Controller handling notification verification");
-      const id = req.params.id; // Extract 'id' from req.params
-      const value = req.params.value; // Extract 'value' from req.params
+      
+      const id = req.params.id; 
+      const value = req.params.value; 
 
-      // Validate if ID is a string and a valid ObjectId
       if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid ID parameter" });
       }
 
-      // Call your service to verify the notification
       let result = await this.adminServices.verifynotification(id, value);
-      console.log(result, "controller result")
-      // Handle cases based on value and result
+
       if (result) {
         if (value === "Accept") {
           return res.status(200).json({ message: "Car Accepted" });
@@ -394,11 +347,9 @@ export class AdminController {
         }
       }
 
-      // If no matching result, return a 404 or an appropriate message
       return res.status(404).json({ message: "Notification not found or invalid action" });
 
     } catch (error) {
-      console.error("Error during notification verification:", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -408,10 +359,9 @@ export class AdminController {
     try {
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
-      const result = await this.adminServices.fetchCars(page,limit); // Fetch users from service
+      const result = await this.adminServices.fetchCars(page,limit); 
 
       if (result) {
-        // Respond with the service result, no need to return
         res.status(result.status).json(result.data);
       } else {
         res.status(500).json({ message: "Internal server error" });
@@ -426,11 +376,8 @@ export class AdminController {
   // ******************************Change car status*****************************
 
   async updateStatusCar(req: Request, res: Response): Promise<Response> {
-    try {
-      console.log("Updating car status");
+    try {    
       const id = req.params.id;
-      console.log(id, "Car ID in updateStatusCar");
-
       if (!id || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid car ID" });
       }
@@ -451,13 +398,12 @@ export class AdminController {
   // ***********************Add offer*************************
   async addOffer(req: Request, res: Response): Promise<Response> {
     try {
-      console.log(req.body, "offer")
+     
       const saveOffer = await this.adminServices.addOffer(req.body.offer);
-      console.log(saveOffer, "save offer")
+      
       if (!saveOffer) {
         return res.status(404).json({ message: "Offer is not saved" });
       }
-
       return res.status(200).json({ message: "Offer saved updated successfully", car: req.body });
     } catch (error) {
       console.error("Error save Offer status:", error);
@@ -470,33 +416,26 @@ export class AdminController {
     try {
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
-      const result = await this.adminServices.fetchOffer(page,limit); // Fetch offers from service
-      console.log(result, "result in fetch offer")
+      const result = await this.adminServices.fetchOffer(page,limit); 
       if (result) {
-        // Send the response, no explicit return needed
         res.status(result.status).json(result.data);
       } else {
         res.status(500).json({ message: "Internal server error" });
       }
     } catch (error) {
-      console.error("Error during fetch offers:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
   // ************************************8edit offer***************************
   async editOffer(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-      const id = req.params.id; // Extract 'id' from req.params
-      console.log(id, "edit offer admin controller");
-
-
+      const id = req.params.id; 
+     
       if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid ID parameter" });
       }
 
       const offerExist = await this.adminServices.editOffer(id);
-
-      console.log(offerExist, "offerExist");
 
       if (!offerExist) {
         return res.status(404).json({ message: "Offer not found" });
@@ -504,7 +443,7 @@ export class AdminController {
 
       return res.status(200).json(offerExist);
     } catch (error) {
-      console.error("Error during check offer exist:", error);
+    
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -513,22 +452,18 @@ export class AdminController {
 
   async updateOffer(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-      console.log("Edit offer - Params:", req.params);
-      console.log("offer Data:", req.body);
-
-      const id = req.params.id;  // Get the id from params
+  
+      const id = req.params.id;  
       if (!id) {
         return res.status(400).json({ message: 'ID is missing' });
       }
 
-      const offerData = req.body;  // Directly use req.body, assuming you're sending JSON
+      const offerData = req.body; 
       if (!offerData) {
         return res.status(400).json({ message: 'offer data is missing' });
       }
 
-      // Call the service to save the profile
       const result = await this.adminServices.updateOffer(offerData, id);
-      console.log(result, "Edit offer Result");
 
       if (result?.status === OK) {
         return res.status(OK).json(result.data);  // Return success response
@@ -536,23 +471,20 @@ export class AdminController {
         return res.status(INTERNAL_SERVER_ERROR).json(result?.data);  // Handle internal error from service
       }
     } catch (error) {
-      console.error("Error during  offer update:", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   }
   // *******************************delete Offer*********************888
   async updateStatusOffer(req: Request, res: Response): Promise<Response> {
     try {
-      console.log("updateStatusOffer");
-      const id = req.params.id;
-      console.log(id, "Car ID in updateStatusOffer");
 
+      const id = req.params.id;
+     
       if (!id || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid car ID" });
       }
 
       const offerExist = await this.adminServices.updateStatusOffer(id);
-      console.log("delete offer", offerExist)
 
       if (!offerExist) {
         return res.status(404).json({ message: "Offer not found" });
@@ -560,7 +492,6 @@ export class AdminController {
 
       return res.status(200).json({ message: "Offer updateStatusOffer successfully", data: offerExist });
     } catch (error) {
-      console.error("Error updating car status:", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -569,16 +500,15 @@ export class AdminController {
 
   async addCoupon(req: Request, res: Response): Promise<Response> {
     try {
-      console.log(req.body, "coupon")
+  
       const saveCoupon = await this.adminServices.addCoupon(req.body.coupon);
-      console.log(saveCoupon, "Coupon offer")
+    
       if (!saveCoupon) {
         return res.status(404).json({ message: "Coupon is not saved" });
       }
 
       return res.status(200).json({ message: "Coupon saved updated successfully", car: req.body });
     } catch (error) {
-      console.error("Error save Offer status:", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -588,16 +518,15 @@ export class AdminController {
     try {
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
-      const result = await this.adminServices.fetchCoupon(page,limit); // Fetch offers from service
-      console.log(result, "result in fetch Coupon")
+      const result = await this.adminServices.fetchCoupon(page,limit);
+   
       if (result) {
-        // Send the response, no explicit return needed
         res.status(result.status).json(result.data);
       } else {
         res.status(500).json({ message: "Internal server error" });
       }
     } catch (error) {
-      console.error("Error during fetch Coupon:", error);
+   
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -605,17 +534,13 @@ export class AdminController {
   // ************************************edit coupon***************************
   async editCoupon(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-      const id = req.params.id; // Extract 'id' from req.params
-      console.log(id, "edit coupon admin controller");
-
-
+      const id = req.params.id; 
+     
       if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid ID parameter" });
       }
 
       const couponExist = await this.adminServices.editCoupon(id);
-
-      console.log(couponExist, "couponExist");
 
       if (!couponExist) {
         return res.status(404).json({ message: "Coupon not found" });
@@ -623,7 +548,7 @@ export class AdminController {
 
       return res.status(200).json(couponExist);
     } catch (error) {
-      console.error("Error during check coupon exist:", error);
+     
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -631,30 +556,25 @@ export class AdminController {
 
   async updateCoupon(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-      console.log("Edit coupon - Params:", req.params);
-      console.log("coupon Data:", req.body);
-
-      const id = req.params.id;  // Get the id from params
+    
+      const id = req.params.id;  
       if (!id) {
         return res.status(400).json({ message: 'ID is missing' });
       }
-
-      const couponData = req.body;  // Directly use req.body, assuming you're sending JSON
+      const couponData = req.body;  
       if (!couponData) {
         return res.status(400).json({ message: 'coupon data is missing' });
       }
 
-      // Call the service to save the profile
       const result = await this.adminServices.updateCoupon(couponData, id);
-      console.log(result, "Edit coupon Data Result");
 
       if (result?.status === OK) {
-        return res.status(OK).json(result.data);  // Return success response
+        return res.status(OK).json(result.data);  
       } else {
-        return res.status(INTERNAL_SERVER_ERROR).json(result?.data);  // Handle internal error from service
+        return res.status(INTERNAL_SERVER_ERROR).json(result?.data);  
       }
     } catch (error) {
-      console.error("Error during  couponData update:", error);
+   
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -687,7 +607,6 @@ export class AdminController {
       }
       res.status(200).json(result.data);
     } catch (error) {
-      console.error("Error saving profile:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -695,7 +614,6 @@ export class AdminController {
   async specificBookingDetails(req: Request, res: Response): Promise<void> {
     try {
       const bookingId = req.params.id
-      console.log(bookingId, "bookingId")
       const result = await this.adminServices.specificBookingDetails(bookingId);
       if (!result) {
         res.status(500).json({ message: "Error booking history" });
@@ -703,7 +621,6 @@ export class AdminController {
       }
       res.status(200).json(result.data);
     } catch (error) {
-      console.error("Error saving profile:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -712,7 +629,6 @@ export class AdminController {
     try {
       const bookingId = req.params.id
       const status = req.params.status
-      console.log(bookingId, "bookingId", status, "status")
       const result = await this.adminServices.updateStatusOfBooking(bookingId, status);
       if (!result) {
         res.status(500).json({ message: "Status updation failed" });
@@ -720,7 +636,6 @@ export class AdminController {
       }
       res.status(200).json(result.data);
     } catch (error) {
-      console.error("Error cancel booking:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -740,12 +655,35 @@ export class AdminController {
 
 
     } catch (error) {
-      console.error("Error cancel booking:", error);
+     
       res.status(500).json({
         "message": "Internal server error while fetching dashboard data"
       }
       );
     }
   }
+
+  // ***************************fetch sales report*********************
+  
+  async fetchSalesReport(req: Request, res: Response): Promise<void> {
+    try {
+      
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+  
+      const result = await this.adminServices.fetchSalesReport(page, limit);
+  
+      if (!result) {
+        res.status(500).json({ message: "Error fetching sales report" });
+        return;
+      }
+
+      res.status(200).json(result.data);
+    } catch (error) {
+     
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+  
 }
 

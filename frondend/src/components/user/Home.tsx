@@ -41,7 +41,7 @@ function Home() {
     };
 
     fetchData();
-  }, [page]); // Refetch data when the page changes
+  }, [page]); 
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -49,10 +49,18 @@ function Home() {
     }
   };
 
+  const handleSearhCar = (data: CarDataInterface[]) => {
+    console.log("Data received in Home:", data);
+    setCarData(data); 
+    setTotalPages(1)
+  };
+  
+  
+
   return (
     <div>
       <Navbar />
-      <Carosel />
+      <Carosel onEvent={handleSearhCar} /> 
       <ServicesCard />
       {page}page{totalPages}
       <div className="text-center mb-1">

@@ -11,6 +11,7 @@ const providerRouter = {
     carMgt:'/provider/cars',
     getDashboard:'/provider/dashboard',
     bookingHistory:'/provider/booking_history',
+     salesReport:'/provider/sales_report'
   };
   
   export default providerRouter;

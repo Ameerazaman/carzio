@@ -245,9 +245,9 @@ export class ProviderRepository {
 
             const skip = (page - 1) * limit;
             const carDocuments = await CarModel.find()
-            .sort({ createdAt: -1 }) 
-            .skip(skip)
-            .limit(limit) as CarDataInterface[];
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit) as CarDataInterface[];
 
 
 
@@ -528,9 +528,9 @@ export class ProviderRepository {
         }
     }
     // **********************************count cars****************************
-    async countCars(providerId:string): Promise<number | null> {
+    async countCars(providerId: string): Promise<number | null> {
         try {
-            const countCars = await CarModel.find({providerId:providerId}).countDocuments();;
+            const countCars = await CarModel.find({ providerId: providerId }).countDocuments();;
             return countCars;
         } catch (error) {
             console.error("Error fetching car count:", (error as Error).message);
@@ -685,6 +685,24 @@ export class ProviderRepository {
             return [];
         }
     }
+
+    // **********************************Sales Report****************
+    
+    async fetchSalesReport(page: number, limit: number, providerId: string): Promise<BookingInterface[] | null> {
+        try {
+            const skip = (page - 1) * limit;
+            const completedBookings = await BookingModel.find({ status: 'Completed', providerId : providerId })
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit) as BookingInterface[];
+            return completedBookings;
+        } catch (error) {
+            console.error("Error fetching sales report", (error as Error).message);
+            return null;
+        }
+    }
+
+
 }
 
 

@@ -671,14 +671,49 @@ export class UserServices {
             console.log("update booking status", bookingId)
             const updateStatus = await this.userRepository.cancelBookingByUser(bookingId);
             console.log(updateStatus, "updatestaus")
-            const updateWallet = await this.userRepository.cancelBookingUpdateWallet(bookingId, userId, amount)
-            console.log(updateWallet, 'update wallet')
-            if (updateStatus && updateWallet) {
+            // const updateWallet = await this.userRepository.cancelBookingUpdateWallet(bookingId, userId, amount)
+            // console.log(updateWallet, 'update wallet')
+            if (updateStatus) {
                 return {
                     status: OK,
                     data: {
                         success: true,
                         data: updateStatus,
+                    },
+                };
+            } else {
+                return {
+                    status: BAD_REQUEST,
+                    data: {
+                        success: false,
+                        message: "Booking cancel not working"
+                    },
+                };
+            }
+        } catch (error) {
+            console.error("Error fetching updateCoupon:", (error as Error).message);
+            return {
+                status: INTERNAL_SERVER_ERROR,
+                data: {
+                    success: false,
+                    message: 'Internal server error',
+                },
+            };
+        }
+    }
+    // *******************************update wallet after cancel the booking *****************
+
+    async creditToWallet(userId: string, amount: number): Promise<WalletAuthInterface | undefined> {
+        try {
+
+            const updateWallet = await this.userRepository.creditToWallet(userId, amount)
+            console.log(updateWallet, 'update wallet')
+            if (updateWallet) {
+                return {
+                    status: OK,
+                    data: {
+                        success: true,
+                        data: updateWallet,
                     },
                 };
             } else {
@@ -953,15 +988,15 @@ export class UserServices {
     async searchCarAvailability(issueDate: string, returnDate: string): Promise<CarAuthResponse | undefined> {
         try {
             const carData = await this.userRepository.searchCarAvailability(issueDate, returnDate);
-          
-            if (carData ) {
+
+            if (carData) {
                 return {
                     status: OK,
                     data: {
                         success: true,
                         message: 'Success',
                         data: carData,
-                
+
                     },
                 };
             } else {

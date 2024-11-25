@@ -12,7 +12,7 @@ interface BookingHistoryUserProps {
 function BookingHistoryProvider({ bookingHistory }: BookingHistoryUserProps) {
   return (
     <div className="container mx-auto p-6">
-  
+
       {bookingHistory.length === 0 ? (
         <div className="flex flex-col items-center justify-center mt-10">
           <FaClipboardList className="text-gray-400 text-6xl mb-4" />
@@ -62,15 +62,15 @@ function BookingHistoryProvider({ bookingHistory }: BookingHistoryUserProps) {
                   <td className="py-3 px-6 text-left">
                     <span
                       className={`py-1 px-3 rounded-full text-xs font-semibold ${order.status === 'success'
-                          ? 'bg-green-200 text-green-600'
-                          : 'bg-yellow-200 text-yellow-600'
+                        ? 'bg-green-200 text-green-600'
+                        : 'bg-yellow-200 text-yellow-600'
                         }`}
                     >
                       {order.status}
                     </span>
                   </td>
                   <td className="py-3 px-6 text-center">
-                    <Link to={`/view_details/${order._id}`}>
+                    <Link to={`/provider/view_details/${order._id}`}>
                       <button className="text-blue-500 hover:text-blue-700 font-semibold">
                         View Details
                       </button>

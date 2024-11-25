@@ -12,39 +12,16 @@ import { fetchCars } from '../../Api/User'
 
 
 function LandingPage() {
-  // const [carData, setCarData] = useState<CarDataInterface[]>([]);
-  // const [loading, setLoading] = useState<boolean>(true);
-  // const [error, setError] = useState<string | null>(null);
-
-  // useEffect(() => {
-  //     const fetchData = async () => {
-  //         try {
-  //             setLoading(true);
-  //             const result = await fetchCars(); // Assuming this is your API call to fetch data
-  //             console.log(result?.data?.data, "Fetched car data");
-
-  //             if (result?.data?.data) {
-  //                 // Ensure the data returned matches the CarDataInterface structure
-  //                 setCarData(result.data.data);
-  //             } else {
-  //                 setError("No car data returned.");
-  //             }
-  
-  //         } catch (error) {
-  //             console.error("Error fetching data:", error);
-  //             setError("Error fetching car data.");
-  //         } finally {
-  //             setLoading(false);
-  //         }
-  //     };
-
-  //     fetchData();
-  // }, []);
-
+ 
+  const handleSearhCar = (data: CarDataInterface[]) => {
+    console.log("Data received in Home:", data);
+    // setCarData(data); 
+    // setTotalPages(1)
+  };
   return (
     <div>
       <Navbar />
-      <Carosel />
+      <Carosel onEvent={handleSearhCar} /> 
       <About />
       <ServicesCard />
       

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import Navbar, { User } from '../../Pages/Common/Navbar';
-import BookingHistoryUser from '../../Pages/User/LandingPage/BookingHistoryUser';
+
 import Pagination from '../../Pages/Common/Pagination';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../App/Store';
 import { Booking } from '../../Interface/BookinDetailsInterface';
 import { getBookingHistory } from '../../Api/Provider';
 import Sidebar from '../../Pages/Provider/Sidebar';
+import BookingHistoryProvider from '../../Pages/Provider/BookingHistoryProvider';
 
 function BookingHistoryInProvider() {
   const provider = useSelector((state: RootState) => state.provider.currentProvider) as User | null;
@@ -60,7 +61,7 @@ function BookingHistoryInProvider() {
             <div className="text-center text-red-500">{error}</div>
           ) : bookingHistory.length > 0 ? (
             <>
-              <BookingHistoryUser bookingHistory={bookingHistory} />
+              <BookingHistoryProvider bookingHistory={bookingHistory} />
               <Pagination
                 currentPage={page}
                 totalPages={totalPages}

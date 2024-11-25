@@ -805,7 +805,44 @@ export class AdminServices {
     }
   }
 
+// *********************************Sales Report**********************
+async fetchSalesReport(page: number, limit: number): Promise<BookingAuthResponse | undefined> {
+  try {
+    
+    const salesReport = await this.adminRepostry.fetchSalesReport(page, limit);
+    console.log(salesReport, "fetch sales report");
 
+    if (salesReport && salesReport.length > 0) {
+      return {
+        status: OK,
+        data: {
+          success: true,
+          message: 'Sales report retrieved successfully',
+          data: salesReport,
+          page: page,
+          totalPage: Math.ceil(salesReport.length / limit),
+        },
+      };
+    } else {
+      return {
+        status: BAD_REQUEST,
+        data: {
+          success: false,
+          message: "Sales report not retrieved",
+        },
+      };
+    }
+  } catch (error) {
+    console.error("Error fetching sales report:", (error as Error).message);
+    return {
+      status: INTERNAL_SERVER_ERROR,
+      data: {
+        success: false,
+        message: 'Internal server error',
+      },
+    };
+  }
+}
 
 }
 

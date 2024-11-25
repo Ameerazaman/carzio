@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { searchCarAvailabilty } from '../../Api/User';
+import { CarDataInterface } from '../../Interface/CarInterface';
 
 // Sample slide data
 const slides = [
@@ -8,13 +9,19 @@ const slides = [
   { image: '/images/dark-side-car-digital-art-4k-2z.jpg', title: 'Luxury Cars', date: '2024-03-01' },
 ];
 
-function Carosel() {
+interface CarouselProps {
+  onEvent: (data: CarDataInterface[]) => void; // Define the type for the prop
+}
+
+const Carosel: React.FC<CarouselProps> = ({ onEvent }) => {
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [filteredSlides, setFilteredSlides] = useState(slides);
   const [isFiltering, setIsFiltering] = useState(false);
   const carouselRef = useRef(null);
+  const [carData, setCarData] = useState<CarDataInterface[]>([]);
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex === filteredSlides.length - 1 ? 0 : prevIndex + 1));
@@ -24,26 +31,29 @@ function Carosel() {
     setCurrentIndex((prevIndex) => (prevIndex === 0 ? filteredSlides.length - 1 : prevIndex - 1));
   };
 
+
   const translateXValue = -currentIndex * 100;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   
-    // Convert startDate and endDate to Date objects
     const start = new Date(startDate);
     const end = new Date(endDate);
   
-    // Convert the Date objects to ISO string format
     const startString = start.toISOString();
     const endString = end.toISOString();
   
-    // Pass the string versions of the dates to searchCarAvailabilty
-    const result = await searchCarAvailabilty(startString, endString);
-  
-    console.log(result);
-    console.log(startString, endString, "start end");
+    try {
+      const result = await searchCarAvailabilty(startString, endString);
+      const cars = result.data.data; // Assume this returns an array of CarDataInterface
+      setCarData(cars); // Update local state
+      onEvent(cars); // Pass the full data to the Home component
+    } catch (error) {
+      console.error("Error fetching car data:", error);
+    }
   };
   
+
 
   useEffect(() => {
 

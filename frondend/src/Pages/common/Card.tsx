@@ -15,9 +15,9 @@ function Card({ carData }: CardProps) {
   return (
     <div className="flex flex-col items-center mt-8">
       {/* Car card with compact design and hover effect */}
-
       <Link to={`/car_details/${carData.id} `}>
         <div className="min-w-[240px] max-w-xs w-full bg-white rounded-lg shadow-md overflow-hidden m-4 p-3 transition-transform duration-300 transform hover:scale-105 hover:shadow-xl">
+
 
           {/* Aspect Ratio Container for Image */}
           <div className="relative w-full pb-[56.25%] mb-3 overflow-hidden rounded-md"> {/* 16:9 Aspect Ratio */}

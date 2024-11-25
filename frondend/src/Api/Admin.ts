@@ -537,6 +537,20 @@ const getDashboardConstData = async () => {
     }
 }
 
+// **************************** sales report ***************************
+const fetchSalesReport = async (page: number, limit: number): Promise<any> => {
+    try {
+      const result = await adminAPI.get(adminRouter.salesReport, {
+        params: { page, limit },
+      });
+      return result.data;
+    } catch (error) {
+      console.error("API Error:", (error as Error).message);
+      errorHandler(error as Error);
+      throw error;
+    }
+  };
+  
 
 export {
     adminLogout,
@@ -568,5 +582,6 @@ export {
     getBookingHistory,
     specificBookingDetails,
     updateStatusOfBooking,
-    getDashboardConstData
+    getDashboardConstData,
+    fetchSalesReport
 }

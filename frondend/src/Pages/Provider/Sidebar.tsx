@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaUser, FaCar, FaCog, FaSignOutAlt, FaCalendarAlt, FaComments, FaTachometerAlt } from 'react-icons/fa';
+import { FaUser, FaCar, FaCog, FaSignOutAlt, FaCalendarAlt, FaComments, FaTachometerAlt, FaFileAlt } from 'react-icons/fa';
 
 function Sidebar() {
   return (
@@ -10,6 +10,12 @@ function Sidebar() {
           <a href="/provider/home" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-200">
             <FaUser className="mr-2" />
             Profile
+          </a>
+        </li>
+        <li>
+          <a href="/provider/sales_report" className="font-bold flex items-center p-2 hover:bg-red-600 rounded transition duration-300 transform hover:scale-105 shadow-md">
+            <FaFileAlt className="mr-2" />
+            Report
           </a>
         </li>
         <li>

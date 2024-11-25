@@ -59,6 +59,8 @@ adminRouter.get('/booking_history',adminAuthenticate,async(req,res)=>adminContro
 adminRouter.get('/details_of_specifc_order/:id',adminAuthenticate,async(req,res)=>adminController.specificBookingDetails(req,res))
 adminRouter.get('/update_status/:id/:status',adminAuthenticate,async(req,res)=>adminController.updateStatusOfBooking(req,res))
 
+adminRouter.get('/sales_report',adminAuthenticate,async (req, res) => adminController.fetchSalesReport(req, res) );
+  
 
 export default adminRouter;
 

@@ -358,7 +358,8 @@ const specificBookingDetails = async (bookingId: string) => {
         errorHandler(error as Error);
         throw error;
     }
-}
+};
+
 
 // ****************************cancel booking by user**********************
 const cancelBookingByUser = async (bookingId: string, userId: string, amount: number) => {
@@ -377,19 +378,22 @@ const cancelBookingByUser = async (bookingId: string, userId: string, amount: nu
     }
 };
 
-
 //*****************/ cancelBookong update add amount to waalet***********************
 const storeCancelAmtToWallet = async (userId: string, amount: number) => {
     try {
         console.log(amount, "amount", userId, "userId");
-        const result = await userApi.put(`/cancel_amt_to_wallet/${userId}/${amount}`);
+        const result = await userApi.put(`/credit_to_wallet`, {
+            userId,
+            amount
+        });
         return result;
     } catch (error) {
         console.error("API Error:", error);
         errorHandler(error as Error);
         throw error;
     }
-}
+};
+
 // ****************************check booked or not *********************
 const checkingBookedOrNot = async (issueDate: string, returnDate: string, carId: string) => {
     try {
@@ -527,6 +531,7 @@ export {
     getBookingHistory,
     specificBookingDetails,
     cancelBookingByUser,
+  
     checkingBookedOrNot,
     checkBalanceUpdateWallet,
     storeCancelAmtToWallet,

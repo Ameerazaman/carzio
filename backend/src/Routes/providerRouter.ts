@@ -49,7 +49,8 @@ providerRouter.get('/chat_history/:providerId/:userId', (req, res, next) => {
     await providerController.fetchChatHistory(req, res);
 });
 providerRouter.get('/dashboard/:providerId',providerAuthenticate,async(req,res)=>providerController.getDashboardConstData(req,res))
-
+providerRouter.get('/sales_report',providerAuthenticate,async (req, res) => providerController.fetchSalesReport(req, res) );
+ 
 
 
 export default providerRouter;

@@ -7,17 +7,20 @@ import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
 
-const stripePromise = loadStripe('pk_test_51QJq7aDRjWHiMHMFbKsTqHRDHPep0XNgdvdjLwN8gWxkZpn2mMKx4fKXm0fQLjusUKKqRfFPzd17w52FH9Koe07800Ce8IksDd');
 
+const stripePromise = loadStripe('pk_test_51QJq7aDRjWHiMHMFbKsTqHRDHPep0XNgdvdjLwN8gWxkZpn2mMKx4fKXm0fQLjusUKKqRfFPzd17w52FH9Koe07800Ce8IksDd');
 // Lazy loading components
-const DashboardProvider =lazy(()=>import('./Components/Provider/DashboardProvider'));
-const  Chat =lazy(()=>import( './Components/Provider/Chat'));
+
+const BookingReportProvider =lazy(()=>import( './Components/Provider/BookingReportProvider'));
+const BookingReport =lazy(()=>import('./Components/Admin/BookingReport')) ;
+const DashboardProvider = lazy(() => import('./Components/Provider/DashboardProvider'));
+const Chat = lazy(() => import('./Components/Provider/Chat'));
 const CheckoutForm = lazy(() => import('./Pages/User/LandingPage/CheckOutForm'));
 const Profile = lazy(() => import('./Components/User/Profile'));
 const WalletPage = lazy(() => import('./Components/User/WalletPage'));
 
-const HistoryDetailsInAdmin = lazy(() => (import('./Components/Admin/HistoryDetailsInAdmin')))
-const BookingHistoryInAdmin = lazy(() => (import('./Components/Admin/BookingHistoryInAdmin')))
+const HistoryDetailsInAdmin = lazy(() => import('./Components/Admin/HistoryDetailsInAdmin'))
+const BookingHistoryInAdmin = lazy(() => import('./Components/Admin/BookingHistoryInAdmin'))
 const HistoryDetailsInProvider = lazy(() => import('./Components/Provider/HistoryDetailsInProvider'))
 const BookingHistoryInProvider = lazy(() => import('./Components/Provider/BookingHistoryInProvider'))
 const UserHistoryDetails = lazy(() => import('./Components/User/UserHistoryDetails'))
@@ -86,7 +89,7 @@ function App() {
             <Route path='/booking_history' element={<BookingHistory />} />
             <Route path='/view_details/:bookingId' element={<UserHistoryDetails />} />
             <Route path='/wallet' element={<WalletPage />} />
-         
+
 
 
             {/* ************************************Provider Side*************************** */}
@@ -100,8 +103,9 @@ function App() {
             <Route path="/provider/edit_car/:id" element={<EditCarMgt />} />
             <Route path="/provider/booking" element={<BookingHistoryInProvider />} />
             <Route path='/provider/view_details/:bookingId' element={<HistoryDetailsInProvider />} />
-            <Route path='/provider/chat' element={<Chat/>} />
+            <Route path='/provider/chat' element={<Chat />} />
             <Route path="/provider/dashboard" element={<DashboardProvider />} />
+            <Route path="/provider/sales_report" element={<BookingReportProvider />} />
             {/* *************************************Admin Side**************************** */}
 
             <Route path="/admin/login" element={<LoginAdmin />} />
@@ -121,6 +125,7 @@ function App() {
             <Route path="/admin/edit_coupons/:id" element={<EditCouponMgt />} />
             <Route path="/admin/booking" element={<BookingHistoryInAdmin />} />
             <Route path='/admin/view_details/:bookingId' element={<HistoryDetailsInAdmin />} />
+            <Route path="/admin/sales_report" element={<BookingReport />} />
 
           </Routes>
         </Suspense>

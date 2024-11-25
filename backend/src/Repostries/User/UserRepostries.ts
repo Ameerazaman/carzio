@@ -547,7 +547,7 @@ export class UserRepository {
     }
 
     // ***************************canceled booking amount credited to walet**********8
-    async cancelBookingUpdateWallet(bookingId: string, userId: string, amount: number): Promise<WalletInterface | null> {
+    async creditToWallet( userId: string, amount: number): Promise<WalletInterface | null> {
         try {
             const lastTransaction = await WalletModel.findOne({ UserId: userId }).sort({ createdAt: -1 });
             const lastTotalAmt = lastTransaction && typeof lastTransaction.TotalAmt === 'number' ? lastTransaction.TotalAmt : 0;
@@ -707,9 +707,9 @@ export class UserRepository {
     }
 
     // ************************************car availabilty in date***************************
-    async searchCarAvailability(startDate: string, endDate: string): Promise<CarDataInterface | null> {
+    async searchCarAvailability(startDate: string, endDate: string): Promise<CarDataInterface[]> {
         try {
-
+          
             const start = new Date(startDate);
             const end = new Date(endDate);
 
@@ -723,12 +723,35 @@ export class UserRepository {
             const availableCars = await CarModel.find({
                 _id: { $nin: bookedCarIds },
             });
-            console.log(availableCars, "cars available")
-            return availableCars;
+
+            // Map the available cars to match the CarDataInterface structure
+            const cars: CarDataInterface[] = availableCars.map((car:CarDataInterface) => ({
+                car_name: car.car_name,
+                model: car.model,
+                rentalPrice: car.rentalPrice,
+                engineType: car.engineType,
+                fuelType: car.fuelType,
+                color: car.color,
+                images: car.images,
+                rcNumber: car.rcNumber,
+                rcExpiry: car.rcExpiry,
+                insurancePolicyNumber: car.insurancePolicyNumber,
+                insuranceExpiry: car.insuranceExpiry,
+                pollutionCertificateNumber: car.pollutionCertificateNumber,
+                pollutionExpiry: car.pollutionExpiry,
+                providerId: car.providerId,
+                isStatus: car.isStatus,
+                createdAt: car.createdAt,
+                id: car.id,
+            }));
+
+            console.log(cars, "Available cars");
+            return cars;
         } catch (error) {
             console.error('Error checking car availability:', error);
-            throw error;
+            throw error; // Rethrow the error to handle it at a higher level
         }
-    };
+    }
+
 
 }
