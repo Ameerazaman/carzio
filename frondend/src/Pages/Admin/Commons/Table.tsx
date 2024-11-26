@@ -259,7 +259,7 @@ const Table: React.FC<TableProps> = ({ tableData: initialTableData, header }) =>
                   <td className="py-2 px-4 border-b text-center">
                     <button
                       onClick={() => handleStatus(data?.id)}
-                      className={`py-1 px-3 rounded-full ${data?.isActive ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+                      className={`py-1 px-3 rounded-full ${data?.isActive ? 'bg-red-600 text-white' : 'bg-green-600 text-white'
                         } cursor-pointer`}
                     >
                       {data?.isActive ? 'Active' : 'Block'}

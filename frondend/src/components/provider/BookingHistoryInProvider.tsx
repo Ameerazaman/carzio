@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import Navbar, { User } from '../../Pages/Common/Navbar';
-
 import Pagination from '../../Pages/Common/Pagination';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../App/Store';
@@ -25,11 +24,11 @@ function BookingHistoryInProvider() {
           setLoading(true);
           setError(null);
           const result = await getBookingHistory(provider._id, page, limit);
-          setBookingHistory(result.data.data);
+          setBookingHistory(result.data.data || []); // Fallback to an empty array
           setTotalPages(result.data.totalPage || 1);
-        } catch (error) {
-          setError("Error fetching booking history.");
-    
+        } catch (err) {
+          setError('Error fetching booking history.');
+          setBookingHistory([]); // Ensure state is an array even on error
         } finally {
           setLoading(false);
         }
@@ -47,7 +46,6 @@ function BookingHistoryInProvider() {
 
   return (
     <div className="h-screen flex flex-col bg-gray-100">
-
       <Navbar />
       <div className="flex flex-1">
         <div className="w-64 bg-gray-800 text-white h-full">

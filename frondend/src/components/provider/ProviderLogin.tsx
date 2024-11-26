@@ -132,7 +132,7 @@ function ProviderLogin() {
                 <p className="text-sm text-gray-600">
                   Already have an account?
                   <a
-                    href="/signup"
+                    href="/provider/signup"
                     className="font-bold text-red-600 no-underline hover:text-red-500"
                   >
                     Sign up

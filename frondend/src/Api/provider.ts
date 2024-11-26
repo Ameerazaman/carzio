@@ -27,13 +27,14 @@ const refreshProviderAccessToken = async () => {
 };
 //   ****************************signup ******************************
 
-const signup = async ({ email, password, confirmPassword }: signupFormData) => {
+const signup = async ({ email, password, confirmPassword,username }: signupFormData) => {
     try {
 
         const result = await providerAPI.post(providerRouter.signup, {
             email,
             password,
             confirmPassword,
+            username
         });
 
         if (result.data.success) {

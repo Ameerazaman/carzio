@@ -16,7 +16,7 @@ function Home() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const limit = 2;
+  const limit = 8;
 
   useEffect(() => {
     const fetchData = async () => {

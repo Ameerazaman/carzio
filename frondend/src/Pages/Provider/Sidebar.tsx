@@ -43,12 +43,6 @@ function Sidebar() {
           </a>
         </li>
      
-        <li>
-          <a href="/logout" className="flex items-center p-2 hover:bg-red-600 rounded transition duration-200">
-            <FaSignOutAlt className="mr-2" />
-            Logout
-          </a>
-        </li>
       </ul>
     </div>
   );

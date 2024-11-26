@@ -75,6 +75,7 @@ function ProviderSignup() {
     }
 
     try {
+      
       let result = await signup(formData);
 
       if (result.success) {

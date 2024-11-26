@@ -48,10 +48,10 @@ const EditCar: React.FC = () => {
                         providerId: carData?.providerId || ''
                     });
                 } catch (error) {
-                    
+
                 }
             } else {
-               
+
             }
         };
 
@@ -88,7 +88,7 @@ const EditCar: React.FC = () => {
             [name]: value,
         }));
     };
-    
+
 
     // Handle image uploads
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,14 +155,14 @@ const EditCar: React.FC = () => {
         const carId = id; // Ensure this value is obtained correctly, e.g., via props or state
 
         if (!carId) {
-            
+
             return;
         }
 
         // Ensure uploadedFiles is defined before proceeding
         const uploadedFiles = formData.uploadedFiles || [];
         if (uploadedFiles.length === 0) {
-            
+
             return;
         }
 
@@ -170,11 +170,11 @@ const EditCar: React.FC = () => {
             // Pass `uploadedFiles` to the API call
             const result = await editCarImage(uploadedFiles, carId);
             if (result) {
-               
+
                 navigate('/provider/cars'); // Navigate on successful upload
             }
         } catch (error) {
-          
+
         }
     };
 
@@ -183,10 +183,10 @@ const EditCar: React.FC = () => {
     const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (validate()) {
-          
+
             const carId = id
             if (!carId) {
-               
+
                 return; // Or handle this case as you see fit
             }
 
@@ -295,6 +295,7 @@ const EditCar: React.FC = () => {
                                             <div className="flex items-center bg-gray-700 rounded-lg p-2">
                                                 <BiDetail className="text-white text-xl mr-2" />
                                                 <input
+                                                    readOnly
                                                     type="text"
                                                     name="rcNumber" // Updated name to reflect the field's purpose
                                                     value={formData.rcNumber} // Updated value to match state variable
@@ -398,7 +399,7 @@ const EditCar: React.FC = () => {
                                                     <option className=' text-black' value="V6">Manual</option>
                                                     <option className=' text-black' value="V8">Automaic</option>
                                                     <option className=' text-black' value="Electric">Electric</option>
-                                                    
+
                                                 </select>
                                             </div>
                                             {errors.engineType && <p className="text-red-500 text-sm mt-1">{errors.engineType}</p>}

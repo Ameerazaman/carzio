@@ -26,16 +26,18 @@ interface UserDocument extends Document {
 }
 
 export class AdminRepository {
-
   async emailExistCheck(email: string): Promise<adminInterface | null> {
     try {
       const existingAdmin = await adminModel.findOne({ email });
 
       return existingAdmin as adminInterface;
+
     } catch (error) {
+
       return null;
     }
   }
+
   // ***************************fetch users*************************
   async fetchUsers(page: number, limit: number): Promise<UserInterface[] | null> {
     try {
@@ -746,10 +748,10 @@ export class AdminRepository {
         },
         {
           $lookup: {
-            from: 'carmodels',          
-            localField: 'CarsId',       
-            foreignField: '_id',        
-            as: 'carDetails',          
+            from: 'carmodels',
+            localField: 'CarsId',
+            foreignField: '_id',
+            as: 'carDetails',
           },
         },
         {
@@ -787,7 +789,7 @@ export class AdminRepository {
     try {
       const bookings = await BookingModel.find();
       const totalCompletedAmount = bookings
-        .filter((booking) => booking.status === "Completed") 
+        .filter((booking) => booking.status === "Completed")
         .reduce((sum, booking) => sum + booking.total_Amt, 0);
       return totalCompletedAmount / 2;
     } catch (error) {
@@ -903,7 +905,7 @@ export class AdminRepository {
         .limit(limit) as BookingInterface[];
       return completedBookings;
     } catch (error) {
-    
+
       return null;
     }
   }

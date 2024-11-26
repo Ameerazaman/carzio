@@ -9,9 +9,9 @@ import { toast } from 'react-hot-toast';
 
 const ProviderOtp: React.FC = () => {
   let dispatch = useDispatch()
-  const [timer, setTimer] = useState<number>(50); 
-  const [isTimerActive, setIsTimerActive] = useState<boolean>(true); 
-  const [otp, setOtp] = useState<string[]>(Array(6).fill('')); 
+  const [timer, setTimer] = useState<number>(50);
+  const [isTimerActive, setIsTimerActive] = useState<boolean>(true);
+  const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
   const navigate = useNavigate()
   // Effect to handle countdown
   useEffect(() => {
@@ -27,26 +27,26 @@ const ProviderOtp: React.FC = () => {
   }, [timer, isTimerActive]);
 
 
-  
+
   const handleResendOtp = async () => {
     try {
       // Call the API to resend the OTP
       const result = await resend();
       console.log(result);
-      
+
       if (result?.data?.success) {
         console.log('OTP Resent!');
-        
+
         // Reset OTP inputs and restart the timer in sequence
         setOtp(Array(6).fill('')); // Reset OTP input fields
         setIsTimerActive(false);    // Stop the timer before restarting
-        
+
         // Use setTimeout to ensure states update properly
         setTimeout(() => {
           setTimer(50);             // Reset the timer to 50 seconds
           setIsTimerActive(true);   // Reactivate the timer after resetting
         }, 0);
-  
+
         toast.success('OTP resent successfully.');
       } else {
         toast.error(result?.data?.message || 'Failed to resend OTP. Try again.');
@@ -56,8 +56,8 @@ const ProviderOtp: React.FC = () => {
       toast.error('Error resending OTP. Please try again.');
     }
   };
-  
-  
+
+
 
   const handleInputChange = (index: number, value: string) => {
     // Update the OTP state based on input change
@@ -128,9 +128,9 @@ const ProviderOtp: React.FC = () => {
                 className="w-full bg-red-600 hover:bg-red-700 text-white py-2 md:py-2 rounded font-semibold transition duration-300 text-sm"
               >
                 Verify OTP
-              </button> :""
+              </button> : ""
             }
-          
+
           </form>
 
           {isTimerActive &&
@@ -140,7 +140,7 @@ const ProviderOtp: React.FC = () => {
             </p>
           }
           <p className="mt-4 text-gray-600 text-center text-sm">
-             {isTimerActive ? `Resend OTP in ${timer}s` : (
+            {isTimerActive ? `Resend OTP in ${timer}s` : (
               <button
                 type="submit" onClick={handleResendOtp}
                 className="p-2 w-full bg-red-600 hover:bg-red-700 text-white py-2 md:py-2 rounded font-semibold transition duration-300 text-sm"

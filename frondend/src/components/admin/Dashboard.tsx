@@ -9,33 +9,34 @@ import AdminDashboard from '../../Pages/Admin/AdminDashboard';
 
 function Dashboard() {
   const admin = useSelector((state: RootState) => state.admin.currentAdmin) as User | null;
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (admin) {
       navigate('/admin/dashboard');
     } else {
-      navigate("/admin/login");
+      navigate('/admin/login');
     }
-  }, [admin]); // Dependency array to log admin info only when it changes
+  }, [admin, navigate]); 
 
   return (
-    <div className="flex">
-      {/* Sidebar */}
-      <div className="fixed top-0 left-0 w-64 h-full bg-gray-800 text-white">
-        <Sidebar />
-      </div>
+    <div className="flex flex-col min-h-screen">
+      {/* Navbar */}
+      <Navbar />
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col ml-64">
-        {/* Top Navbar */}
-        <div className="fixed top-0 left-0 w-full z-10 bg-white shadow-md">
-          <Navbar />
+      <div className="flex flex-1">
+        {/* Sidebar */}
+        <div className="hidden lg:block w-64">
+          <Sidebar />
         </div>
 
-        {/* Content Area */}
-        <div className="flex-1 p-6 mt-16 overflow-y-auto bg-gray-100">
-          <div className="overflow-x-auto bg-white rounded-lg shadow-md">
+        {/* Main Content */}
+        <div className="flex-1 p-4 lg:p-6 bg-gray-100 overflow-y-auto">
+          {/* Dashboard Heading */}
+          <h1 className="text-2xl font-bold mb-4 text-center lg:text-left">Admin Dashboard</h1>
+
+          {/* Dashboard Content */}
+          <div className="bg-white rounded-lg shadow-md p-4">
             <AdminDashboard />
           </div>
         </div>

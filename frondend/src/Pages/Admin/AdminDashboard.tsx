@@ -174,11 +174,7 @@ const AdminDashboard: React.FC = () => {
                     <div className="text-3xl text-yellow-500">{carBookingTotal}</div>
                     <Doughnut data={carBookingDoughnutData} options={doughnutOptions} height={100} width={100} />
                 </div>
-                <div className="stat-item text-center flex-1">
-                    <h3 className="text-xl font-semibold">Total Car Bookings</h3>
-                    <div className="text-3xl text-yellow-500">{carBookingTotal}</div>
-                    <Doughnut data={reveueDoughnutData} options={doughnutOptions} height={100} width={100} />
-                </div>
+              
 
 
             </div>

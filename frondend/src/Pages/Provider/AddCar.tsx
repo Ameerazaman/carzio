@@ -207,7 +207,7 @@ const AddCar: React.FC = () => {
                                             name="engineType"
                                             value={carData.engineType}
                                             onChange={handleInputChange}
-                                            className={`bg-transparent text-white w-full outline-none ${errors.engineType ? 'border border-red-500' : ''}`}
+                                            className={`bg-transparent text-grey w-full outline-none ${errors.engineType ? 'border border-red-500' : ''}`}
                                         >
                                             <option value="" disabled>Select engine type</option>
                                             <option value="V6">Manual</option>
@@ -227,7 +227,7 @@ const AddCar: React.FC = () => {
                                             name="fuelType"
                                             value={carData.fuelType}
                                             onChange={handleInputChange}
-                                            className={`bg-transparent text-white w-full outline-none ${errors.fuelType ? 'border border-red-500' : ''}`}
+                                            className={`bg-transparent text-grey w-full outline-none ${errors.fuelType ? 'border border-red-500' : ''}`}
                                         >
                                             <option value="" disabled>Select fuel type</option>
                                             <option value="Petrol">Petrol</option>

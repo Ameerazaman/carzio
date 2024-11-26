@@ -68,6 +68,7 @@ export class AdminServices {
 
   async adminSignIn(adminData: adminInterface): Promise<adminAuthResponse | undefined> {
     try {
+      
       const provider = await this.adminRepostry.emailExistCheck(adminData.email);
 
       if (!provider) {

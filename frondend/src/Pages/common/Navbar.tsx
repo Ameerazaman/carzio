@@ -17,15 +17,16 @@ export interface User {
   email: string;
   username: string;
   _id: string;
-  // other user fields
+
+
 }
 
 // 
 function Navbar() {
   let dispatch = useDispatch()
   let navigate = useNavigate()
-  const user = useSelector((state: RootState) => state.user.currentUser) as User | null;
-  const provider = useSelector((state: RootState) => state.provider.currentProvider) as User | null;
+  const user = useSelector((state: RootState) => state.user?.currentUser) as User | null;
+  const provider = useSelector((state: RootState) => state.provider?.currentProvider) as User | null;
   if (user?._id) {
     localStorage.setItem('userId', user._id);
   }
@@ -64,10 +65,17 @@ function Navbar() {
         }
       });
     } catch (error) {
-     
+
     }
   }
-
+  useEffect(() => {
+    if (user) {
+      console.log(user)
+    }
+    if (provider) {
+      console.log(provider)
+    }
+  })
   return (
     <header>
       {/* First Dark Red Navigation Bar */}
@@ -120,7 +128,7 @@ function Navbar() {
           {/* Logo */}
           <div className="flex items-center space-x-4">
             <img
-              src="\images\Gauto - Car Rental HTML Template Preview - ThemeForest_files\logo.png"
+              src="\images\carzio.png"
               alt="Logo"
               className="h-10 w-auto"
             />
@@ -152,29 +160,29 @@ function Navbar() {
               <a href="/provider/login">Provider Signup</a>
             </button> : ""
           }
-          {provider && !user?
+          {provider && !user ?
             < button className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition duration-300">
-          <a href="/provider/Home">Provider Home</a>
-        </button> : ""}
-      </div>
-    </nav>
-      {
-    user ? (
-      <div className="bg-black p-2">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="flex space-x-8">
-            <a href="/home" className="text-white hover:text-red-400 transition duration-300 font-semibold">Home</a>
-            <a href="/booking_history" className="text-white hover:text-red-400 transition duration-300 font-semibold">History</a>
-            <a href="/carList" className="text-white hover:text-red-400 transition duration-300 font-semibold">Cars</a>
-            <a href="/offers" className="text-white hover:text-red-400 transition duration-300 font-semibold flex items-center">Offer </a>
-            <a href="/wallet" className="text-white hover:text-red-400 transition duration-300 font-semibold flex items-center"> Wallet </a>
-          </div>
+              <a href="/provider/Home">Provider Home</a>
+            </button> : ""}
         </div>
-      </div>
-    ) : (
-      <hr style={{ backgroundColor: 'black', height: '2px' }} />
-    )
-  }
+      </nav>
+      {
+        user ? (
+          <div className="bg-black p-2">
+            <div className="container mx-auto flex justify-between items-center">
+              <div className="flex space-x-8">
+                <a href="/home" className="text-white hover:text-red-400 transition duration-300 font-semibold">Home</a>
+                <a href="/booking_history" className="text-white hover:text-red-400 transition duration-300 font-semibold">History</a>
+                <a href="/carList" className="text-white hover:text-red-400 transition duration-300 font-semibold">Cars</a>
+                <a href="/offers" className="text-white hover:text-red-400 transition duration-300 font-semibold flex items-center">Offer </a>
+                <a href="/wallet" className="text-white hover:text-red-400 transition duration-300 font-semibold flex items-center"> Wallet </a>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <hr style={{ backgroundColor: 'black', height: '2px' }} />
+        )
+      }
     </header >
   )
 }

@@ -4,9 +4,9 @@ import { CarDataInterface } from '../../Interface/CarInterface';
 
 // Sample slide data
 const slides = [
-  { image: '/images/hyundai-creta.webp', title: 'Cars are available', date: '2024-01-01' },
-  { image: '/images/family-car.jpg', title: 'Family Cars', date: '2024-02-01' },
-  { image: '/images/dark-side-car-digital-art-4k-2z.jpg', title: 'Luxury Cars', date: '2024-03-01' },
+  { image: '/images/hyundai-creta.webp', title: 'Affordable Cars for Rent', date: '2024-01-01' },
+  { image: '/images/family-car.jpg', title: 'Perfect Family Cars for Every Journey', date: '2024-02-01' },
+  // { image: '/images/dark-side-car-digital-art-4k-2z.jpg', title: 'Luxury Cars for a Premium Experience', date: '2024-03-01' },
 ];
 
 interface CarouselProps {
@@ -36,23 +36,23 @@ const Carosel: React.FC<CarouselProps> = ({ onEvent }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     const start = new Date(startDate);
     const end = new Date(endDate);
-  
+
     const startString = start.toISOString();
     const endString = end.toISOString();
-  
+
     try {
       const result = await searchCarAvailabilty(startString, endString);
       const cars = result.data.data; // Assume this returns an array of CarDataInterface
       setCarData(cars); // Update local state
       onEvent(cars); // Pass the full data to the Home component
     } catch (error) {
-    
+
     }
   };
-  
+
 
 
   useEffect(() => {

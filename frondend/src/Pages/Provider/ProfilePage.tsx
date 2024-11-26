@@ -56,7 +56,7 @@ const ProfilePage = () => {
     };
 
     fetchProfile();
-  }, [provider]);
+  }, [provider, isEditing]);
 
   // Handle image change
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,9 +110,9 @@ const ProfilePage = () => {
     try {
       const formData = new FormData();
       formData.append('image', selectedImage); // 'image' should match the backend field name
-      const result =await updateProfileImage(formData,profileId);
-      
-       if (result) {
+      const result = await updateProfileImage(formData, profileId);
+
+      if (result) {
         toast.success('Image updated successfully.');
       } else {
         toast.error('Failed to update the image.');
@@ -202,7 +202,7 @@ const ProfilePage = () => {
               <p className="text-xs text-gray-500 mt-1 w-full text-left">Image selected: {selectedImage.name}</p>
             )}
           </div>
-          
+
         </div>
         <div className="flex-grow w-2/3">
           <h1 className="text-xl font-bold mb-3 text-red-600">Provider Profile</h1>

@@ -15,17 +15,17 @@ function CarList() {
 
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState<number>(1);
-    const limit = 2
+    const limit = 10
     const navigate = useNavigate();
 
     const filterData = (data: CarDataInterface[] | { message: string }) => {
         if (Array.isArray(data)) {
             if (data.length === 0) {
-               
-                setCarData([]); 
+
+                setCarData([]);
                 setError("No cars match your Searching."); // Set a message for empty data
             } else {
-              
+
                 setCarData(data); // Update car data if `data` is a non-empty array
                 setError(null); // Clear any previous error messages
             }
@@ -42,17 +42,17 @@ function CarList() {
             try {
                 setLoading(true);
                 const result = await fetchCars(page, limit);
-                
+
 
                 if (result?.data?.data) {
                     setCarData(result.data.data);
-                   
+
                     setTotalPages(result.data.totalPage || 1);
                 } else {
                     setError('No car data returned.');
                 }
             } catch (error) {
-               
+
                 setError("Error fetching car data.");
             } finally {
                 setLoading(false);
@@ -64,9 +64,9 @@ function CarList() {
 
     const handlePageChange = (newPage: number) => {
         if (newPage >= 1 && newPage <= totalPages) {
-          setPage(newPage);
+            setPage(newPage);
         }
-      };
+    };
 
     return (
         <div>
@@ -93,11 +93,11 @@ function CarList() {
                     )}
                 </div>
             </div>
-                <Pagination
-                    currentPage={page}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                />
+            <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+            />
         </div>
     );
 }

@@ -11,7 +11,7 @@ function ProviderMgt() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const limit = 1;
+  const limit = 10;
   const header: string = 'provider'; // Define whether this is for users or providers
 
   useEffect(() => {

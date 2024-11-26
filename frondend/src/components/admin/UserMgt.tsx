@@ -12,7 +12,7 @@ function UserMgt() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const limit = 1;
+  const limit = 10;
 
   useEffect(() => {
     const fetchData = async () => {

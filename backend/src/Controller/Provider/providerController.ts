@@ -53,7 +53,6 @@ export class ProviderController {
     async ProviderSignup(req: Request, res: Response): Promise<void> {
         try {
             req.app.locals.ProviderData = req.body;
-
             const existingUser = await this.providerServices.userSignup(req.app.locals.ProviderData);
 
             if (existingUser) {
@@ -78,8 +77,8 @@ export class ProviderController {
     /*********************************resend Otp for provider***************** */
     async ProviderResendOtp(req: Request, res: Response): Promise<Response> {
         try {
-         
-            const email = req.app.locals.providerEmail; 
+
+            const email = req.app.locals.providerEmail;
             const otp = await generateAndSendOTP(email);
             var otpData = await this.providerServices.createOtp(email, Number(otp))
             if (otpData) {
@@ -89,14 +88,14 @@ export class ProviderController {
                     message: 'Resend OTP successfully',
                 });
             } else {
-          
+
                 return res.status(BAD_REQUEST).json({
                     success: false,
                     message: 'Error during OTP resend'
                 });
             }
         } catch (error) {
-           
+
             return res.status(INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: 'Internal Server Error.'
@@ -108,9 +107,9 @@ export class ProviderController {
 
     async verifyOtp(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
         try {
-            const { otp } = req.body; 
-            let email = req.app.locals.providerEmail; 
-           
+            const { otp } = req.body;
+            let email = req.app.locals.providerEmail;
+
             var OTPRecord = await this.providerServices.verifyOtp(email, otp)
 
             if (!OTPRecord) {
@@ -119,7 +118,7 @@ export class ProviderController {
             }
             if (OTPRecord) {
                 const providerData = req.app.locals.ProviderData
-
+                console.log(providerData, "providerData")
                 const savedProvider = await this.providerServices.saveProvider(providerData);
 
                 if (savedProvider) {
@@ -138,11 +137,11 @@ export class ProviderController {
                 }
 
             } else {
-                
+
                 return res.status(BAD_REQUEST).json({ success: false, message: 'Incorrect OTP!' });
             }
         } catch (error) {
-           
+
             return res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error.' });
         }
     }
@@ -158,9 +157,9 @@ export class ProviderController {
                 const access_token = result.data.token;
                 const refresh_token = result.data.refreshToken;
                 const accessTokenMaxAge = 5 * 60 * 1000;
-                const refreshTokenMaxAge = 48 * 60 * 60 * 1000; 
-                
-                return res.status(OK) 
+                const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+
+                return res.status(OK)
                     .cookie('access_token', access_token, {
                         maxAge: accessTokenMaxAge,
                         httpOnly: true,
@@ -173,7 +172,7 @@ export class ProviderController {
                     })
                     .json({ success: true, user: result.data, message: result.data.message });
             } else {
-               
+
                 return res.status(BAD_REQUEST).json({ success: false, message: result?.data.message });
             }
         } catch (error) {
@@ -184,7 +183,7 @@ export class ProviderController {
     // **************************************provider Logout***********************
     async providerLogout(req: Request, res: Response): Promise<void> {
         try {
-          
+
             res.clearCookie('access_token', {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production'
@@ -193,10 +192,10 @@ export class ProviderController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production'
             });
-            
+
             res.status(200).json({ success: true, message: "Logged out successfully" });
         } catch (error) {
-        
+
             res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -204,25 +203,26 @@ export class ProviderController {
     // ****************************check provider address exist or not******************
     async checkProviderAddrress(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
         try {
-            const id = req.params.id; 
+            const id = req.params.id;
 
             if (!id || typeof id !== "string") {
                 return res.status(400).json({ message: "Invalid ID parameter" });
             }
             const address = await this.providerServices.checkProviderAddress(id);
+            
             if (address) {
 
                 return res.status(200).json(address);
             }
 
             else {
-                
-                return res.status(404).json({ message: "Address not found" });
+
+                return res.status(400).json({ message: "Address not found" });
             }
 
 
         } catch (error) {
-            
+
             return res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -237,13 +237,13 @@ export class ProviderController {
             const result = await this.providerServices.saveProfile(req.app.locals.profile);
 
             if (result?.status === OK) {
-                return res.status(OK).json(result.data); 
+                return res.status(OK).json(result.data);
             } else {
-                return res.status(INTERNAL_SERVER_ERROR).json(result?.data); 
+                return res.status(INTERNAL_SERVER_ERROR).json(result?.data);
             }
 
         } catch (error) {
-           
+
             return res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -252,12 +252,12 @@ export class ProviderController {
     async editProfile(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
         try {
 
-            const id = req.params.id;  
+            const id = req.params.id;
             if (!id) {
                 return res.status(400).json({ message: 'ID is missing' });
             }
 
-            const profileData = req.body; 
+            const profileData = req.body;
             if (!profileData) {
                 return res.status(400).json({ message: 'Profile data is missing' });
             }
@@ -277,7 +277,7 @@ export class ProviderController {
 
     async updateProfileImage(req: Request, res: Response): Promise<Response> {
         try {
-          
+
             const { id } = req.params;
             if (!id) {
                 return res.status(400).json({ message: 'ID is missing' });
@@ -305,8 +305,8 @@ export class ProviderController {
     // *************************************Addd car details******************************
     async addCarDetails(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
         try {
-            const carData = req.body;  
-            const uploadedFiles = req.files as Express.Multer.File[]; 
+            const carData = req.body;
+            const uploadedFiles = req.files as Express.Multer.File[];
 
             const imagePaths = uploadedFiles.map((file) => `/uploads/${file.filename}`);
 
@@ -319,7 +319,7 @@ export class ProviderController {
                 return res.status(INTERNAL_SERVER_ERROR).json({ message: "Car Already exist" });  // Handle internal error from service
             }
         } catch (error) {
-    
+
             return res.status(500).json({ message: "Internal server error" });
         }
 
@@ -327,17 +327,17 @@ export class ProviderController {
 
 
     // *************************fetch car for car management********************
-      async fetchCars(req: Request, res: Response): Promise<void> {
+    async fetchCars(req: Request, res: Response): Promise<void> {
         try {
             const page = req.query.page ? Number(req.query.page) : undefined;
             const limit = req.query.limit ? Number(req.query.limit) : undefined;
-            const providerId = req.query.providerId as string ;
+            const providerId = req.query.providerId as string;
             if (page !== undefined && limit !== undefined) {
-               
-                const result = await this.providerServices.fetchCars(providerId,page, limit);
-              
+
+                const result = await this.providerServices.fetchCars(providerId, page, limit);
+
                 if (result) {
-                   
+
                     res.status(200).json(result.data);
                 } else {
                     res.status(500).json({ message: "Internal server error" });
@@ -346,7 +346,7 @@ export class ProviderController {
                 res.status(400).json({ message: "Invalid page or limit" });
             }
         } catch (error) {
-          
+
             res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -354,7 +354,7 @@ export class ProviderController {
 
     async updateStatusCar(req: Request, res: Response): Promise<Response> {
         try {
-            
+
             const id = req.params.id;
 
             if (!id || !mongoose.Types.ObjectId.isValid(id)) {
@@ -369,7 +369,7 @@ export class ProviderController {
 
             return res.status(200).json({ message: "Car status updated successfully", car: carExist });
         } catch (error) {
-           
+
             return res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -378,7 +378,7 @@ export class ProviderController {
 
     async editCar(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
         try {
-            const id = req.params.id; 
+            const id = req.params.id;
 
             if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
                 return res.status(400).json({ message: "Invalid ID parameter" });
@@ -392,7 +392,7 @@ export class ProviderController {
 
             return res.status(200).json(carExist);
         } catch (error) {
-          
+
             return res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -401,13 +401,13 @@ export class ProviderController {
     async updateCar(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
         try {
             const id = req.params.id;
-           
+
             if (!id) {
                 return res.status(400).json({ message: 'ID is missing' });
             }
 
             const carData = req.body;
- 
+
             let result = await this.providerServices.updateCar(carData, id);
 
             if (result?.status === OK) {
@@ -416,7 +416,7 @@ export class ProviderController {
                 return res.status(INTERNAL_SERVER_ERROR).json({ message: "Car already exists" });
             }
         } catch (error) {
-   
+
             return res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -455,7 +455,7 @@ export class ProviderController {
     // ******************************get booking history**************************8
     async getBookingHistory(req: Request, res: Response): Promise<void> {
         try {
-            const providerId = req.query.providerId as string ;
+            const providerId = req.query.providerId as string;
             const page = req.query.page ? Number(req.query.page) : 1;
             const limit = req.query.limit ? Number(req.query.limit) : 10;
             const result = await this.providerServices.getBookingHistory(providerId, page, limit);
@@ -490,7 +490,7 @@ export class ProviderController {
         try {
             const bookingId = req.params.id
             const status = req.params.status
-            
+
             const result = await this.providerServices.updateStatusOfBooking(bookingId, status);
             if (!result) {
                 res.status(500).json({ message: "Status updation failed" });
@@ -507,7 +507,7 @@ export class ProviderController {
         try {
 
             const providerId = req.params.providerId
-           
+
             const result = await this.providerServices.fetchUsersChat(providerId);
             if (!result) {
                 res.status(500).json({ message: "Fetch users chat is failed" });
@@ -515,83 +515,83 @@ export class ProviderController {
             }
             res.status(200).json(result.data);
         } catch (error) {
-          
+
             res.status(500).json({ message: "Internal server error" });
         }
     }
- // *********************************fetch chat history***********************8
- async fetchChatHistory(req: Request, res: Response): Promise<void> {
-    try {
-        
-        const providerId = req.params.providerId as string | undefined | '';
-        const userId = req.params.userId as string | undefined | '';
-        if (!userId || !providerId) {
-            res.status(400).json({ success: false, message: "userId and providerId are required" });
-            return; 
-        }
-        const result = await this.providerServices.fetchChatHistory(userId, providerId);
-        if (result?.data?.success) {
-            res.status(200).json({
-                success: true,
-                data: result.data.data, 
-            });
-        } else {
-            res.status(200).json({
+    // *********************************fetch chat history***********************8
+    async fetchChatHistory(req: Request, res: Response): Promise<void> {
+        try {
+
+            const providerId = req.params.providerId as string | undefined | '';
+            const userId = req.params.userId as string | undefined | '';
+            if (!userId || !providerId) {
+                res.status(400).json({ success: false, message: "userId and providerId are required" });
+                return;
+            }
+            const result = await this.providerServices.fetchChatHistory(userId, providerId);
+            if (result?.data?.success) {
+                res.status(200).json({
+                    success: true,
+                    data: result.data.data,
+                });
+            } else {
+                res.status(200).json({
+                    success: false,
+                    message: "No chat history found",
+                });
+            }
+        } catch (error) {
+            console.error("Error in fetch chat history:", error);
+            res.status(500).json({
                 success: false,
-                message: "No chat history found",
+                message: "An unexpected error occurred while fetching chat history",
             });
         }
-    } catch (error) {
-        console.error("Error in fetch chat history:", error);
-        res.status(500).json({
-            success: false,
-            message: "An unexpected error occurred while fetching chat history",
-        });
     }
-}
 
- // **************************get dash board constsnt data**********************
- async getDashboardConstData(req: Request, res: Response): Promise<void> {
-    try {
-        const providerId=req.params.providerId
-      const result = await this.providerServices.getConstDashboardData(providerId)
-      if (!result) {
-        res.status(500).json({
-          message: "Dashboard data could not be retrieved"
+    // **************************get dash board constsnt data**********************
+    async getDashboardConstData(req: Request, res: Response): Promise<void> {
+        try {
+            const providerId = req.params.providerId
+            const result = await this.providerServices.getConstDashboardData(providerId)
+            if (!result) {
+                res.status(500).json({
+                    message: "Dashboard data could not be retrieved"
+                }
+                );
+                return
+            }
+            res.status(200).json(result.data.data);
+
+
+        } catch (error) {
+
+            res.status(500).json({
+                "message": "Internal server error while fetching dashboard data"
+            }
+            );
         }
-        );
-        return
-      }
-      res.status(200).json(result.data.data);
-
-
-    } catch (error) {
-     
-      res.status(500).json({
-        "message": "Internal server error while fetching dashboard data"
-      }
-      );
     }
-  }
 
-   // ***************************fetch sales report*********************
-  
-   async fetchSalesReport(req: Request, res: Response): Promise<void> {
-    try {
-      const page = req.query.page ? Number(req.query.page) : 1;
-      const limit = req.query.limit ? Number(req.query.limit) : 10;
-      const providerId = req.query.providerId as string ;
-      const result = await this.providerServices.fetchSalesReport(page, limit,providerId);
-  
-      if (!result) {
-        res.status(500).json({ message: "Error fetching sales report" });
-        return;
-      }
-      res.status(200).json(result.data);
-    } catch (error) {
-    
-      res.status(500).json({ message: "Internal server error" });
+    // ***************************fetch sales report*********************
+
+    async fetchSalesReport(req: Request, res: Response): Promise<void> {
+        try {
+            const page = req.query.page ? Number(req.query.page) : 1;
+            const limit = req.query.limit ? Number(req.query.limit) : 10;
+            const providerId = req.query.providerId as string;
+            const result = await this.providerServices.fetchSalesReport(page, limit, providerId);
+
+            if (!result) {
+                res.status(500).json({ message: "Error fetching sales report" });
+                return;
+            }
+            res.status(200).json(result.data);
+        } catch (error) {
+
+            res.status(500).json({ message: "Internal server error" });
+        }
     }
-  }
 
 }

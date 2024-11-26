@@ -81,6 +81,7 @@ export class ProviderRepository {
 
     async saveProvider(providerData: ProviderInterface): Promise<ProviderInterface | null> {
         try {
+            console.log(providerData,"providerdata")
             const newUser = new providerModel(providerData);
 
             await newUser.save();

@@ -54,7 +54,7 @@ export class AdminController {
       const { email, password }: { email: string; password: string } = req.body;
      
       const result = await this.adminServices.adminSignIn({ email, password });
-
+console.log(result)
       if (result?.data.success) {
         const access_token = result.data.token;
         const refresh_token = result.data.refreshToken;
