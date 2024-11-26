@@ -23,17 +23,13 @@ function Home() {
       try {
         setLoading(true);
         const result = await fetchCars(page, limit);
-        console.log(result, 'Fetched car data');
-
         if (result?.data?.data) {
           setCarData(result.data.data);
-          console.log(result.data.data.totalPage, "totalPage")
           setTotalPages(result.data.totalPage || 1);
         } else {
           setError('No car data returned.');
         }
       } catch (err) {
-        console.error('Error fetching data:', err);
         setError('Error fetching car data.');
       } finally {
         setLoading(false);
@@ -50,7 +46,7 @@ function Home() {
   };
 
   const handleSearhCar = (data: CarDataInterface[]) => {
-    console.log("Data received in Home:", data);
+
     setCarData(data); 
     setTotalPages(1)
   };

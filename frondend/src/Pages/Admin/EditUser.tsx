@@ -29,19 +29,19 @@ const EditUser: React.FC<EditUserProps> = ({ header }) => {
           try {
 
             const result = await editUser(id);
-            console.log(result, "result") // Ensure 'id' is defined
+           
             const userData = result?.data; // Assuming user data is inside `data`
-            // Setting the formData with the fetched user data
+      
             setFormData({
               username: userData?.username || '',
               email: userData?.email || '',
               password: '' // Keep password empty for security reasons
             });
           } catch (error) {
-            console.error('Error fetching user data:', error);
+          
           }
         } else {
-          console.error('No user ID provided.');
+          
         }
       }
       else {

@@ -11,7 +11,7 @@ interface CardProps {
 
 function Card({ carData }: CardProps) {
   const user = useSelector((state: RootState) => state.user.currentUser) as User | null;
-  console.log(carData, "carData")
+ 
   return (
     <div className="flex flex-col items-center mt-8">
       {/* Car card with compact design and hover effect */}

@@ -44,7 +44,7 @@ const EditOffer: React.FC<EditOfferProps> = ({ header }) => {
                     }
                 }
             } catch (error) {
-                console.error('Error fetching offer data:', error);
+            
             }
         };
 

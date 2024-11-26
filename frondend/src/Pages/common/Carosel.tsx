@@ -49,7 +49,7 @@ const Carosel: React.FC<CarouselProps> = ({ onEvent }) => {
       setCarData(cars); // Update local state
       onEvent(cars); // Pass the full data to the Home component
     } catch (error) {
-      console.error("Error fetching car data:", error);
+    
     }
   };
   

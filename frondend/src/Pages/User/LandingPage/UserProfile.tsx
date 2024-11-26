@@ -25,13 +25,13 @@ const UserProfile = () => {
     });
 
     useEffect(() => {
-        console.log("userid", user)
+        
         const fetchProfile = async () => {
             if (user) {
-                console.log("userid", user._id)
+                
                 try {
                     const result = await checkProfile(user._id);
-                    console.log(result, "profile")
+                   
                     if (result?.status === 200) {
                         setProfile(result.data);
                         setProfileId(result.data._id);
@@ -119,7 +119,7 @@ const UserProfile = () => {
 
         try {
             if (isEditing) {
-                console.log("hai,edit")
+               
                 const result = await editProfile(formData, profileId);
                 if (result) {
                     setIsEditing(true)
@@ -128,7 +128,7 @@ const UserProfile = () => {
                     toast.error('Failed to update profile.');
                 }
             } else {
-                console.log("hai,save")
+               
                 const result = await saveProfileData(formData);
                 setIsEditing(true)
                 if (result) {

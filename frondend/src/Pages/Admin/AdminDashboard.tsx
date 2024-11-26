@@ -18,7 +18,6 @@ const AdminDashboard: React.FC = () => {
     useEffect(() => {
         const fetchDashboardData = async () => {
             const result = await getDashboardConstData();
-            console.log(result, "result const data")
             setTotalUsers(result.data.totalUsers);
             setTotalProviders(result.data.totalProviders);
             setTotalCars(result.data.totalCars);

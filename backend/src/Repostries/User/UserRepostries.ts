@@ -84,7 +84,7 @@ export class UserRepository {
 
             return existingUser as UserInterface;
         } catch (error) {
-            console.log("Error checking email existence:", error);
+
             return null;
         }
     }
@@ -99,8 +99,6 @@ export class UserRepository {
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit) as CarDataInterface[];
-
-
 
             const cars: CarDataInterface[] = carDocuments.map((car: CarDataInterface) => ({
                 car_name: car.car_name,
@@ -125,7 +123,7 @@ export class UserRepository {
 
             return cars;
         } catch (error) {
-            console.error("Error fetching cars:", error);
+
             return null;
         }
     }
@@ -135,7 +133,6 @@ export class UserRepository {
             const total = await CarModel.countDocuments();
             return total
         } catch (error) {
-            console.error("Error fetching cars counts:", error);
             return null;
         }
     }
@@ -146,7 +143,6 @@ export class UserRepository {
             return result as CarDataInterface
         }
         catch (error) {
-            console.error("Error fetching Car:", error);
             return null;
         }
     }
@@ -154,7 +150,6 @@ export class UserRepository {
     // ************************car ratings(star) in carDetails*****************
     async getReviewAndRatings(carId: string): Promise<{ averageRating: number | null; reviews: string[] }> {
         try {
-            console.log(carId, "carId");
             const result = await ReviewModel.aggregate([
                 { $match: { carId: carId } },
                 {
@@ -165,8 +160,6 @@ export class UserRepository {
                     },
                 },
             ]);
-
-            console.log(result[0], "result ratings");
             if (result.length === 0) {
                 return { averageRating: null, reviews: [] };
             }
@@ -176,7 +169,6 @@ export class UserRepository {
                 reviews: result[0].reviews,
             };
         } catch (error) {
-            console.error("Error fetching reviews and ratings:", error);
             return { averageRating: null, reviews: [] };
         }
     }
@@ -185,7 +177,7 @@ export class UserRepository {
 
     async carFilter(engineType?: string[], fuelType?: string[], sortPrice?: string): Promise<CarDataInterface[] | null> {
         try {
-            // Create a filter object
+
             const filters: any = {};
 
             if (engineType && engineType.length > 0) {
@@ -195,14 +187,11 @@ export class UserRepository {
                 filters.fuelType = { $in: fuelType.map(type => new RegExp(type, 'i')) }; // Case-insensitive filter
             }
 
-            // Determine sorting order based on sortPrice parameter
             const sortOrder = sortPrice === 'lowToHigh' ? 1 : sortPrice === 'highToLow' ? -1 : undefined;
-            console.log(filters, "filters");
 
-            // Execute the query with filters and optional sorting
             const filteredCars = await CarModel.find(filters)
-                .sort(sortOrder ? { rentalPrice: sortOrder } : {}) // Sort only if sortOrder is defined
-                .exec() as CarDataInterface[]; // Make sure CarModel is defined and imported
+                .sort(sortOrder ? { rentalPrice: sortOrder } : {})
+                .exec() as CarDataInterface[];
 
             const cars: CarDataInterface[] = filteredCars.map((car: CarDataInterface) => ({
                 car_name: car.car_name,
@@ -225,7 +214,6 @@ export class UserRepository {
             }));
             return cars
         } catch (error) {
-            console.error("Error fetching cars:", error);
             return null;
         }
     }
@@ -238,42 +226,35 @@ export class UserRepository {
             const result = await CarModel.find({ car_name: { $regex: regex } });
             return result
         } catch (error) {
-            console.error("Error searching for cars:", error);
+
             return null;
         }
     }
     // *************************fetch offer8*******************888
     async fetchOffer(): Promise<OfferDataInterface[] | null> {
         try {
-            // Fetch offers from the database, with type assertion
+
             const data = await Offer.find().sort({ createdAt: -1 }) as OfferDataInterface[]; // Array of OfferDataInterface documents
 
-            console.log("Offers in management:", data);
-
-            // Map the documents to the OfferReturnData type
             const offers: OfferDataInterface[] = data.map((offer: OfferDataInterface) => ({
                 carName: offer.carName,
                 offerTitle: offer.offerTitle,
                 startDate: offer.startDate,
                 endDate: offer.endDate,
                 discountPercentage: offer.discountPercentage,
-                id: offer.id?.toString() || "", // Convert `_id` to string if present
-                isActive: offer.isActive ?? true, // Set a default value if `isActive` is undefined
+                id: offer.id?.toString() || "",
+                isActive: offer.isActive ?? true,
             }));
 
             return offers;
         } catch (error) {
-            console.error("Error fetching offers:", error);
             return null;
         }
     }
 
     // ***********************check profile******************
     async checkProfile(userId: string): Promise<ProfileInterface | null> {
-        console.log(userId, "check profile userId")
         const data = await UserProfileModel.findOne({ userId: userId })
-
-        console.log(data, "data")
         if (data) {
             return {
                 _id: data._id,
@@ -291,20 +272,18 @@ export class UserRepository {
 
     async saveProfile(profileData: ProfileInterface): Promise<ProfileInterface | null> {
         try {
-
             const savedProfile = await UserProfileModel.create(profileData)
-            console.log(savedProfile, "save profile")
             return savedProfile as ProfileInterface;
         } catch (error) {
-            console.error("Error saving profile:", (error as Error).message);
-            return null; // Return null if there's an error
+
+            return null;
         }
     }
     // *************************Edit profile************************
 
     async editProfile(profileData: ProfileInterface, profileId: string): Promise<ProfileInterface | null> {
         try {
-            console.log("editprofile", profileData)
+
             const updatedProfile = await UserProfileModel.findOneAndUpdate(
                 { _id: profileId },
                 profileData,
@@ -315,7 +294,7 @@ export class UserRepository {
             }
             return null;
         } catch (error) {
-            console.error("Error updating profile:", error);
+
             return null;
         }
     }
@@ -323,15 +302,12 @@ export class UserRepository {
     //******************** */ check Address**************************
     async checkAddress(userId: string): Promise<UserAddressInterface | null> {
         try {
-            console.log(userId, "check address userId")
             const checkAddress = await UserAddressModel.findOne({ userId: userId })
-            console.log(checkAddress, "checkaddress")
             if (checkAddress) {
                 return checkAddress as UserAddressInterface;
             }
             return null;
         } catch (error) {
-            console.error("Error updating profile:", error);
             return null;
         }
     }
@@ -339,12 +315,12 @@ export class UserRepository {
     // ***************save address*********************8
     async saveAddress(addressData: UserAddressInterface): Promise<UserAddressInterface | null> {
         try {
-            console.log(addressData, "addressData")
+
             const savedAddress = await UserAddressModel.create(addressData);
             return savedAddress as UserAddressInterface;
         } catch (error) {
-            console.error("Error saving profile:", (error as Error).message);
-            return null; // Return null if there's an error
+
+            return null;
         }
     }
     // *************************Edit Address************************
@@ -361,7 +337,6 @@ export class UserRepository {
             }
             return null;
         } catch (error) {
-            console.error("Error updating Adress:", error);
             return null;
         }
     }
@@ -369,14 +344,12 @@ export class UserRepository {
     // **************************fetch coupon************
     async fetchCoupon(userId: string): Promise<CouponInterface[] | null> {
         try {
-            console.log(userId, "userId")
             const couponsWithoutUser = await Coupon.find({ userId: { $ne: userId } }) as CouponInterface[];
             if (couponsWithoutUser && couponsWithoutUser.length > 0) {
                 return couponsWithoutUser;
             }
             return null;
         } catch (error) {
-            console.error("Error fetching coupons:", error);
             return null;
         }
     }
@@ -384,20 +357,14 @@ export class UserRepository {
     // ******************check offer for booking******************
     async checkOfferForBooking(carName: string): Promise<OfferDataInterface | null> {
         try {
-            console.log(carName, "carname")
-
             const offer = await Offer.findOne({
                 carName: { $regex: new RegExp(`^${carName}$`, 'i') },
             });
-
-
-            console.log(offer, "offer")
             if (offer) {
                 return offer as OfferDataInterface
             }
             return null;
         } catch (error) {
-            console.error("Error checking offer for booking:", error);
             return null;
         }
     }
@@ -408,14 +375,13 @@ export class UserRepository {
             const savedBooking = await BookingModel.create(bookingData);
             return savedBooking as BookingInterface;
         } catch (error) {
-            console.error("Error saving profile:", (error as Error).message);
-            return null; // Return null if there's an error
+
+            return null;
         }
     }
     // **********************update userid in coupon ***********************
     async userIdInCoupon(couponCode: string, userId: string): Promise<CouponInterface | null> {
         try {
-            console.log("coupon code:", couponCode, userId);
             const updatedCoupon = await Coupon.findOneAndUpdate(
                 { code: couponCode },
                 { $push: { userId: userId } },
@@ -427,8 +393,8 @@ export class UserRepository {
             }
             return null;
         } catch (error) {
-            console.error("Error updating coupon userId:", (error as Error).message);
-            return null;  // Return null in case of error
+
+            return null;
         }
     }
 
@@ -438,18 +404,18 @@ export class UserRepository {
 
     async getBookingHistory(userId: string, page: number, limit: number): Promise<BookingInterface[] | null> {
         try {
-            console.log(userId, "userId in get booking history");
+
             const bookingHistory = await BookingModel.aggregate([
                 { $match: { UserId: userId } },
                 {
                     $addFields: {
-                        CarsObjectId: { $toObjectId: "$CarsId" } // Convert CarsId string to ObjectId
+                        CarsObjectId: { $toObjectId: "$CarsId" }
                     }
                 },
                 {
                     $lookup: {
-                        from: 'carmodels', // Collection name for CarModel
-                        localField: 'CarsObjectId', // Use the converted ObjectId field
+                        from: 'carmodels',
+                        localField: 'CarsObjectId',
                         foreignField: '_id',
                         as: 'bookingDetails',
                     },
@@ -460,10 +426,8 @@ export class UserRepository {
                 { $limit: limit },
             ]);
 
-            console.log(bookingHistory, "booking history");
             return bookingHistory
         } catch (error) {
-            console.error("Error fetching booking history with car details:", (error as Error).message);
             return null;
         }
     }
@@ -472,13 +436,11 @@ export class UserRepository {
 
     async countBookingHistory(userId: string): Promise<number | null> {
         try {
-            console.log(userId, "userId count booking history")
             const total = await BookingModel.aggregate([
                 { $match: { UserId: userId } }])
-            console.log(total, "count of documnets")
             return total.length;
         } catch (error) {
-            console.error("Error counting booking history:", (error as Error).message);
+
             return null;
         }
     }
@@ -489,43 +451,39 @@ export class UserRepository {
 
     async specificBookingDetails(bookingId: string): Promise<BookingInterface | null> {
         try {
-            console.log(bookingId, "bookingId in get booking history");
 
-            // Convert bookingId to an ObjectId
             const objectId = new mongoose.Types.ObjectId(bookingId);
 
             const bookingHistory = await BookingModel.aggregate([
-                { $match: { _id: objectId } }, // Match the specific booking by ObjectId
+                { $match: { _id: objectId } },
                 {
                     $addFields: {
-                        CarsObjectId: { $toObjectId: "$CarsId" }, // Convert CarsId to ObjectId
-                        UserAddressObjectId: { $toObjectId: "$UserAddressId" } // Convert UserAddressId to ObjectId
+                        CarsObjectId: { $toObjectId: "$CarsId" },
+                        UserAddressObjectId: { $toObjectId: "$UserAddressId" }
                     }
                 },
                 {
                     $lookup: {
-                        from: 'carmodels', // Collection name for CarModel
+                        from: 'carmodels',
                         localField: 'CarsObjectId',
                         foreignField: '_id',
                         as: 'bookingDetails'
                     }
                 },
-                { $unwind: '$bookingDetails' }, // Flatten bookingDetails array
+                { $unwind: '$bookingDetails' },
                 {
                     $lookup: {
-                        from: 'useraddressmodels', // Collection name for UserAddress
+                        from: 'useraddressmodels',
                         localField: 'UserAddressObjectId',
                         foreignField: '_id',
                         as: 'userAddress'
                     }
                 },
-                { $unwind: '$userAddress' } // Flatten userAddress array
+                { $unwind: '$userAddress' }
             ]);
 
-            console.log(bookingHistory, "booking history");
-            return bookingHistory[0] || null; // Return the first matched result or null if none found
+            return bookingHistory[0] || null;
         } catch (error) {
-            console.error("error specific booking details:", (error as Error).message);
             return null;
         }
     }
@@ -541,13 +499,12 @@ export class UserRepository {
             );
             return updatedBooking as BookingInterface
         } catch (error) {
-            console.error("Error cancel booking by user:", (error as Error).message);
             return null;
         }
     }
 
     // ***************************canceled booking amount credited to walet**********8
-    async creditToWallet( userId: string, amount: number): Promise<WalletInterface | null> {
+    async creditToWallet(userId: string, amount: number): Promise<WalletInterface | null> {
         try {
             const lastTransaction = await WalletModel.findOne({ UserId: userId }).sort({ createdAt: -1 });
             const lastTotalAmt = lastTransaction && typeof lastTransaction.TotalAmt === 'number' ? lastTransaction.TotalAmt : 0;
@@ -568,11 +525,10 @@ export class UserRepository {
                 TotalAmt: updatedTotal,
             });
 
-            console.log("Wallet Updated Successfully:", result);
+
             return result as WalletInterface;
 
         } catch (error) {
-            console.error("Error in cancelBookingUpdateWallet:", (error as Error).message);
             return null;
         }
     }
@@ -581,9 +537,9 @@ export class UserRepository {
     async checkBookedOrNot(carId: string): Promise<BookingDateInterface[] | null> {
         try {
             const check = await BookingModel.find({ CarsId: carId })
-            console.log(check, "check")
+
             const result = await BookingModel.find({ CarsId: carId }, { IssueDate: 1, ReturnDate: 1 }).lean();
-            console.log(result, "check booked or ")
+
             const transformedResult = result.map(doc => ({
                 issueDate: doc.IssueDate,
                 returnDate: doc.ReturnDate
@@ -591,7 +547,7 @@ export class UserRepository {
 
             return transformedResult;
         } catch (error) {
-            console.error("Error check bookeed or not:", (error as Error).message);
+
             return null;
         }
     }
@@ -616,15 +572,14 @@ export class UserRepository {
 
                     TotalAmt: updatedTotal,
                 });
-                console.log("Wallet successfully updated:", result);
+
                 return result as WalletInterface;
             } else {
-                console.error("Insufficient balance in wallet.");
+
                 return null;
             }
 
         } catch (error) {
-            console.error("Error while checking balance and updating wallet:", (error as Error).message);
             return null;
         }
     }
@@ -634,17 +589,15 @@ export class UserRepository {
     // ***************get Wallet********************************
     async getWalletPage(userId: string, page: number, limit: number): Promise<WalletInterface[] | null> {
         try {
-            console.log(userId, "userId in get booking history");
+
             const walletData = await WalletModel.aggregate([
                 { $match: { UserId: userId } },
                 { $skip: (page - 1) * limit },
                 { $limit: limit },
             ]);
 
-            console.log(walletData, "booking history");
             return walletData
         } catch (error) {
-            console.error("Error fetching booking history with car details:", (error as Error).message);
             return null;
         }
     }
@@ -653,13 +606,13 @@ export class UserRepository {
 
     async countWalletDocuments(userId: string): Promise<number | null> {
         try {
-            console.log(userId, "userId count booking history")
+           
             const total = await WalletModel.aggregate([
                 { $match: { UserId: userId } }])
-            console.log(total, "count of documnets")
+           
             return total.length;
         } catch (error) {
-            console.error("Error counting booking history:", (error as Error).message);
+           
             return null;
         }
     }
@@ -671,7 +624,6 @@ export class UserRepository {
             const saveReview = await ReviewModel.create(reviewData);
             return saveReview as ReviewDataInterface;
         } catch (error) {
-            console.error("Error saving profile:", (error as Error).message);
             return null;
         }
     }
@@ -682,7 +634,6 @@ export class UserRepository {
             let result = await ReviewModel.findOne({ bookingId: bookId })
             return result as ReviewDataInterface
         } catch (error) {
-            console.error("Error check bookId in review:", (error as Error).message);
             return null;
         }
     }
@@ -701,7 +652,6 @@ export class UserRepository {
             });
             return result as IChat[]
         } catch (error) {
-            console.error("Error check bookId in review:", (error as Error).message);
             return null;
         }
     }
@@ -709,7 +659,7 @@ export class UserRepository {
     // ************************************car availabilty in date***************************
     async searchCarAvailability(startDate: string, endDate: string): Promise<CarDataInterface[]> {
         try {
-          
+
             const start = new Date(startDate);
             const end = new Date(endDate);
 
@@ -724,8 +674,7 @@ export class UserRepository {
                 _id: { $nin: bookedCarIds },
             });
 
-            // Map the available cars to match the CarDataInterface structure
-            const cars: CarDataInterface[] = availableCars.map((car:CarDataInterface) => ({
+            const cars: CarDataInterface[] = availableCars.map((car: CarDataInterface) => ({
                 car_name: car.car_name,
                 model: car.model,
                 rentalPrice: car.rentalPrice,
@@ -745,11 +694,10 @@ export class UserRepository {
                 id: car.id,
             }));
 
-            console.log(cars, "Available cars");
             return cars;
         } catch (error) {
-            console.error('Error checking car availability:', error);
-            throw error; // Rethrow the error to handle it at a higher level
+
+            throw error; 
         }
     }
 

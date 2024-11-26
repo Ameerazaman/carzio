@@ -17,12 +17,11 @@ const refreshProviderAccessToken = async () => {
             withCredentials: true
         });
 
-        console.log(response.data, 'refreshed')
         const { access_token } = response.data;
         Cookies.set('access_token', access_token);
         return access_token;
     } catch (error) {
-        console.error('Error refreshing access token:', error);
+
         throw error;
     }
 };
@@ -30,28 +29,26 @@ const refreshProviderAccessToken = async () => {
 
 const signup = async ({ email, password, confirmPassword }: signupFormData) => {
     try {
-        console.log("providerSignup")
+
         const result = await providerAPI.post(providerRouter.signup, {
             email,
             password,
             confirmPassword,
         });
-        console.log(result, "response");
 
         if (result.data.success) {
-            return { success: true };  // Successful signup
+            return { success: true }; 
         } else {
-            // Handle the failure case (like email already exists)
+  
             return { success: false, message: result.data.message || 'Signup failed.' };
         }
     } catch (error) {
-        // Type assertion to narrow down the type of 'error'
+
         if (error instanceof AxiosError && error.response) {
-            // Check if the server returned a specific error message
-            console.log('Axios Error:', error.response.data.message);
+
             return { success: false, message: error.response.data.message || 'An error occurred during signup.' };
         } else {
-            // Handle generic error (network error, etc.)
+
             console.log(error as Error);
             return { success: false, message: 'An error occurred during signup.' };
         }
@@ -66,7 +63,7 @@ const resend = async () => {
         const result = await providerAPI.get(providerRouter.reSend);
         return result
     } catch (error) {
-        console.log(error as Error);
+        errorHandler(error as Error);
     }
 };
 
@@ -76,7 +73,6 @@ const verifyOtp = async (otp: string) => {
 
         const result = await providerAPI.post(providerRouter.verifyOtp, { otp });
 
-        // Check if the result was successful
         if (result.data.success) {
 
             return { success: true };
@@ -84,12 +80,11 @@ const verifyOtp = async (otp: string) => {
             return { success: false, message: result.data.message || 'OTP verification failed.' };
         }
     } catch (error: any) {
-        // Handle both network errors and response errors (like 400 status)
         if (error.response) {
 
             return { success: false, message: error.response.data.message || 'OTP verification failed.' };
         } else {
-            console.log('Error during OTP verification:', error.message);
+            errorHandler(error as Error);
             throw new Error('Network or server error during OTP verification.');
         }
     }
@@ -99,25 +94,23 @@ const verifyOtp = async (otp: string) => {
 // ******************************login provider*******************************
 const loginProvider = async ({ email, password }: signupFormData) => {
     try {
-
         const result = await providerAPI.post(providerRouter.providerLogin, { email, password });
         return result;
-    } catch (error) {
-        console.log(error as Error);
+    } catch (error) {      
         errorHandler(error as Error);
     }
 }
 // ******************************************logout Provider***************************
 const providerLogout = async () => {
     try {
-        console.log("logout ")
+       
         const result = await providerAPI.get(providerRouter.providerLogout)
-        console.log("result when logout")
+        
         if (result) {
             window.location.href = '/'
         }
     } catch (error) {
-        console.log(error as Error);
+       
         errorHandler(error as Error);
 
     }
@@ -126,14 +119,14 @@ const providerLogout = async () => {
 
 const getProfile = async (userId: string) => {
     try {
-        console.log("fetch address of provider with id:", userId);
+       
         const result = await providerAPI.get(`/provider/home/${userId}`);  // Use the id in the API URL
-        console.log(result, "profile");
+        
         if (result) {
             return result;
         }
     } catch (error) {
-        console.log(error as Error);
+       
         errorHandler(error as Error);
     }
 };
@@ -155,19 +148,14 @@ const submitProfileData = async (profileData: ProfileType) => {
 // ************************edit profile data ***********************
 const editProfileData = async (profileData: ProfileType, addressId: string) => {
     try {
-        console.log("Edit profile called with ID:", addressId, "and Data:", profileData);
-
-        // Make PUT request to update profile
         const result = await providerAPI.put(`/provider/edit_profile/${addressId}`, profileData, {
             headers: { 'Content-Type': 'application/json' },
         });
-        console.log(result, "Profile update result");
-
         if (result) {
             return result;
         }
     } catch (error) {
-        console.error("Error in editProfileData:", error);
+
         errorHandler(error as Error);
     }
 };
@@ -177,35 +165,32 @@ const addCarDetails = async (carData: CarDataInterface) => {
     try {
         const formData = new FormData();
 
-        // Append each field in carData except for the uploaded files
         Object.entries(carData).forEach(([key, value]) => {
-            if (key !== 'uploadedFiles') {  // Ignore the file field for now
+            if (key !== 'uploadedFiles') { 
                 formData.append(key, value as string);
             }
         });
 
-        // Append the uploaded files (if there are any)
         carData.uploadedFiles?.forEach((file) => {
-            formData.append('images', file);  // Append each file under the 'images' field
+            formData.append('images', file); 
         });
 
-        // Make the API call with formData
         const result = await providerAPI.post(providerRouter.add_car, formData, {
             headers: {
-                'Content-Type': 'multipart/form-data',  // Optional, as Axios will handle this
+                'Content-Type': 'multipart/form-data',  
             },
         });
 
         return result.data;
     } catch (error) {
-        console.error("Error in addCarDetails:", error);
+      
         errorHandler(error as Error);
     }
 };
 // ****************************car mnagement**************************
 const carManagement = async (providerId:string,page:number,limit:number) => {
     try {
-        console.log("fetch cars")
+
         const result = await providerAPI.get(providerRouter.carMgt, {
             params: {
                 page,
@@ -217,39 +202,33 @@ const carManagement = async (providerId:string,page:number,limit:number) => {
             return result
         }
     } catch (error) {
-        console.log(error as Error);
         errorHandler(error as Error);
-
     }
 
 }
 
 
-// update Status of Car
+//***********************update Status of Car*************************
 
 const updateStatusCar = async (id: string) => {
     try {
-        console.log(id, "update status")
         const result = await providerAPI.put(`/provider/update_status_car/${id}`);
-        console.log(result, "resulteditUser")
         if (result) {
             return result
-
         }
 
     } catch (error) {
-        console.log(error as Error);
         errorHandler(error as Error);
 
     }
 }
 
-// Edit car Data
+//*******************Edit car Data******************
 const editCar = async (id: string) => {
     try {
 
         const result = await providerAPI.get(`/provider/edit_Car/${id}`);
-        console.log(result, "resulteditCar")
+
         if (result) {
             return result
         }
@@ -261,32 +240,15 @@ const editCar = async (id: string) => {
     }
 }
 
-// Edit car details in car mgt
+//***************** */ Edit car details in car mgt************************
 const editCarDetails = async (carData: CarDataInterface, id: string) => {
     try {
-        // const formData = new FormData();
-        // Object.entries(carData).forEach(([key, value]) => {
-        //     if (key !== 'uploadedFiles') {
-        //         formData.append(key, value as string);
-        //     }
-        // });
-
-        // console.log()
-        // carData.uploadedFiles?.forEach((file) => {
-        //     console.log("uploaded files",file)
-        //     if (typeof file === 'object' && file instanceof File) {
-        //         formData.append('images', file); // Correctly append file
-        //     } else {
-        //         console.error("Invalid file object, expected a File:", file);
-        //     }
-        // });
-
         const result = await providerAPI.put(`/provider/edit_Car/${id}`, carData,
             { headers: { 'Content-Type': 'application/json' } },);
 
         return result.data;
     } catch (error) {
-        console.error("Error in addCarDetails:", error);
+
         errorHandler(error as Error);
     }
 };
@@ -296,10 +258,9 @@ const editCarImage = async (uploadedFiles: File[], id: string) => {
     try {
         const formData = new FormData();
 
-        // Append each file to formData
         uploadedFiles.forEach((file) => {
             if (file instanceof File) {
-                formData.append('images', file); // Add each image file
+                formData.append('images', file); 
             } else {
                 console.error("Invalid file object, expected a File:", file);
             }
@@ -307,7 +268,7 @@ const editCarImage = async (uploadedFiles: File[], id: string) => {
         const result = await providerAPI.put(
             `/provider/edit_car_image/${id}`,
             formData,
-            { headers: { 'Content-Type': 'multipart/form-data' } } // Ensure 'multipart/form-data'
+            { headers: { 'Content-Type': 'multipart/form-data' } } 
         );
 
         return result.data;
@@ -325,13 +286,12 @@ const updateProfileImage = async (formData: FormData, id: string) => {
             formData,
             {
                 headers: {
-                    'Content-Type': 'multipart/form-data', // Required for file upload
+                    'Content-Type': 'multipart/form-data', 
                 },
             }
         );
         return result.data;
     } catch (error) {
-        console.error('Error in updateProfileImage:', error);
         errorHandler(error as Error);
     }
 };
@@ -347,7 +307,7 @@ const getBookingHistory = async (providerId: string, page: number, limit: number
         });
         return result;
     } catch (error) {
-        console.error("API Error:", error);
+
         errorHandler(error as Error);
         throw error;
     }
@@ -360,7 +320,7 @@ const specificBookingDetails = async (bookingId: string) => {
         const result = await providerAPI.get(`/provider/details_of_specifc_order/${bookingId}`);
         return result;
     } catch (error) {
-        console.error("API Error:", error);
+
         errorHandler(error as Error);
         throw error;
     }
@@ -372,7 +332,6 @@ const updateStatusOfBooking = async (bookingId: string, status: string) => {
         const result = await providerAPI.get(`/provider/update_status/${bookingId}/${status}`);
         return result;
     } catch (error) {
-        console.error("API Error:", error);
         errorHandler(error as Error);
         throw error;
     }
@@ -382,11 +341,10 @@ const updateStatusOfBooking = async (bookingId: string, status: string) => {
 const fetchUsersChat = async (providerId: string) => {
     try {
         const response = await providerAPI.get(`/provider/fetch_users_chat/${providerId}`);
-        console.log("API Response:", response.data);
-        return response.data; // Return only the data portion
+        return response.data; 
     } catch (error) {
-        console.error("Error fetching user chat:", error);
-        errorHandler(error as Error); // Custom error handler
+
+        errorHandler(error as Error); 
         throw new Error("Failed to fetch user chat.");
     }
 };
@@ -396,15 +354,15 @@ const fetchUsersChat = async (providerId: string) => {
 
 const fetchChat = async (providerId: string, userId: string): Promise<any> => {
     try {
-        console.log(`Fetching chat history for providerId: ${providerId}, userId: ${userId}`);
+       
         const url = `/provider/chat_history/${providerId}/${userId}`;
-        console.log("API URL:", url);
+      
         const result = await providerAPI.get(url);
-        console.log("API Response:", result);
+       
         return result.data;
     } catch (error) {
-        console.error("Error fetching chat history:", error);
-        throw error; // Handle the error appropriately
+  
+        throw error;
     }
 };
 // ******************************get DashboardData********************
@@ -428,7 +386,7 @@ const fetchSalesReport = async (page: number, limit: number,providerId:string): 
           
       return result.data;
     } catch (error) {
-      console.error("API Error:", (error as Error).message);
+     
       errorHandler(error as Error);
       throw error;
     }

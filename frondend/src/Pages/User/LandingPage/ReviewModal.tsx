@@ -32,7 +32,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, bookingId, c
                 onClose();
             }
         } catch (error) {
-            console.error("Error submitting review:", error);
+           
             alert("Failed to submit your review. Please try again.");
         }
     };

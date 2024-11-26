@@ -18,14 +18,13 @@ function HistoryDetailsProvider() {
                 try {
                     setLoading(true);
                     const result = await specificBookingDetails(bookingId);
-                    console.log(result.data, "reuslt")
                     setBookingHistory(result.data.data);
                     
                     setLoading(false);
                 } catch (error) {
                     setError("Error fetching booking history.");
                     setLoading(false);
-                    console.error("Error fetching booking history:", error);
+                    
                 }
             } else {
                 setLoading(false);
@@ -39,13 +38,13 @@ function HistoryDetailsProvider() {
     const handleStatusChange = async (newStatus: string) => {
         setStatus(false)
         if (!bookingId) return;
-        console.log(newStatus, "status")
+
         try {
             await updateStatusOfBooking(bookingId, newStatus); // Call your API with the new status
             setStatus(true)
         } catch (error) {
             Swal.fire('Error', 'Failed to update booking status', 'error');
-            console.error('Error updating booking status:', error);
+    
         }
     };
 

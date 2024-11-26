@@ -16,7 +16,7 @@ dotenv.config()
 declare global {
     namespace Express {
         interface Request {
-            provider?: ProviderInterface; // Add your UserInterface type here
+            provider?: ProviderInterface; 
         }
     }
 }
@@ -26,19 +26,14 @@ const providerAuth = async (req: Request, res: Response, next: NextFunction) => 
     try {
         let token = req.cookies.access_token;
         let refresh_token = req.cookies.refresh_token;
-            // Handle missing refresh token
         if (!refresh_token) {
             return res.status(401).json({ success: false, message: 'Refresh Token Expired' });
         }
 
-        // Verify refresh token
         const refreshTokenValid = verifyRefreshToken(refresh_token);
-  
-        // Fetch user using the token
-        const provider = await providerRepository.getProviderById(refreshTokenValid.data);
-     
 
-        // Check if the user is blocked
+        const provider = await providerRepository.getProviderById(refreshTokenValid.data);
+
         if (provider?.isBlocked === true) {
             return res.status(401).json({ success: false, message: "Provider is blocked by Admin" });
         }
@@ -48,14 +43,12 @@ const providerAuth = async (req: Request, res: Response, next: NextFunction) => 
             return res.status(401).json({ success: false, message: "Access Token Expired" });
         }
 
-        // Verify access token
         const decoded = verifyAccessToken(token);
      
         if (!decoded?.data) {
             return res.status(401).json({ success: false, message: "Access Token Expired" });
         }
 
-        // Fetch user using access token
         const existingProvider = await providerRepository.getProviderById(decoded.data);
         if (!existingProvider) {
             return res.status(404).json({ message: "provider not found" });

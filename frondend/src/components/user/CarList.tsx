@@ -21,11 +21,11 @@ function CarList() {
     const filterData = (data: CarDataInterface[] | { message: string }) => {
         if (Array.isArray(data)) {
             if (data.length === 0) {
-                console.log("No cars found in filtered data.");
-                setCarData([]); // Clear car data
+               
+                setCarData([]); 
                 setError("No cars match your Searching."); // Set a message for empty data
             } else {
-                console.log(data, "filtered data as array");
+              
                 setCarData(data); // Update car data if `data` is a non-empty array
                 setError(null); // Clear any previous error messages
             }
@@ -42,17 +42,17 @@ function CarList() {
             try {
                 setLoading(true);
                 const result = await fetchCars(page, limit);
-                console.log(result, 'Fetched car data');
+                
 
                 if (result?.data?.data) {
                     setCarData(result.data.data);
-                    console.log(result.data.data.totalPage, "totalPage")
+                   
                     setTotalPages(result.data.totalPage || 1);
                 } else {
                     setError('No car data returned.');
                 }
             } catch (error) {
-                console.error("Error fetching data:", error);
+               
                 setError("Error fetching car data.");
             } finally {
                 setLoading(false);

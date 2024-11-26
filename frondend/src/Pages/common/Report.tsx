@@ -8,7 +8,7 @@ const Report: React.FC<TableProps> = ({ tableData: initialTableData }) => {
   const [tableData, setTableData] = useState(initialTableData);
 
   useEffect(() => {
-    console.log(tableData, "data");
+   
   }, [tableData]);
 
   const downloadCSV = () => {

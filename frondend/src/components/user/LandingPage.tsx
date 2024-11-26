@@ -14,9 +14,6 @@ import { fetchCars } from '../../Api/User'
 function LandingPage() {
  
   const handleSearhCar = (data: CarDataInterface[]) => {
-    console.log("Data received in Home:", data);
-    // setCarData(data); 
-    // setTotalPages(1)
   };
   return (
     <div>

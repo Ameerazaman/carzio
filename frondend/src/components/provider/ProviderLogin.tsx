@@ -68,7 +68,7 @@ function ProviderLogin() {
       }
 
     } catch (error) {
-      console.log(error as Error);
+ 
       toast.error('somthing went wrong while login');
     }
   };

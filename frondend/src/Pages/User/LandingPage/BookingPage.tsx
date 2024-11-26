@@ -56,8 +56,6 @@ function BookingPage() {
         setLoading(true);
         if (carId) {
           const result = await carDetail(carId);
-          console.log(result?.data, "result car data");
-
           const carDetails = result?.data?.data;
           setCarData(carDetails);
 
@@ -77,7 +75,7 @@ function BookingPage() {
           }
         }
       } catch (err: any) {
-        console.error("Error fetching car data:", err);
+
       } finally {
         setLoading(false);
       }
@@ -115,7 +113,7 @@ function BookingPage() {
           }
         }
       } catch (err: any) {
-        console.error("Error fetching coupon and offer data:", err);
+
       } finally {
         setLoading(false);
       }

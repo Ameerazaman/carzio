@@ -34,7 +34,7 @@ const EditCoupon: React.FC<EditCouponProps> = ({ header }) => {
                         });
                     }
                 } catch (error) {
-                    console.error('Error fetching coupon data:', error);
+         
                 }
             }
         };
@@ -76,11 +76,9 @@ const EditCoupon: React.FC<EditCouponProps> = ({ header }) => {
                     if (result?.data) {
                         navigate('/admin/coupon');
                     }
-                } else {
-                    console.warn("No ID found for updating the coupon.");
                 }
             } catch (error) {
-                console.error('Error updating coupon:', error);
+               
             }
         }
     };

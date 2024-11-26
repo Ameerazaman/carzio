@@ -76,16 +76,15 @@ function ProviderSignup() {
 
     try {
       let result = await signup(formData);
-      console.log(result, 'signup result');
 
       if (result.success) {
-        navigate('/provider/otp'); // Navigate to OTP page on success
+        navigate('/provider/otp'); 
       } else {
-        // Show specific error message returned by the server
+    
         toast.error(result.message);
       }
     } catch (error) {
-      console.log(error);
+      
       toast.error('An error occurred during signup.');
     }
   };

@@ -78,7 +78,7 @@ function AddOffer() {
                     navigate('/admin/offers');
                 }
             } catch (error) {
-                console.error('Error adding offer:', error);
+            
             }
         }
     };

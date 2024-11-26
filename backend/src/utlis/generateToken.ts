@@ -20,7 +20,7 @@ export class CreateJWT {
             const decoded = jwt.verify(token, secret) as JwtPayload;
             return { success: true, decoded };
         } catch (err: any) {
-            console.error('Error while verifying JWT token:', err);
+           
             if (err?.name === 'TokenExpiredError') return { success: false, message: 'Token Expired!' };
             else return { success: false, message: 'Internal server error' }
         }
@@ -29,7 +29,7 @@ export class CreateJWT {
         try {
             let secret = process.env.JWT_REFRESH_SECRET;
             const decoded = jwt.verify(token, secret) as JwtPayload;
-            console.log(decoded,"decoded")
+            
             return { success: true, decoded };
         } catch (error) {
             console.log(error as Error);

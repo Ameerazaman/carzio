@@ -28,7 +28,7 @@ function HistoryDetail() {
 
                     if (result.data.data.status === "Completed") {
                         const result = await checkBookidInReview(bookingId)
-                        console.log(result.data.success, "check bookid")
+                        
                         if (!result.data.success) {
                             setIsReviewModalOpen(true);
                         }
@@ -38,7 +38,7 @@ function HistoryDetail() {
                 } catch (error) {
                     setError("Error fetching booking history.");
                     setLoading(false);
-                    console.error("Error fetching booking history:", error);
+                    
                 }
             } else {
                 setLoading(false);

@@ -14,23 +14,10 @@ const jwt = new CreateJWT();
 const userRepository = new UserRepository();
 dotenv.config()
 
-// declare global {
-//     namespace Express {
-//         interface Request {
-//             userId?: string,
-//             user?: UserInterface | null,
-//         }
-//     }
-// }
-// interface AuthRequest extends Request {
-//     user?: { id: string };
-//   }
-//   import { UserInterface } from './path-to-your-user-interface'; // Adjust the path accordingly
-
 declare global {
     namespace Express {
         interface Request {
-            user?: UserInterface; // Add your UserInterface type here
+            user?: UserInterface; 
         }
     }
 }
@@ -47,11 +34,8 @@ const userAuth = async (req: Request, res: Response, next: NextFunction) => {
 
         const refreshTokenValid = verifyRefreshToken(refresh_token);
   
-        // Fetch user using the token
         const user = await userRepository.getUserById(refreshTokenValid.data);
-     
 
-        // Check if the user is blocked
         if (user?.isBlocked === true) {
             return res.status(401).json({ success: false, message: "User is blocked by Admin" });
         }
@@ -61,14 +45,12 @@ const userAuth = async (req: Request, res: Response, next: NextFunction) => {
             return res.status(401).json({ success: false, message: "Access Token Expired" });
         }
 
-        // Verify access token
         const decoded = verifyAccessToken(token);
      
         if (!decoded?.data) {
             return res.status(401).json({ success: false, message: "Access Token Expired" });
         }
 
-        // Fetch user using access token
         const existingUser = await userRepository.getUserById(decoded.data);
         if (!existingUser) {
             return res.status(404).json({ message: "User not found" });

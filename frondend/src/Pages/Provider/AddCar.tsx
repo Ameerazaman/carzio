@@ -120,7 +120,7 @@ const AddCar: React.FC = () => {
     const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (validate()) {
-            console.log('Car data saved:', carData);
+            
             let result = await addCarDetails(carData);
             if (result) {
                 navigate('/provider/home');

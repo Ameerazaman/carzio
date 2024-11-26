@@ -9,9 +9,9 @@ import { toast } from 'react-hot-toast';
 
 const ProviderOtp: React.FC = () => {
   let dispatch = useDispatch()
-  const [timer, setTimer] = useState<number>(50); // Set initial timer value
-  const [isTimerActive, setIsTimerActive] = useState<boolean>(true); // State to control button text
-  const [otp, setOtp] = useState<string[]>(Array(6).fill('')); // State to store the OTP digits
+  const [timer, setTimer] = useState<number>(50); 
+  const [isTimerActive, setIsTimerActive] = useState<boolean>(true); 
+  const [otp, setOtp] = useState<string[]>(Array(6).fill('')); 
   const navigate = useNavigate()
   // Effect to handle countdown
   useEffect(() => {

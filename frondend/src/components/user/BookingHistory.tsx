@@ -9,7 +9,7 @@ import { getBookingHistory } from '../../Api/User';
 
 
 function BookingHistory() {
-  const user = useSelector((state: RootState) => state.user.currentUser) as User | null;
+  const user = useSelector((state: RootState) => state.user?.currentUser) as User | null;
   const [bookingHistory, setBookingHistory] = useState<Booking[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,13 +23,13 @@ function BookingHistory() {
         try {
           const result = await getBookingHistory(user._id, page, limit); // Pass them as separate arguments
           setBookingHistory(result.data.data);
-          console.log(result.data.totalPage, "result data")
+
           setTotalPages(result.data.totalPage || 1);
           setLoading(false);
         } catch (error) {
           setError("Error fetching booking history.");
           setLoading(false);
-          console.error("Error fetching booking history:", error);
+ 
         }
       }
     };

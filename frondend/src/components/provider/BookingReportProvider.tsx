@@ -23,11 +23,9 @@ function BookingReportProvider() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                console.log(page, limit, "page limit")
+ 
                 if (provider) {
                     const result = await fetchSalesReport(page, limit, provider?._id);
-                    console.log(result, "fetch Sales Report");
-
                     if (result?.data) {
                         setTableData(result.data);
                         setTotalPages(result.data.totalPage || 1);
@@ -36,7 +34,7 @@ function BookingReportProvider() {
                     }
                 }
             } catch (error) {
-                console.error("sales report is not retrieved:", error);
+
                 setError("sales report is not retrieved.");
             } finally {
                 setLoading(false);

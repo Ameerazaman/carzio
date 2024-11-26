@@ -1,6 +1,6 @@
 import { ProviderInterface, ProviderAdressInterface } from '../../Interface/ProviderInterface';
 import { ProviderRepository } from '../../Repostries/Provider/ProviderRepostries';
-import { OtpDocument } from '../../Model/User/OtpModel'; // Import OtpDocument for OTP-related return type
+import { OtpDocument } from '../../Model/User/OtpModel';
 import Encrypt from '../../Utlis/ComparedPassword';
 import { CreateJWT } from '../../Utlis/GenerateToken';
 import { UserRepository } from '../../Repostries/User/UserRepostries';
@@ -25,9 +25,8 @@ export class ProviderServices {
     // refresh access token
     async providerGetById(id: string): Promise<ProviderAuthResponse | null> {
         try {
-            console.log(id, "providergetby id")
+            
             let provider = await this.providerRepostry.getProviderById(id)
-            console.log(provider?.id, "get by userId")
             if (!provider) {
 
                 return {
@@ -52,7 +51,6 @@ export class ProviderServices {
             };
         }
         catch (error) {
-            console.log(error as Error);
             return null;
         }
 
@@ -60,10 +58,8 @@ export class ProviderServices {
     // *******************************8Signup logic************************8
     async userSignup(providerData: ProviderInterface): Promise<ProviderInterface | null> {
         try {
-            console.log("signup services", providerData)
             return await this.providerRepostry.emailExistCheck(providerData.email);
         } catch (error) {
-            console.log(error as Error);
             return null;
         }
     }
@@ -71,9 +67,8 @@ export class ProviderServices {
     //********************************8 */ OTP creation logic**************************
     async createOtp(email: string, otp: number): Promise<OtpDocument | null> {
         try {
-            return await this.providerRepostry.createOtp(otp, email); // Ensure correct type
+            return await this.providerRepostry.createOtp(otp, email); 
         } catch (error) {
-            console.log(error as Error);
             return null;
         }
     }
@@ -84,7 +79,7 @@ export class ProviderServices {
             return await this.providerRepostry.findOtp(email, otp)
         }
         catch (error) {
-            console.log(error as Error);
+      
             return null;
         }
     }
@@ -95,7 +90,6 @@ export class ProviderServices {
             providerData.password = await this.encrypt.hashPassword(providerData.password);
 
             const provider = await this.providerRepostry.saveProvider(providerData);
-            console.log(provider, "saveUser in services", provider)
             return {
                 status: OK,
                 data: {
@@ -119,8 +113,6 @@ export class ProviderServices {
     // ***************************************provider SignIn****************************
     async providerSignIn(providerData: ProviderInterface): Promise<ProviderAuthResponse | undefined> {
         try {
-            // Call emailPasswordCheck from the repository to get the user by email
-
             const provider = await this.providerRepostry.emailExistCheck(providerData.email);
 
             if (!provider) {
@@ -155,10 +147,7 @@ export class ProviderServices {
             }
 
             const token = this.createjwt.generateToken(provider.id!);
-            console.log(token, "token"); // Assert that `id` exists after saving
             const refreshToken = this.createjwt.generateRefreshToken(provider.id!);
-            console.log(refreshToken, "refreshtoken");
-
             return {
                 status: OK,
                 data: {
@@ -172,7 +161,6 @@ export class ProviderServices {
             };
 
         } catch (error) {
-            console.error("Error login user:", (error as Error).message);
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {
@@ -186,9 +174,8 @@ export class ProviderServices {
     // ************************************check provider Address********************
     async checkProviderAddress(id: string): Promise<ProviderAdressInterface | null> {
         try {
-            return await this.providerRepostry.checkProviderAddress(id); // Use the repository method for checking
+            return await this.providerRepostry.checkProviderAddress(id); 
         } catch (error) {
-            console.error("Error checking provider address via repository:", error);
             return null;
         }
     }
@@ -199,21 +186,18 @@ export class ProviderServices {
         try {
 
             const provider = await this.providerRepostry.saveProfile(providerData);
-            // Log the saved provider data
-
             return {
-                status: 200, // Successful save
+                status: 200, 
                 data: {
                     success: true,
                     message: 'Profile saved successfully',
-                    // data: provider, // Optionally include saved data
                 },
             };
 
         } catch (error) {
-            console.error("Error saving provider profile:", (error as Error).message);
+
             return {
-                status: 500, // Internal server error
+                status: 500, 
                 data: {
                     success: false,
                     message: 'Internal server error',
@@ -227,21 +211,18 @@ export class ProviderServices {
         try {
 
             const provider = await this.providerRepostry.editProfile(providerData, id);
-            // Log the saved provider data
-
             return {
-                status: 200, // Successful save
+                status: 200, 
                 data: {
                     success: true,
                     message: 'Profile saved successfully',
-                    // data: provider, // Optionally include saved data
                 },
             };
 
         } catch (error) {
-            console.error("Error saving provider profile:", (error as Error).message);
+
             return {
-                status: 500, // Internal server error
+                status: 500, 
                 data: {
                     success: false,
                     message: 'Internal server error',
@@ -253,11 +234,9 @@ export class ProviderServices {
     // **************************************update car Image***********************
     async updateProfileImage<T>(file: T, id: string): Promise<CarAuthResponse | undefined> {
         try {
-            // 1. Upload image to Cloudinary (or another cloud service)
-            const result = await uploadImageToCloudinary(file);
-            console.log(result, "Cloudinary upload result");
 
-            // Type-check for results array
+            const result = await uploadImageToCloudinary(file);
+
             if (!result.success || !result.results || result.results.length === 0) {
                 return {
                     status: 400,
@@ -268,10 +247,7 @@ export class ProviderServices {
                 };
             }
 
-            // Extract the URL from the first result in the results array
             const imageUrl = result.results[0].url;
-            console.log(imageUrl, 'Image URL in profile update');
-
             if (!imageUrl) {
                 return {
                     status: 400,
@@ -282,7 +258,6 @@ export class ProviderServices {
                 };
             }
 
-            // 3. Update provider profile in the database
             const provider = await this.providerRepostry.updateprofileImage(imageUrl, id);
 
             if (!provider) {
@@ -303,7 +278,6 @@ export class ProviderServices {
                 },
             };
         } catch (error) {
-            console.error("Error updating profile image:", (error as Error).message);
             return {
                 status: 500,
                 data: {
@@ -334,26 +308,24 @@ export class ProviderServices {
 
 
             carData.images = images
-            // Saving car data along with image URLs if the upload was successful
             const saveCar = await this.providerRepostry.addCarDetails(
                 carData,
-                // Assuming carData has a field to save image URLs
             );
 
             if (saveCar) {
                 return {
-                    status: 200, // Successful save
+                    status: 200, 
                     data: {
                         success: true,
                         message: 'Car data saved successfully',
-                        data: saveCar, // Optionally include saved data
+                        data: saveCar,
                     },
                 };
             }
         } catch (error) {
-            console.error('Error saving provider profile:', (error as Error).message);
+
             return {
-                status: 500, // Internal server error
+                status: 500,
                 data: {
                     success: false,
                     message: 'Internal server error',
@@ -366,8 +338,6 @@ export class ProviderServices {
         try {
             const carData = await this.providerRepostry.fetchCars(page, limit);
             const totalPage = await this.providerRepostry.countCars(providerId)
-            console.log(carData, "fetch cars services");
-
             if (carData && carData.length > 0 && totalPage) {
                 return {
                     status: OK,
@@ -389,7 +359,7 @@ export class ProviderServices {
                 };
             }
         } catch (error) {
-            console.error("Error fetching cars:", (error as Error).message);
+        
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {
@@ -404,41 +374,23 @@ export class ProviderServices {
     async updateStatusCar(id: string): Promise<CarDataInterface | null> {
         try {
 
-            return await this.providerRepostry.updateStatusCar(id); // Use the repository method for checking
+            return await this.providerRepostry.updateStatusCar(id); 
         } catch (error) {
-            console.error("Error checking provider address via repository:", error);
+
             return null;
         }
     }
     // *************************fetch car for edit in  car mgt*********************
     async editCar(id: string): Promise<CarDataInterface | null> {
         try {
-
-            return await this.providerRepostry.editCar(id); // Use the repository method for checking
+            return await this.providerRepostry.editCar(id); 
         } catch (error) {
-            console.error("Error checking edit car via repository:", error);
             return null;
         }
     }
     // ***********************************update car in edit management************************
     async updateCar(carData: CarDataInterface, id: string): Promise<CarAuthResponse | undefined> {
         try {
-
-            // const result = await uploadImageToCloudinary(files);
-            // if (!result.success) {
-            //     return {
-            //         status: 400,
-            //         data: {
-            //             success: false,
-            //             message: 'Image upload failed',
-            //         },
-            //     };
-            // }
-
-            // const images = result?.results?.map((obj: any) => obj?.url) || [];
-
-            // console.log(images, 'Images in add car details repository');
-            // carData.images = images
 
             const provider = await this.providerRepostry.updateCar(carData, id);
             return {
@@ -450,7 +402,6 @@ export class ProviderServices {
             };
 
         } catch (error) {
-            console.error("Error upadting car Data:", (error as Error).message);
             return {
                 status: 500,
                 data: {
@@ -476,12 +427,8 @@ export class ProviderServices {
                 };
             }
 
-            // Extract image URLs from the result
             const images = result?.results?.map((obj: any) => obj?.url) || [];
 
-            console.log(images, 'Images in add car details repository');
-
-            // Ensure you're passing an array of images
             const provider = await this.providerRepostry.updateCarImage(images, id);
 
             return {
@@ -492,7 +439,7 @@ export class ProviderServices {
                 },
             };
         } catch (error) {
-            console.error("Error updating car data:", (error as Error).message);
+       
             return {
                 status: 500,
                 data: {
@@ -508,11 +455,11 @@ export class ProviderServices {
 
     async getBookingHistory(providerId: string, page: number, limit: number): Promise<BookingAuthResponse | undefined> {
         try {
-            console.log("getbooking history", providerId)
+
             const bookingHistory = await this.providerRepostry.getBookingHistory(providerId, page, limit);
-            console.log(bookingHistory, "booking history and documents",)
+   
             const historyDocuments = await this.providerRepostry.countBooking(providerId)
-            console.log(historyDocuments, "documents")
+    
             if (bookingHistory && historyDocuments) {
                 return {
                     status: OK,
@@ -533,7 +480,7 @@ export class ProviderServices {
                 };
             }
         } catch (error) {
-            console.error("Error fetching updateCoupon:", (error as Error).message);
+          
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {
@@ -547,7 +494,7 @@ export class ProviderServices {
 
     async specificBookingDetails(bookingId: string): Promise<BookingAuthResponse | undefined> {
         try {
-            console.log("getbooking history", bookingId)
+            
             const bookingHistory = await this.providerRepostry.specificBookingDetails(bookingId);
             if (bookingHistory) {
                 return {
@@ -567,7 +514,7 @@ export class ProviderServices {
                 };
             }
         } catch (error) {
-            console.error("Error fetching updateCoupon:", (error as Error).message);
+          
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {
@@ -581,7 +528,7 @@ export class ProviderServices {
 
     async updateStatusOfBooking(bookingId: string, status: string): Promise<BookingAuthResponse | undefined> {
         try {
-            console.log("update booking status", bookingId)
+            
             const updateStatus = await this.providerRepostry.updateStatusOfBooking(bookingId, status);
             if (updateStatus) {
                 return {
@@ -601,7 +548,7 @@ export class ProviderServices {
                 };
             }
         } catch (error) {
-            console.error("Error fetching updateCoupon:", (error as Error).message);
+            
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {
@@ -614,12 +561,9 @@ export class ProviderServices {
     // ***********************************fetch users chat by provider********************
     async fetchUsersChat(providerId: string): Promise<chatAuthInterface> {
         try {
-            console.log("fetchUsersChat", providerId);
 
-            // Fetch chat from the repository
             const usersChat = await this.providerRepostry.fetchUsersChat(providerId);
 
-            // If chat is found, return a success response
             if (usersChat) {
                 return {
                     status: OK,
@@ -629,7 +573,7 @@ export class ProviderServices {
                     },
                 };
             } else {
-                // If no chat is found, return a failure response
+       
                 return {
                     status: BAD_REQUEST,
                     data: {
@@ -639,8 +583,6 @@ export class ProviderServices {
                 };
             }
         } catch (error) {
-            // Handle unexpected errors
-            console.error("Error fetching chat history:", (error as Error).message);
 
             return {
                 status: INTERNAL_SERVER_ERROR,
@@ -675,7 +617,6 @@ export class ProviderServices {
                 };
             }
         } catch (error) {
-            console.error("Error creating review:", (error as Error).message);
 
             return {
                 status: INTERNAL_SERVER_ERROR,
@@ -695,7 +636,6 @@ export class ProviderServices {
             const revenue = (await this.providerRepostry.totalRevenue(providerId)) ?? 0;
             const totalBooking = (await this.providerRepostry.countBooking(providerId)) ?? 0;
             const revenueByCar = (await this.providerRepostry.revenueByCar(providerId)) ?? 0;
-            console.log(revenueByCar, "revunue by car")
             return {
                 status: 200,
                 data: {
@@ -710,7 +650,7 @@ export class ProviderServices {
                 },
             };
         } catch (error) {
-            console.error("Error fetching dashboard data:", (error as Error).message);
+        
             return null;
         }
     }
@@ -720,7 +660,6 @@ export class ProviderServices {
         try {
 
             const salesReport = await this.providerRepostry.fetchSalesReport(page, limit,providerId);
-            console.log(salesReport, "fetch sales report");
 
             if (salesReport && salesReport.length > 0) {
                 return {
@@ -743,7 +682,6 @@ export class ProviderServices {
                 };
             }
         } catch (error) {
-            console.error("Error fetching sales report:", (error as Error).message);
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {

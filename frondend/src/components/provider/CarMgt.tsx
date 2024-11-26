@@ -23,7 +23,6 @@ function CarMgt() {
                 setError(null);
                 if (provider?._id) {
                     const result = await carManagement(provider?._id, page, limit);
-                    console.log(result?.data, "Fetched car data");
                     if (result?.data?.data) {
 
                         setTableData(result.data.data);
@@ -33,7 +32,7 @@ function CarMgt() {
                     }
                 }
             } catch (error) {
-                console.error("Error fetching data:", error);
+
                 setError("Error fetching car data.");
             } finally {
                 setLoading(false);
@@ -41,11 +40,11 @@ function CarMgt() {
         };
 
         fetchData();
-    }, [page]); // Re-run the effect whenever `page` changes
+    }, [page]); 
 
     const handlePageChange = (newPage: number) => {
         if (newPage >= 1 && newPage <= totalPages) {
-            setPage(newPage); // Update the page
+            setPage(newPage);
         }
     };
 

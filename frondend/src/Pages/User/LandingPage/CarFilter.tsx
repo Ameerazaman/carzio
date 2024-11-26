@@ -21,10 +21,10 @@ function CarFilter({ filteredData }: CarFilterProps) {
   const handleSearchCar = (async () => {
     try {
       const response = await searchCar(filters.searchQuery);
-      console.log(response?.data, "filter")
+     
       filteredData(response?.data); // Pass data to the parent
     } catch (error) {
-      console.error("Failed to fetch filtered cars", error);
+    
     }
   })
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, category: 'engineType' | 'fuelType') => {
@@ -59,10 +59,10 @@ function CarFilter({ filteredData }: CarFilterProps) {
   const fetchFilteredCars = async (filters: Filter) => {
     try {
       const response = await applyFilters(filters);
-console.log(response,"response")
+
       filteredData(response?.data); // Pass data to the parent
     } catch (error) {
-      console.error("Failed to fetch filtered cars", error);
+     
     }
   };
 

@@ -2,8 +2,8 @@ import express, { Router } from 'express';
 import { AdminServices } from '../Services/Admin/AdminServices';
 import { AdminRepository } from '../Repostries/Admin/AdminRepostries';
 
-import Encrypt from '../Utlis/ComparedPassword'; // Importing the Encrypt utility
-import { CreateJWT } from '../Utlis/GenerateToken'; // Importing the CreateJWT utility
+import Encrypt from '../Utlis/ComparedPassword'; 
+import { CreateJWT } from '../Utlis/GenerateToken'; 
 import { AdminController } from '../Controller/Admin/AdminController';
 import adminAuthenticate from '../Middlewares/AdminAuthMiddleware'
 
@@ -11,13 +11,11 @@ import adminAuthenticate from '../Middlewares/AdminAuthMiddleware'
 const adminRouter: Router = express.Router();
 
 const adminRepository = new AdminRepository();
-const encrypt = new Encrypt(); // Creating an instance of Encrypt
+const encrypt = new Encrypt(); 
 const createJWT = new CreateJWT();
 
-// Passing all required dependencies to UserServices
 const adminServices = new AdminServices(adminRepository, encrypt, createJWT);
 
-// Pass the instance of UserServices to the UserController
 const adminController = new AdminController(adminServices);
 adminRouter.get('/logout', (req, res) => adminController.adminLogout(req, res))
 adminRouter.post('/login', (req, res) => adminController.adminLogin(req, res))

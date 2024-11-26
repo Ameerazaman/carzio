@@ -95,11 +95,10 @@ const Table: React.FC<TableProps> = ({ tableData: initialTableData, header }) =>
           
         }
       } else {
-        // User canceled the action
-        console.log("Action canceled.");
+       
       }
     } catch (error) {
-      console.error("Error updating status:", error);
+    
       
       // Show error alert
       Swal.fire({

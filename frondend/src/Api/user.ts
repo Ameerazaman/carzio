@@ -20,35 +20,31 @@ const refreshUserAccessToken = async () => {
             withCredentials: true
         });
 
-        console.log(response.data, 'refreshed')
         const { access_token } = response.data;
         Cookies.set('access_token', access_token);
         return access_token;
     } catch (error) {
-        console.error('Error refreshing access token:', error);
+
         throw error;
     }
 };
-
+// ******************************signup**************************
 const signup = async ({ email, password, confirmPassword, username }: signupFormData) => {
     try {
-        console.log(email, password, confirmPassword, username, "data")
         const result = await userApi.post(userRouter.signup, {
             email,
             password,
             confirmPassword,
-            username, // Corrected field name here
+            username, 
         });
-        console.log(result, "response");
-
         if (result.data.success) {
-            return { success: true };  // Successful signup
+            return { success: true }; 
         } else {
             return { success: false, message: result.data.message || 'Signup failed.' };
         }
     } catch (error) {
         if (error instanceof AxiosError && error.response) {
-            console.log('Axios Error:', error.response.data.message);
+           
             return { success: false, message: error.response.data.message || 'An error occurred during signup.' };
         } else {
             console.log(error as Error);
@@ -57,10 +53,10 @@ const signup = async ({ email, password, confirmPassword, username }: signupForm
     }
 };
 
+// *********************************resend otp **********************
 
 const resend = async () => {
     try {
-        console.log("Resending OTP via API...");
         const result = await userApi.get(userRouter.reSend);
         return result
     } catch (error) {
@@ -68,32 +64,32 @@ const resend = async () => {
     }
 };
 
+// ***********************************verify otp*******************
 const verifyOtp = async (otp: string) => {
     try {
-        console.log(`Verifying OTP: ${otp}`);
+
         const result = await userApi.post(userRouter.verifyOtp, { otp });
 
-        // Check if the result was successful
         if (result.data.success) {
-            console.log('OTP verified successfully.');
+
             return { success: true };
         } else {
             return { success: false, message: result.data.message || 'OTP verification failed.' };
         }
     } catch (error: any) {
-        // Handle both network errors and response errors (like 400 status)
+   
         if (error.response) {
-            console.log('OTP verification failed:', error.response.data.message);
+          
             return { success: false, message: error.response.data.message || 'OTP verification failed.' };
         } else {
-            console.log('Error during OTP verification:', error.message);
+
             throw new Error('Network or server error during OTP verification.');
         }
     }
 
 };
 
-
+// *****************************login User****************
 const loginUser = async ({ email, password }: signupFormData) => {
     try {
         const result = await userApi.post(userRouter.userLogin, { email, password });
@@ -104,18 +100,15 @@ const loginUser = async ({ email, password }: signupFormData) => {
     }
 }
 
-
+// ********************************user Logout*********************
 const userLogout = async () => {
     try {
-
         const result = await userApi.get(userRouter.userLogout)
         if (result) {
             window.location.href = '/login'
-
         }
         return result
     } catch (error) {
-        console.log(error as Error);
         errorHandler(error as Error);
 
     }
@@ -136,7 +129,6 @@ const fetchCars = async (page: number, limit: number) => {
             return result
         }
     } catch (error) {
-        console.log(error as Error);
         errorHandler(error as Error);
 
     }
@@ -145,15 +137,12 @@ const fetchCars = async (page: number, limit: number) => {
 // *******************car Details Page *************************
 const carDetail = async (id: string) => {
     try {
-
         const result = await userApi.get(`/car_details/${id}`);
-
         if (result) {
             return result
         }
-
     } catch (error) {
-        console.log(error as Error);
+    
         errorHandler(error as Error);
 
     }
@@ -167,7 +156,6 @@ const applyFilters = async (params: Filter) => {
             return result;
         }
     } catch (error) {
-        console.error(error as Error);
         errorHandler(error as Error);
     }
 };
@@ -181,7 +169,7 @@ const searchCar = async (searchQuery: string) => {
             return result;
         }
     } catch (error) {
-        console.error(error as Error);
+
         errorHandler(error as Error);
     }
 }
@@ -193,7 +181,7 @@ const getOffer = async () => {
             return result;
         }
     } catch (error) {
-        console.error(error as Error);
+
         errorHandler(error as Error);
     }
 }
@@ -206,7 +194,6 @@ const checkProfile = async (id: string) => {
             return result;
         }
     } catch (error) {
-        console.error(error as Error);
         errorHandler(error as Error);
     }
 }
@@ -219,7 +206,7 @@ const saveProfileData = async (profileData: ProfileInterface) => {
             return result
         }
     } catch (error) {
-        console.error(error as Error);
+
         errorHandler(error as Error);
     }
 
@@ -233,7 +220,7 @@ const editProfile = async (profileData: ProfileInterface, id: string) => {
             return result
         }
     } catch (error) {
-        console.error(error as Error);
+
         errorHandler(error as Error);
     }
 }
@@ -242,11 +229,9 @@ const checkAddress = async (id: string) => {
     try {
         const result = await userApi.get(`/address/${id}`)
         if (result) {
-            console.log(result, "result fetch address")
             return result
         }
     } catch (error) {
-        console.error(error as Error);
         errorHandler(error as Error);
     }
 }
@@ -259,7 +244,6 @@ const checkOffer = async (carName: string) => {
             return result
         }
     } catch (error) {
-        console.error(error as Error);
         errorHandler(error as Error);
     }
 }
@@ -271,7 +255,6 @@ const saveAddressData = async (addressData: AddressInterface) => {
             return result
         }
     } catch (error) {
-        console.error(error as Error);
         errorHandler(error as Error);
     }
 }
@@ -284,7 +267,6 @@ const editAddress = async (addressData: AddressInterface, id: string) => {
             return result
         }
     } catch (error) {
-        console.error(error as Error);
         errorHandler(error as Error);
     }
 }
@@ -298,7 +280,6 @@ const fetchCoupon = async (id: string) => {
             return result
         }
     } catch (error) {
-        console.error(error as Error);
         errorHandler(error as Error);
     }
 }
@@ -306,13 +287,13 @@ const fetchCoupon = async (id: string) => {
 
 const BookingConfirm = async (bookingData: BookingFormData) => {
     try {
-        console.log(bookingData, "booking data")
+
         const result = await userApi.post(`/booking_confirm`, bookingData);
         return result;
     } catch (error) {
-        console.error("API Error:", error);
+
         errorHandler(error as Error);
-        throw error; // Propagate the error to handle it in handleSubmit
+        throw error;
     }
 };
 
@@ -323,7 +304,7 @@ const userIdStoredInCoupon = async (coupon: string, userId: string,) => {
         const result = await userApi.post(`/userid_in_coupon/${coupon}/${userId}`);
         return result;
     } catch (error) {
-        console.error("API Error:", error);
+
         errorHandler(error as Error);
         throw error;
     }
@@ -341,7 +322,7 @@ const getBookingHistory = async (userId: string, page: number, limit: number) =>
         });
         return result;
     } catch (error) {
-        console.error("API Error:", error);
+
         errorHandler(error as Error);
         throw error;
     }
@@ -354,7 +335,7 @@ const specificBookingDetails = async (bookingId: string) => {
         const result = await userApi.get(`/details_of_specifc_order/${bookingId}`);
         return result;
     } catch (error) {
-        console.error("API Error:", error);
+
         errorHandler(error as Error);
         throw error;
     }
@@ -373,7 +354,7 @@ const cancelBookingByUser = async (bookingId: string, userId: string, amount: nu
         });
         return result;
     } catch (error) {
-        console.error("API Error:", error);
+
         throw error;
     }
 };
@@ -381,14 +362,14 @@ const cancelBookingByUser = async (bookingId: string, userId: string, amount: nu
 //*****************/ cancelBookong update add amount to waalet***********************
 const storeCancelAmtToWallet = async (userId: string, amount: number) => {
     try {
-        console.log(amount, "amount", userId, "userId");
+
         const result = await userApi.put(`/credit_to_wallet`, {
             userId,
             amount
         });
         return result;
     } catch (error) {
-        console.error("API Error:", error);
+
         errorHandler(error as Error);
         throw error;
     }
@@ -397,7 +378,7 @@ const storeCancelAmtToWallet = async (userId: string, amount: number) => {
 // ****************************check booked or not *********************
 const checkingBookedOrNot = async (issueDate: string, returnDate: string, carId: string) => {
     try {
-        console.log(issueDate, "issuedate", returnDate, "returndate");
+
         const result = await userApi.get(`/check_booking`, {
             params: {
                 issueDate,
@@ -407,7 +388,7 @@ const checkingBookedOrNot = async (issueDate: string, returnDate: string, carId:
         });
         return result;
     } catch (error) {
-        console.error("API Error:", error);
+
         errorHandler(error as Error);
         throw error;
     }
@@ -415,11 +396,11 @@ const checkingBookedOrNot = async (issueDate: string, returnDate: string, carId:
 //   *******************************check Wallet ****************
 const checkBalanceUpdateWallet = async (amount: number, userId: string) => {
     try {
-        console.log(amount, "amount", userId, "userId");
+
         const result = await userApi.put(`/check_update_wallet/${userId}/${amount}`);
         return result;
     } catch (error) {
-        console.error("API Error:", error);
+
         errorHandler(error as Error);
         throw error;
     }
@@ -437,7 +418,6 @@ const getWalletPage = async (userId: string, page: number, limit: number) => {
         });
         return result;
     } catch (error) {
-        console.error("API Error:", error);
         errorHandler(error as Error);
         throw error;
     }
@@ -446,11 +426,11 @@ const getWalletPage = async (userId: string, page: number, limit: number) => {
 // ****************************create review and ratings***************
 const createReviewAndRatings = async (reviewData: reviewDataInterface): Promise<any> => {
     try {
-        const result = await userApi.post(userRouter.createReviewRatings, reviewData); // Send data in the body
+        const result = await userApi.post(userRouter.createReviewRatings, reviewData); 
         return result.data;
     } catch (error) {
-        console.error("Error creating review and ratings:", error);
-        errorHandler(error as Error); // Use your error handler
+
+        errorHandler(error as Error); 
         throw error;
     }
 };
@@ -466,8 +446,8 @@ const checkBookidInReview = async (bookId: string): Promise<any> => {
         });
         return result;
     } catch (error) {
-        console.error("Error bookId in review:", error);
-        errorHandler(error as Error); // Use your error handler
+
+        errorHandler(error as Error); 
         throw error;
     }
 }
@@ -481,7 +461,7 @@ const fetchChat = async (userId: string, providerId: string): Promise<any> => {
         return result.data;  
         
     } catch (error) {
-        console.error("Error fetching chat history:", error);
+ 
         errorHandler(error as Error);
         throw error; 
     }
@@ -490,7 +470,7 @@ const fetchChat = async (userId: string, providerId: string): Promise<any> => {
 // *****************************search car availabilty*******************
 const searchCarAvailabilty = async (issueDate: string, returnDate: string): Promise<any> => {
     try {
-      console.log(issueDate, returnDate);
+
       const result = await userApi.get(userRouter.searchCarAvailabilty, {
         params: {
           issueDate,
@@ -499,8 +479,8 @@ const searchCarAvailabilty = async (issueDate: string, returnDate: string): Prom
       });
       return result;
     } catch (error) {
-      console.error("Error bookId in review:", error);
-      errorHandler(error as Error); // Use your error handler
+
+      errorHandler(error as Error); 
       throw error;
     }
   };

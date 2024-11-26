@@ -20,14 +20,14 @@ const CheckoutForm = () => {
   useEffect(() => {
     const createPaymentIntent = async () => {
       try {
-        console.log(bookingData, "bookiing data checkout")
+        
         const response = await userApi.post('/create-payment-intent', {
           amount: bookingData.total_Amt, // Convert to cents
         });
 
         setPaymentIntent(response.data);
       } catch (error) {
-        console.error("Error creating payment intent:", error);
+        
       }
     };
 
@@ -53,13 +53,13 @@ const CheckoutForm = () => {
       });
 
       if (result.error) {
-        console.error("Payment Error:", result.error.message);
+       
         toast.error("An error occurred during payment.");
       } else if (result.paymentIntent?.status === 'succeeded') {
         toast.success('Payment successful!');
         const result=await BookingConfirm(bookingData); 
         if(result){
-          console.log(bookingData.Coupon,"coupon",bookingData.UserId,"userId")
+          
           if(bookingData.Coupon){
             const result=await userIdStoredInCoupon(bookingData.Coupon,bookingData.UserId)
           }
@@ -67,7 +67,7 @@ const CheckoutForm = () => {
         }
       }
     } catch (error) {
-      console.error("Error confirming payment:", error);
+    
       toast.error("An error occurred during payment.");
     } finally {
       setLoading(false);

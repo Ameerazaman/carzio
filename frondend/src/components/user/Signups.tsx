@@ -11,12 +11,7 @@ interface Errors {
   password?: string;
   confirmPassword?: string;
 }
-// export interface signupFormData {
-//   username?: string;
-//   email?: string;
-//   password?: string;
-//   confirmPassword?: string;
-// }
+
 
 function Signup() {
   let dispatch = useDispatch();
@@ -73,17 +68,15 @@ function Signup() {
     }
 
     try {
-        console.log(formData, "formData")
+       
         let result = await signup(formData);
-        console.log(result, 'signup result');
-
         if (result.success) {
             navigate('/otp'); // Navigate to OTP page on success
         } else {
             toast.error(result.message);
         }
     } catch (error) {
-        console.log(error);
+      
         toast.error('An error occurred during signup.');
     }
 };

@@ -64,7 +64,7 @@ function Navbar() {
         }
       });
     } catch (error) {
-      console.log(error as Error);
+     
     }
   }
 

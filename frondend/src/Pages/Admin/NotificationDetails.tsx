@@ -32,12 +32,11 @@ const NotificationDetails: React.FC = () => {
 
       const result = await verifyNotification(id, action);
       if (result) {
-        console.log('Verification successful:', result);
+        
           navigate('/admin/notifications')
         // Optionally, display a success message or refresh data
       } else {
-        console.log('Verification failed');
-        // Optionally, display an error message
+       
       }
     }
   };

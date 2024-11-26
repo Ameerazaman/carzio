@@ -12,7 +12,7 @@ function CarDetail() {
 
     const { id } = useParams<{ id: string }>();
     const user = useSelector((state: RootState) => state.user.currentUser) as User | null;
-    const username=user?.username??''
+    const username = user?.username ?? ''
     const userId = user?._id ?? '';
     const [carDetails, setCarDetails] = useState<CarDataInterface>({
         car_name: '',
@@ -49,7 +49,6 @@ function CarDetail() {
             if (id) {
                 try {
                     const result = await carDetail(id);
-                    console.log(result, 'result detail'); // Assuming `carDetails` is your fetch function, replace it with correct API call.
                     let carData = result?.data?.data;
                     const formatDate = (dateString: string) => {
                         const date = new Date(dateString);

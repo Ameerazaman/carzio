@@ -9,6 +9,7 @@ import { RootState } from '../../../App/Store';
 import { User } from '../../Common/Navbar';
 import { adminLogout } from '../../../Api/Admin';
 import { signOutAdmin } from '../../../App/Slice/AdminSlice';
+import toast from 'react-hot-toast';
 
 function Navbar() {
   const admin = useSelector((state: RootState) => state.admin.currentAdmin) as User | null;
@@ -35,17 +36,17 @@ function Navbar() {
         if (result.isConfirmed && admin) {
           try {
             const response = await adminLogout();
-            console.log(response, "response")// Wait for the logout request to complete
+           
             if (response) {
               dispatch(signOutAdmin()); // Clear admin from Redux store
-              // toast.success("You are logged out!");
+
               navigate('/admin/login'); // Navigate to login page
             } else {
               throw new Error("Logout failed");
             }
           } catch (error) {
-            console.error("Error during logout:", error);
-            // toast.error("Logout failed. Please try again.");
+
+            toast.error("Logout failed. Please try again.");
           }
         } else {
           navigate('/admin/dashboard'); // If canceled, remain on dashboard

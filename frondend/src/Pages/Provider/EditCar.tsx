@@ -48,10 +48,10 @@ const EditCar: React.FC = () => {
                         providerId: carData?.providerId || ''
                     });
                 } catch (error) {
-                    console.error('Error fetching car data:', error);
+                    
                 }
             } else {
-                console.error('No car ID provided.');
+               
             }
         };
 
@@ -155,14 +155,14 @@ const EditCar: React.FC = () => {
         const carId = id; // Ensure this value is obtained correctly, e.g., via props or state
 
         if (!carId) {
-            console.error('Car ID is required!');
+            
             return;
         }
 
         // Ensure uploadedFiles is defined before proceeding
         const uploadedFiles = formData.uploadedFiles || [];
         if (uploadedFiles.length === 0) {
-            console.error('No images uploaded!');
+            
             return;
         }
 
@@ -170,11 +170,11 @@ const EditCar: React.FC = () => {
             // Pass `uploadedFiles` to the API call
             const result = await editCarImage(uploadedFiles, carId);
             if (result) {
-                console.log('Car images updated successfully:', result);
+               
                 navigate('/provider/cars'); // Navigate on successful upload
             }
         } catch (error) {
-            console.error('Error while updating car images:', error);
+          
         }
     };
 
@@ -183,10 +183,10 @@ const EditCar: React.FC = () => {
     const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (validate()) {
-            console.log('Car data saved:', formData);
+          
             const carId = id
             if (!carId) {
-                console.error('Car ID is required!');
+               
                 return; // Or handle this case as you see fit
             }
 

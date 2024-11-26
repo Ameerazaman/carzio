@@ -490,7 +490,7 @@ export class ProviderController {
         try {
             const bookingId = req.params.id
             const status = req.params.status
-            console.log(bookingId, "bookingId", status, "status")
+            
             const result = await this.providerServices.updateStatusOfBooking(bookingId, status);
             if (!result) {
                 res.status(500).json({ message: "Status updation failed" });
@@ -498,7 +498,6 @@ export class ProviderController {
             }
             res.status(200).json(result.data);
         } catch (error) {
-            console.error("Error cancel booking:", error);
             res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -506,9 +505,9 @@ export class ProviderController {
     // *****************************fetch users chat by provider*****************
     async fetchUsersChat(req: Request, res: Response): Promise<void> {
         try {
-            console.log(req.params, "req.params")
+
             const providerId = req.params.providerId
-            console.log(providerId, "receiverId")
+           
             const result = await this.providerServices.fetchUsersChat(providerId);
             if (!result) {
                 res.status(500).json({ message: "Fetch users chat is failed" });
@@ -516,14 +515,14 @@ export class ProviderController {
             }
             res.status(200).json(result.data);
         } catch (error) {
-            console.error("Error fetch users:", error);
+          
             res.status(500).json({ message: "Internal server error" });
         }
     }
  // *********************************fetch chat history***********************8
  async fetchChatHistory(req: Request, res: Response): Promise<void> {
     try {
-        console.log(req.params, "req.qhjuer for chat history")
+        
         const providerId = req.params.providerId as string | undefined | '';
         const userId = req.params.userId as string | undefined | '';
         if (!userId || !providerId) {
@@ -567,7 +566,7 @@ export class ProviderController {
 
 
     } catch (error) {
-      console.error("Error cancel booking:", error);
+     
       res.status(500).json({
         "message": "Internal server error while fetching dashboard data"
       }
@@ -579,7 +578,6 @@ export class ProviderController {
   
    async fetchSalesReport(req: Request, res: Response): Promise<void> {
     try {
-      console.log(req.query,"query")
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
       const providerId = req.query.providerId as string ;
@@ -591,7 +589,7 @@ export class ProviderController {
       }
       res.status(200).json(result.data);
     } catch (error) {
-      console.error("Error fetching sales report:", (error as Error).message);
+    
       res.status(500).json({ message: "Internal server error" });
     }
   }

@@ -56,7 +56,7 @@ const AddCoupon: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (validate()) {
-            console.log('Coupon Data:', formData);
+           
             const result = await createCoupon(formData);
             if (result) {
                 navigate('/admin/coupon');

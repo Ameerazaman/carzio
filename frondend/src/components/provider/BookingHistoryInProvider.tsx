@@ -29,7 +29,7 @@ function BookingHistoryInProvider() {
           setTotalPages(result.data.totalPage || 1);
         } catch (error) {
           setError("Error fetching booking history.");
-          console.error("Error fetching booking history:", error);
+    
         } finally {
           setLoading(false);
         }

@@ -12,7 +12,7 @@ const OfferCard: React.FC = () => {
         const fetchOffers = async () => {
             try {
                 const result = await getOffer();
-                console.log(result, "offer");
+               
                 if (result && Array.isArray(result?.data?.data)) {
                     setOfferCards(result.data.data);
                 } else {

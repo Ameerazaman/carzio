@@ -32,11 +32,8 @@ const Otp: React.FC = () => {
     try {
       // Call the API to resend the OTP
       const result = await resend();
-      console.log(result);
       
       if (result?.data?.success) {
-        console.log('OTP Resent!');
-        
         // Reset OTP inputs and restart the timer in sequence
         setOtp(Array(6).fill('')); // Reset OTP input fields
         setIsTimerActive(false);    // Stop the timer before restarting
@@ -52,7 +49,7 @@ const Otp: React.FC = () => {
         toast.error(result?.data?.message || 'Failed to resend OTP. Try again.');
       }
     } catch (error) {
-      console.error('Error resending OTP:', error);
+
       toast.error('Error resending OTP. Please try again.');
     }
   };
