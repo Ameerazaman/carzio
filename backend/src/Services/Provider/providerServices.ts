@@ -25,7 +25,7 @@ export class ProviderServices {
     // refresh access token
     async providerGetById(id: string): Promise<ProviderAuthResponse | null> {
         try {
-            
+
             let provider = await this.providerRepostry.getProviderById(id)
             if (!provider) {
 
@@ -42,7 +42,6 @@ export class ProviderServices {
                 status: OK,
                 data: {
                     success: true,
-                    message: 'Success',
                     providerId: provider.id,
                     token: newAccessToken,
                     data: provider
@@ -67,7 +66,7 @@ export class ProviderServices {
     //********************************8 */ OTP creation logic**************************
     async createOtp(email: string, otp: number): Promise<OtpDocument | null> {
         try {
-            return await this.providerRepostry.createOtp(otp, email); 
+            return await this.providerRepostry.createOtp(otp, email);
         } catch (error) {
             return null;
         }
@@ -79,7 +78,7 @@ export class ProviderServices {
             return await this.providerRepostry.findOtp(email, otp)
         }
         catch (error) {
-      
+
             return null;
         }
     }
@@ -94,7 +93,6 @@ export class ProviderServices {
                 status: OK,
                 data: {
                     success: true,
-                    message: 'Success',
                 }
             };
 
@@ -174,7 +172,7 @@ export class ProviderServices {
     // ************************************check provider Address********************
     async checkProviderAddress(id: string): Promise<ProviderAdressInterface | null> {
         try {
-            return await this.providerRepostry.checkProviderAddress(id); 
+            return await this.providerRepostry.checkProviderAddress(id);
         } catch (error) {
             return null;
         }
@@ -187,7 +185,7 @@ export class ProviderServices {
 
             const provider = await this.providerRepostry.saveProfile(providerData);
             return {
-                status: 200, 
+                status: 200,
                 data: {
                     success: true,
                     message: 'Profile saved successfully',
@@ -197,7 +195,7 @@ export class ProviderServices {
         } catch (error) {
 
             return {
-                status: 500, 
+                status: 500,
                 data: {
                     success: false,
                     message: 'Internal server error',
@@ -212,17 +210,17 @@ export class ProviderServices {
 
             const provider = await this.providerRepostry.editProfile(providerData, id);
             return {
-                status: 200, 
+                status: 200,
                 data: {
                     success: true,
-                    message: 'Profile saved successfully',
+                    message: 'Profile edit successfully',
                 },
             };
 
         } catch (error) {
 
             return {
-                status: 500, 
+                status: 500,
                 data: {
                     success: false,
                     message: 'Internal server error',
@@ -314,7 +312,7 @@ export class ProviderServices {
 
             if (saveCar) {
                 return {
-                    status: 200, 
+                    status: 200,
                     data: {
                         success: true,
                         message: 'Car data saved successfully',
@@ -336,14 +334,13 @@ export class ProviderServices {
     // **************************fetch car for car managementa****************************
     async fetchCars(providerId: string, page: number, limit: number): Promise<CarAuthResponse | undefined> {
         try {
-            const carData = await this.providerRepostry.fetchCars(page, limit);
+            const carData = await this.providerRepostry.fetchCars(providerId, page, limit);
             const totalPage = await this.providerRepostry.countCars(providerId)
             if (carData && carData.length > 0 && totalPage) {
                 return {
                     status: OK,
                     data: {
                         success: true,
-                        message: 'Success',
                         data: carData,
                         page: page,
                         totalPage: Math.ceil(totalPage / limit) ?? 1
@@ -359,7 +356,7 @@ export class ProviderServices {
                 };
             }
         } catch (error) {
-        
+
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {
@@ -374,7 +371,7 @@ export class ProviderServices {
     async updateStatusCar(id: string): Promise<CarDataInterface | null> {
         try {
 
-            return await this.providerRepostry.updateStatusCar(id); 
+            return await this.providerRepostry.updateStatusCar(id);
         } catch (error) {
 
             return null;
@@ -383,7 +380,7 @@ export class ProviderServices {
     // *************************fetch car for edit in  car mgt*********************
     async editCar(id: string): Promise<CarDataInterface | null> {
         try {
-            return await this.providerRepostry.editCar(id); 
+            return await this.providerRepostry.editCar(id);
         } catch (error) {
             return null;
         }
@@ -435,11 +432,11 @@ export class ProviderServices {
                 status: 200,
                 data: {
                     success: true,
-                    message: 'Car updated successfully',
+                
                 },
             };
         } catch (error) {
-       
+
             return {
                 status: 500,
                 data: {
@@ -457,9 +454,9 @@ export class ProviderServices {
         try {
 
             const bookingHistory = await this.providerRepostry.getBookingHistory(providerId, page, limit);
-   
+
             const historyDocuments = await this.providerRepostry.countBooking(providerId)
-    
+
             if (bookingHistory && historyDocuments) {
                 return {
                     status: OK,
@@ -480,7 +477,7 @@ export class ProviderServices {
                 };
             }
         } catch (error) {
-          
+
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {
@@ -494,7 +491,7 @@ export class ProviderServices {
 
     async specificBookingDetails(bookingId: string): Promise<BookingAuthResponse | undefined> {
         try {
-            
+
             const bookingHistory = await this.providerRepostry.specificBookingDetails(bookingId);
             if (bookingHistory) {
                 return {
@@ -509,12 +506,12 @@ export class ProviderServices {
                     status: BAD_REQUEST,
                     data: {
                         success: false,
-                        message: "Booking history is not get"
+                        message: "Booking history is not retrieved"
                     },
                 };
             }
         } catch (error) {
-          
+
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {
@@ -528,7 +525,7 @@ export class ProviderServices {
 
     async updateStatusOfBooking(bookingId: string, status: string): Promise<BookingAuthResponse | undefined> {
         try {
-            
+
             const updateStatus = await this.providerRepostry.updateStatusOfBooking(bookingId, status);
             if (updateStatus) {
                 return {
@@ -548,7 +545,7 @@ export class ProviderServices {
                 };
             }
         } catch (error) {
-            
+
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {
@@ -573,7 +570,7 @@ export class ProviderServices {
                     },
                 };
             } else {
-       
+
                 return {
                     status: BAD_REQUEST,
                     data: {
@@ -650,7 +647,7 @@ export class ProviderServices {
                 },
             };
         } catch (error) {
-        
+
             return null;
         }
     }
@@ -659,14 +656,13 @@ export class ProviderServices {
     async fetchSalesReport(page: number, limit: number, providerId: string): Promise<BookingAuthResponse | undefined> {
         try {
 
-            const salesReport = await this.providerRepostry.fetchSalesReport(page, limit,providerId);
+            const salesReport = await this.providerRepostry.fetchSalesReport(page, limit, providerId);
 
             if (salesReport && salesReport.length > 0) {
                 return {
                     status: OK,
                     data: {
                         success: true,
-                        message: 'Sales report retrieved successfully',
                         data: salesReport,
                         page: page,
                         totalPage: Math.ceil(salesReport.length / limit),

@@ -16,7 +16,7 @@ function Home() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const limit = 8;
+  const limit = 6;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,7 +37,7 @@ function Home() {
     };
 
     fetchData();
-  }, [page]); 
+  }, [page]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -47,23 +47,23 @@ function Home() {
 
   const handleSearhCar = (data: CarDataInterface[]) => {
 
-    setCarData(data); 
+    setCarData(data);
     setTotalPages(1)
   };
-  
-  
+
+
 
   return (
     <div>
       <Navbar />
-      <Carosel onEvent={handleSearhCar} /> 
+      <Carosel onEvent={handleSearhCar} />
       <ServicesCard />
-      {page}page{totalPages}
+      
       <div className="text-center mb-1">
         <h3 className="text-3xl font-bold text-gray-800 mb-1">Come with</h3>
         <h4 className="text-lg font-semibold text-red-600">Our Products</h4>
       </div>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
         {loading ? (
           <p>Loading...</p>
         ) : error ? (
@@ -72,6 +72,7 @@ function Home() {
           carData.map((car, index) => <Card key={index} carData={car} />)
         )}
       </div>
+
       <Pagination
         currentPage={page}
         totalPages={totalPages}

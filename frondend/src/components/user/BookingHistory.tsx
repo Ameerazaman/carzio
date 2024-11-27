@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../App/Store';
 import { Booking } from '../../Interface/BookinDetailsInterface';
 import { getBookingHistory } from '../../Api/User';
+import Footer from '../../Pages/Common/Footer';
 
 
 function BookingHistory() {
@@ -76,7 +77,7 @@ function BookingHistory() {
         </div>
       )}
 
-
+<Footer/>
     </div>
   )
 }

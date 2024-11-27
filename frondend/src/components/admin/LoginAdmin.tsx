@@ -135,12 +135,7 @@ let dispatch=useDispatch()
 
           {/* Already have an account? */}
           <div className="mt-4 text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <a href="#" className="text-red-600 font-bold hover:text-red-500">
-                Create Account
-              </a>
-            </p>
+            
           </div>
         </div>
       </div>

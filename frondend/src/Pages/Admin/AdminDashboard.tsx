@@ -30,6 +30,7 @@ const AdminDashboard: React.FC = () => {
 
         fetchDashboardData();
     }, []);
+    
     // Doughnut chart options
     const doughnutOptions = {
         responsive: true,
@@ -82,25 +83,13 @@ const AdminDashboard: React.FC = () => {
         ],
     };
 
-    const reveueDoughnutData = {
-        labels: ['Revenue'],
-        datasets: [
-            {
-                label: 'Total revenue',
-                data: [totalRevenue],
-                backgroundColor: ['#1E90FF'],
-                borderWidth: 1,
-            },
-        ],
-    };
-
     const carBookingDoughnutData = {
         labels: ['Total Car Bookings'],
         datasets: [
             {
                 label: 'Bookings',
-                data: [carBookingTotal],  // Total bookings data
-                backgroundColor: ['#FFD700'],  // Yellow color for bookings
+                data: [carBookingTotal],
+                backgroundColor: ['#FFD700'],
                 borderWidth: 1,
             },
         ],
@@ -122,11 +111,11 @@ const AdminDashboard: React.FC = () => {
     };
 
     const revenueLineChartData = {
-        labels: carRevenueData.map((entry) => entry.carName), // ['maruthi', 'BMW', 'suzuki']
+        labels: carRevenueData.map((entry) => entry.carName),
         datasets: [
             {
                 label: 'Revenue ($)',
-                data: carRevenueData.map((entry) => entry.amount), // [4690, 1080, 616]
+                data: carRevenueData.map((entry) => entry.amount),
                 borderColor: '#FF6347',
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 fill: true,
@@ -134,13 +123,12 @@ const AdminDashboard: React.FC = () => {
         ],
     };
 
-
     const carBookingBarChartData = {
-        labels: carBookingData.map(item => item.carName), // car names as labels
+        labels: carBookingData.map(item => item.carName),
         datasets: [
             {
                 label: 'Car Bookings',
-                data: carBookingData.map(item => item.count), // counts as data
+                data: carBookingData.map(item => item.count),
                 borderColor: '#FF6347',
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 fill: true,
@@ -150,51 +138,40 @@ const AdminDashboard: React.FC = () => {
 
     return (
         <div className="dashboard-container p-6 bg-white rounded-lg shadow-lg">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6">Dashboard</h2>
-
-            {/* Stats Section */}
-            <div className="flex space-x-8 mb-6">
-                <div className="stat-item text-center flex-1">
+           
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div className="stat-item text-center">
                     <h3 className="text-xl font-semibold">Total Users</h3>
                     <div className="text-3xl text-blue-500">{totalUsers}</div>
                     <Doughnut data={userDoughnutData} options={doughnutOptions} height={100} width={100} />
                 </div>
-                <div className="stat-item text-center flex-1">
+                <div className="stat-item text-center">
                     <h3 className="text-xl font-semibold">Total Providers</h3>
                     <div className="text-3xl text-green-500">{totalProviders}</div>
                     <Doughnut data={providerDoughnutData} options={doughnutOptions} height={100} width={100} />
                 </div>
-                <div className="stat-item text-center flex-1">
+                <div className="stat-item text-center">
                     <h3 className="text-xl font-semibold">Total Cars</h3>
                     <div className="text-3xl text-red-500">{totalCars}</div>
                     <Doughnut data={carDoughnutData} options={doughnutOptions} height={100} width={100} />
                 </div>
-                <div className="stat-item text-center flex-1">
+                <div className="stat-item text-center">
                     <h3 className="text-xl font-semibold">Total Car Bookings</h3>
                     <div className="text-3xl text-yellow-500">{carBookingTotal}</div>
                     <Doughnut data={carBookingDoughnutData} options={doughnutOptions} height={100} width={100} />
                 </div>
-              
-
-
             </div>
 
-            {/* Car Bookings Doughnut Section */}
-
-            {/* Revenue Section */}
-            <div className="flex space-x-8 mb-6">
-                {/* Total Revenue Section */}
-                <div className="w-1/2">
-                    <h3 className="text-xl font-semibold mb-3">Total Revenue (50%)</h3>
-                    <div className="text-3xl text-green-600">{totalRevenue.toLocaleString()}</div> {/* Format for readability */}
-                    <Line data={revenueLineChartData} options={lineChartOptions} height={100} width={150} />
+            {/* Revenue and Car Bookings Section */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="w-full">
+                    <h3 className="text-xl font-semibold mb-3">Total Revenue</h3>
+                    <div className="text-3xl text-green-600">{totalRevenue.toLocaleString()}</div>
+                    <Line data={revenueLineChartData} options={lineChartOptions} height={200} />
                 </div>
-
-
-                {/* Car Bookings Section */}
-                <div className="w-1/2">
+                <div className="w-full">
                     <h3 className="text-xl font-semibold mb-3">Car Bookings</h3>
-                    <Bar data={carBookingBarChartData} options={lineChartOptions} height={100} width={150} />
+                    <Bar data={carBookingBarChartData} options={lineChartOptions} height={200} />
                 </div>
             </div>
         </div>

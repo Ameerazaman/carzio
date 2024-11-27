@@ -3,7 +3,7 @@ import { FaPlus } from 'react-icons/fa';
 import Navbar from '../../Pages/Admin/Commons/Navbar';
 import Sidebar from '../../Pages/Admin/Commons/Sidebar';
 import Table from '../../Pages/Admin/Commons/Table';
-import { carManagementt, fetchOffer } from '../../Api/Admin';
+import { fetchOffer } from '../../Api/Admin';
 import { Link } from 'react-router-dom';
 import Pagination from '../../Pages/Common/Pagination';
 

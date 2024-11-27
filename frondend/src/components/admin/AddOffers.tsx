@@ -10,7 +10,7 @@ function AddOffers() {
     <Sidebar />
     <div className="flex-1 flex flex-col">
       <Navbar />
-      <div className="flex-1 bg-gray-100">
+      <div className="flex-1 bg-gray-100 overflow-y-auto">
    
         <div className="overflow-x-auto bg-white rounded-lg shadow-md">
           <AddOffer/>

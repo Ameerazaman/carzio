@@ -28,7 +28,7 @@ function BookingReportProvider() {
         if (provider) {
           const result = await fetchSalesReport(page, limit, provider?._id);
           if (result?.data) {
-            setTableData(result.data.data || []); // Adjust as needed to match the API response structure
+            setTableData(result.data || []); // Adjust as needed to match the API response structure
             setTotalPages(result.data.totalPage || 1);
           } else {
             setError("Sales report is not retrieved.");
@@ -42,7 +42,7 @@ function BookingReportProvider() {
     };
 
     fetchData();
-  }, [page]);
+  }, [page, provider]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -52,11 +52,11 @@ function BookingReportProvider() {
 
   return (
     <div className="flex flex-col h-screen">
-      <Navbar />
-      <div className="flex flex-grow">
+      <Navbar /> {/* Navbar remains fixed at the top */}
+      <div className="flex flex-grow"> {/* Add margin-top to push content below the navbar */}
         <Sidebar />
-        <div className="flex-1 p-6 bg-gray-100">
-          <div className="overflow-x-auto bg-white rounded-lg shadow-md">
+        <div className="flex-1 p-6 bg-gray-100 overflow-y-auto">
+          <div className="overflow-x-auto bg-white rounded-lg shadow-md ">
             {loading ? (
               <p className="text-center py-4">Loading...</p>
             ) : error ? (

@@ -1,0 +1,8 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+function WalletTable(_a) {
+    var walletData = _a.walletData;
+    return (_jsx("div", { className: "container mx-auto p-6", children: _jsx("div", { className: "overflow-x-auto", children: _jsxs("table", { className: "min-w-full bg-white shadow-lg rounded-lg overflow-hidden", children: [_jsx("thead", { children: _jsxs("tr", { className: "bg-gray-800 text-white text-sm leading-normal", children: [_jsx("th", { className: "py-3 px-6 text-left", children: "Transaction ID" }), _jsx("th", { className: "py-3 px-6 text-left", children: "Description" }), _jsx("th", { className: "py-3 px-6 text-left", children: "Type" }), _jsx("th", { className: "py-3 px-6 text-left", children: "Amount" })] }) }), _jsx("tbody", { className: "text-gray-600 text-sm font-light", children: walletData.map(function (transaction) { return (_jsxs("tr", { className: "border-b border-gray-200 hover:bg-gray-100", children: [_jsx("td", { className: "py-3 px-6 text-left whitespace-nowrap", children: transaction._id }), _jsx("td", { className: "py-3 px-6 text-left", children: transaction.Description }), _jsx("td", { className: "py-3 px-6 text-left", children: _jsx("span", { className: "py-1 px-3 rounded-full text-xs font-semibold ".concat(transaction.TransactionType === "Credit"
+                                            ? "bg-green-200 text-green-600"
+                                            : "bg-red-200 text-red-600"), children: transaction.TransactionType }) }), _jsx("td", { className: "py-3 px-6 text-left", children: transaction.Amount })] }, transaction._id)); }) })] }) }) }));
+}
+export default WalletTable;

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { resend, verifyOtp } from '../../Api/Provider';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
@@ -136,7 +135,7 @@ const ProviderOtp: React.FC = () => {
           {isTimerActive &&
             <p className="mt-4 text-gray-600 text-center text-sm">
               Didn't receive OTP?{' '}
-              <a onClick={handleResendOtp} className="text-red-500 hover:underline">Resend</a>
+              <p onClick={handleResendOtp} className="text-red-500 hover:underline">Resend</p>
             </p>
           }
           <p className="mt-4 text-gray-600 text-center text-sm">

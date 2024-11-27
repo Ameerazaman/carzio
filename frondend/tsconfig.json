@@ -1,3 +1,5 @@
+
+
 {
   "compilerOptions": {
     "types": ["node"],
@@ -7,9 +9,7 @@
       "dom.iterable",
       "esnext"
     ],
-    // 
     "typeRoots": ["node_modules/@types"],
-    // 
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -21,9 +21,10 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx"
-    
+    "noEmit": false,  // Change this to false to enable emitting compiled files
+    "jsx": "react-jsx",
+    "outDir": "./dist",  // Specify the output directory
+    "rootDir": "./src"   // Ensure the source code is taken from the 'src' folder
   },
   "include": [
     "src"

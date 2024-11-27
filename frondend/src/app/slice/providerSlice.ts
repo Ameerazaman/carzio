@@ -14,7 +14,7 @@ const providerSlice = createSlice({
       state.loading = true;
     },
     signInSuccessProvider: (state, action) => {
-      state. currentProvider = action.payload;
+      state.currentProvider = action.payload;
       state.loading = false;
       state.error = false;
     },
@@ -26,7 +26,7 @@ const providerSlice = createSlice({
       state.loading = true;
     },
     updateProviderSuccess: (state, action) => {
-      state. currentProvider= action.payload;
+      state.currentProvider= action.payload;
       state.loading = false;
       state.error = false;
     },
@@ -38,7 +38,7 @@ const providerSlice = createSlice({
       state.loading = true;
     },
     deleteProviderSuccess: (state) => {
-      state. currentProvider = null;
+      state.currentProvider = null;
       state.loading = false;
       state.error = false;
     },
@@ -48,7 +48,7 @@ const providerSlice = createSlice({
     },
 
     signOutProvider: (state) => {
-      state. currentProvider= null;
+      state.currentProvider= null;
       state.loading = false;
       state.error = false;
     },

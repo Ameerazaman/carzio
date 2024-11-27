@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { FaEdit, FaTrash, FaTrashAlt } from 'react-icons/fa';
-import { editCoupon, editOffer, editProvider, editUser, notificaionDetails, updateStatus, updateStatusCar, updateStatusCoupon, updateStatusOffer, updateStatusProvider } from '../../../Api/Admin';
+import { FaEdit } from 'react-icons/fa';
+import { editCoupon, editOffer, editProvider, editUser, updateStatus, updateStatusCar, updateStatusCoupon, updateStatusOffer, updateStatusProvider } from '../../../Api/Admin';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';

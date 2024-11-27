@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { editProvider, editUser, updateProvider, updateUser } from '../../Api/Admin';
 import { useParams, useNavigate } from 'react-router-dom';
-import { AxiosResponse } from 'axios';
 
 interface EditUserProps {
   header: string;

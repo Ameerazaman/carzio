@@ -1,140 +1,109 @@
-import React, { useEffect } from 'react';
-import { FaUser, FaUserPlus, FaPhone, FaMapMarkerAlt } from 'react-icons/fa'; // Import icons
+import React, { useEffect, useState } from 'react';
+import { FaUser, FaUserPlus, FaPhone, FaBars, FaTimes } from 'react-icons/fa'; 
 import { RootState } from '../../App/Store';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { userLogout } from '../../Api/User';
 import Swal from 'sweetalert2';
-// import { toast } from 'react-toastify';
 import { toast } from 'react-hot-toast';
-import { useDispatch } from 'react-redux';
 import { signOut } from '../../App/Slice/UserSlice';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { providerLogout } from '../../Api/Provider';
 import { signOutProvider } from '../../App/Slice/ProviderSlice';
-import { Link } from 'react-router-dom';
 
 export interface User {
   email: string;
   username: string;
   _id: string;
-
-
 }
 
-// 
 function Navbar() {
-  let dispatch = useDispatch()
-  let navigate = useNavigate()
+  const [menuOpen, setMenuOpen] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const user = useSelector((state: RootState) => state.user?.currentUser) as User | null;
   const provider = useSelector((state: RootState) => state.provider?.currentProvider) as User | null;
-  if (user?._id) {
-    localStorage.setItem('userId', user._id);
-  }
-  const token = localStorage.getItem('token');
 
   const logoutUser = async () => {
     try {
-      console.log("logout in swt alert")
       Swal.fire({
         title: "Are you sure?",
-        text: "",
         icon: "question",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Yes"
+        confirmButtonText: "Yes",
       }).then((result) => {
         if (result.isConfirmed) {
           if (user) {
-
-            userLogout().then(() => console.log(''))
+            userLogout();
             dispatch(signOut());
-
-            navigate('/')
-          }
-          else if (provider) {
-            providerLogout().then(() => console.log(''))
+            navigate('/');
+          } else if (provider) {
+            providerLogout();
             dispatch(signOutProvider());
-
-            navigate('/')
+            navigate('/');
           }
-
-        }
-        else {
-          navigate('/login')
         }
       });
     } catch (error) {
+      toast.error("Logout failed");
+    }
+  };
 
-    }
-  }
-  useEffect(() => {
-    if (user) {
-      console.log(user)
-    }
-    if (provider) {
-      console.log(provider)
-    }
-  })
   return (
     <header>
       {/* First Dark Red Navigation Bar */}
-      <nav className="relative bg-red-800 p-4 shadow-md">
-        <div className="container mx-auto flex justify-between items-center">
-          {/* Need help and phone number */}
-          <div className="relative z-10 flex items-center space-x-4 text-white">
-            <span>Need help: </span>
-            <FaPhone className="text-white" /> {/* Phone Icon */}
-            <span className="hover:text-red-400 transition duration-300"> +123 456 7890</span>
-          </div>
+      <nav className="relative bg-red-800 p-4 shadow-md flex justify-between items-center">
+        <div className="flex items-center space-x-4 text-white">
 
-          {/* Login/Signup Links */}
-          {!user && !provider ? ( // If user is null or undefined, show login/signup links
-            <div className="relative z-10 space-x-6 flex items-center">
-              <a href="/login" className="text-white hover:text-gray-300 transition duration-300 flex items-center">
-                <FaUser className="mr-2" /> {/* Login Icon */}
-                Login
-              </a>
-              <a href="/signup" className="text-white hover:text-gray-300 transition duration-300 flex items-center">
-                <FaUserPlus className="mr-2" /> {/* Signup Icon */}
-                Signup
-              </a>
-            </div>
-          ) : ( // If user is not null, show username and logout link
-            <div className="relative z-10 space-x-6 flex items-center">
+          <FaPhone />
+          <span className="hover:text-red-400 transition duration-300"> +123 456 7890</span>
+        </div>
 
-              <Link to='/profile'>
-                <span className="text-white flex items-center">
-                  <FaUser className="mr-2" /> {/* User Icon */}
-                  {user ? user.username : provider?.username}{/* Show username */}
-                </span>
+        <button
+          className="text-white lg:hidden focus:outline-none"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+        </button>
+
+        <div
+          className={`${menuOpen ? 'block' : 'hidden'
+            } lg:flex lg:items-center space-x-6`}
+        >
+          {!user && !provider ? (
+            <>
+              <Link to="/login" className="text-white hover:text-gray-300 flex items-center">
+                <FaUser className="mr-2" /> Login
               </Link>
-              {/* Use an inline function to call logoutUser */}
+              <Link to="/signup" className="text-white hover:text-gray-300 flex items-center">
+                <FaUserPlus className="mr-2" /> Signup
+              </Link>
+            </>
+          ) : (
+            <div className="flex items-center space-x-6">
+              <Link to="/profile" className="text-white flex items-center">
+                <FaUser className="mr-2" /> {user ? user.username : provider?.username}
+              </Link>
               <a
-                onClick={() => logoutUser()}
-                className="text-white hover:text-gray-300 transition duration-300 flex items-center cursor-pointer"
+                onClick={logoutUser}
+                className="text-white hover:text-gray-300 cursor-pointer flex items-center"
               >
-                <FaUserPlus className="mr-2" /> {/* Logout Icon */}
-                Logout
+                <FaUserPlus className="mr-2" /> Logout
               </a>
             </div>
           )}
         </div>
       </nav>
 
-      {/* Second White Navigation Bar with Logo, Clock, Globe and Provider Signup */}
+      {/* Second White Navigation Bar */}
       <nav className="bg-white p-3 shadow-md">
         <div className="container mx-auto flex justify-between items-center">
-          {/* Logo */}
-          <div className="flex items-center space-x-4">
-            <img
-              src="\images\carzio.png"
-              alt="Logo"
-              className="h-10 w-auto"
-            />
+          <div className="flex items-center">
+            <img src="/images/carzio.png" alt="Logo" className="h-10" />
           </div>
 
-          {/* Clock and Time */}
           <div className="flex items-center space-x-2">
             <img
               src="\images\Gauto - Car Rental HTML Template Preview - ThemeForest_files\clock.png"
@@ -154,7 +123,6 @@ function Navbar() {
             <span className="text-black-600">Malappuram, Palakkad, Calicut</span>
           </div>
 
-          {/* Provider Signup Button */}
           {!user && !provider ?
             <button className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition duration-300">
               <a href="/provider/login">Provider Signup</a>
@@ -166,6 +134,8 @@ function Navbar() {
             </button> : ""}
         </div>
       </nav>
+
+      {/* Black Navigation Bar */}
       {
         user ? (
           <div className="bg-black p-2">
@@ -183,9 +153,8 @@ function Navbar() {
           <hr style={{ backgroundColor: 'black', height: '2px' }} />
         )
       }
-    </header >
-  )
+    </header>
+  );
 }
 
 export default Navbar;
-

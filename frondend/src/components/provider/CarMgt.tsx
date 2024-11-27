@@ -55,7 +55,7 @@ function CarMgt() {
       <div className="flex flex-grow">
         <Sidebar />
 
-        <div className="flex-1 p-6 bg-gray-100">
+        <div className="flex-1 p-6 bg-gray-100 overflow-y-auto">
           
           <div className="overflow-x-auto bg-white rounded-lg shadow-md">
             {loading ? (

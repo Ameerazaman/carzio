@@ -53,7 +53,6 @@ export class UserServices {
                 status: OK,
                 data: {
                     success: true,
-                    message: 'Success',
                     userId: user.id,
                     token: newAccessToken,
                     data: user
@@ -86,12 +85,10 @@ export class UserServices {
             userData.password = await this.encrypt.hashPassword(userData.password);
 
             const user = await this.userRepository.saveUser(userData);
-            console.log(user, "saveUser in services", user)
             return {
                 status: OK,
                 data: {
                     success: true,
-                    message: 'Success',
 
                 }
             };
@@ -109,7 +106,7 @@ export class UserServices {
         }
     }
 
-// ******************************user Sign in*****************************
+    // ******************************user Sign in*****************************
 
     async userSignIn(userData: UserInterface): Promise<UserAuthResponse | undefined> {
         try {
@@ -151,7 +148,6 @@ export class UserServices {
                 status: OK,
                 data: {
                     success: true,
-                    message: 'Success',
                     userId: user.id,
                     token: token,
                     data: user,
@@ -160,7 +156,7 @@ export class UserServices {
             };
 
         } catch (error) {
-          
+
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {
@@ -182,7 +178,6 @@ export class UserServices {
                     status: OK,
                     data: {
                         success: true,
-                        message: 'Success',
                         data: carData,
                         page: page,
                         totalPage: Math.ceil(totalPage / limit) ?? 1
@@ -230,7 +225,6 @@ export class UserServices {
                 status: 200,
                 data: {
                     success: true,
-                    message: "Car details fetched successfully.",
                     data: carDetails,
                     ratings: averageRating ?? 0,
                     review: reviews.length > 0 ? reviews : [],
@@ -246,7 +240,7 @@ export class UserServices {
         try {
             return await this.userRepository.carFilter(engineType, fuelType, sortPrice);
         } catch (error) {
-           
+
             return null;
         }
     }
@@ -256,7 +250,7 @@ export class UserServices {
             return await this.userRepository.searchCar(searchQuery)
         }
         catch (error) {
-          
+
             return null;
         }
     }
@@ -271,8 +265,7 @@ export class UserServices {
                     status: OK,
                     data: {
                         success: true,
-                        message: 'Success',
-                        data: offerData, 
+                        data: offerData,
                     },
                 };
             } else {
@@ -285,7 +278,7 @@ export class UserServices {
                 };
             }
         } catch (error) {
-           
+
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {
@@ -299,7 +292,7 @@ export class UserServices {
     //   ***********************************check profile****************************
     async checkProfile(id: string): Promise<ProfileInterface | null> {
         try {
-            return await this.userRepository.checkProfile(id); 
+            return await this.userRepository.checkProfile(id);
         } catch (error) {
             return null;
         }
@@ -335,17 +328,17 @@ export class UserServices {
         try {
             const provider = await this.userRepository.editProfile(profileData, id);
             return {
-                status: 200, 
+                status: 200,
                 data: {
                     success: true,
-                    message: 'Profile saved successfully',
+                    message: 'Profile Edit Successfully',
                 },
             };
 
         } catch (error) {
-           
+
             return {
-                status: 500, 
+                status: 500,
                 data: {
                     success: false,
                     message: 'Internal server error',
@@ -356,9 +349,9 @@ export class UserServices {
     //   ***********************************check profile****************************
     async checkAddress(id: string): Promise<UserAddressInterface | null> {
         try {
-            return await this.userRepository.checkAddress(id); 
+            return await this.userRepository.checkAddress(id);
         } catch (error) {
-          
+
             return null;
         }
     }
@@ -370,7 +363,7 @@ export class UserServices {
             const provider = await this.userRepository.saveAddress(addressData);
 
             return {
-                status: 200, 
+                status: 200,
                 data: {
                     success: true,
                     message: 'Address saved successfully'
@@ -378,9 +371,9 @@ export class UserServices {
             };
 
         } catch (error) {
-         
+
             return {
-                status: 500, 
+                status: 500,
                 data: {
                     success: false,
                     message: 'Internal server error',
@@ -396,16 +389,16 @@ export class UserServices {
             const provider = await this.userRepository.editAddress(addressData, id);
 
             return {
-                status: 200, 
+                status: 200,
                 data: {
                     success: true,
-                    message: 'Address saved successfully',
+                    message: 'Address Edit Successfully',
                 },
             };
 
         } catch (error) {
             return {
-                status: 500, // Internal server error
+                status: 500,
                 data: {
                     success: false,
                     message: 'Internal server error',
@@ -418,7 +411,7 @@ export class UserServices {
     async fetchCoupon(userId: string): Promise<CouponAuthResponse | undefined> {
         try {
             const couponData = await this.userRepository.fetchCoupon(userId);
-          
+
             if (couponData && couponData.length > 0) {
                 return {
                     status: OK,
@@ -486,7 +479,7 @@ export class UserServices {
 
     async saveBookingData(bookingData: BookingInterface): Promise<BookingAuthResponse | undefined> {
         try {
-   
+
             const savedBookingData = await this.userRepository.saveBookingData(bookingData);
 
             if (savedBookingData) {
@@ -521,7 +514,7 @@ export class UserServices {
     async userIdInCoupon(coupon: string, userId: string): Promise<CouponAuthResponse | undefined> {
         try {
             const updateCoupon = await this.userRepository.userIdInCoupon(coupon, userId);
-   
+
             if (updateCoupon) {
                 return {
                     status: OK,
@@ -554,11 +547,11 @@ export class UserServices {
 
     async getBookingHistory(userId: string, page: number, limit: number): Promise<BookingAuthResponse | undefined> {
         try {
-    
+
             const bookingHistory = await this.userRepository.getBookingHistory(userId, page, limit);
-    
+
             const historyDocuments = await this.userRepository.countBookingHistory(userId)
- 
+
             if (bookingHistory && historyDocuments) {
                 return {
                     status: OK,
@@ -579,7 +572,7 @@ export class UserServices {
                 };
             }
         } catch (error) {
-   
+
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {
@@ -628,9 +621,9 @@ export class UserServices {
 
     async cancelBookingByUser(bookingId: string, userId: string, amount: number): Promise<BookingAuthResponse | undefined> {
         try {
-         
+
             const updateStatus = await this.userRepository.cancelBookingByUser(bookingId);
-     
+
             if (updateStatus) {
                 return {
                     status: OK,
@@ -649,7 +642,7 @@ export class UserServices {
                 };
             }
         } catch (error) {
-          
+
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {
@@ -665,7 +658,7 @@ export class UserServices {
         try {
 
             const updateWallet = await this.userRepository.creditToWallet(userId, amount)
-    
+
             if (updateWallet) {
                 return {
                     status: OK,
@@ -684,7 +677,7 @@ export class UserServices {
                 };
             }
         } catch (error) {
-   
+
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {
@@ -739,7 +732,7 @@ export class UserServices {
                 },
             };
         } catch (error) {
-        
+
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {
@@ -776,7 +769,7 @@ export class UserServices {
 
 
         } catch (error) {
-      
+
             return {
                 status: INTERNAL_SERVER_ERROR,
                 data: {
@@ -797,7 +790,7 @@ export class UserServices {
 
             if (walletPage && walletDocuments) {
                 const lastTransaction = walletPage[walletPage.length - 1];
-                let totalPrice = lastTransaction?.TotalAmt ?? 0; 
+                let totalPrice = lastTransaction?.TotalAmt ?? 0;
 
                 return {
                     status: OK,
@@ -806,7 +799,7 @@ export class UserServices {
                         data: walletPage,
                         page: page,
                         totalPage: Math.ceil(walletDocuments / limit) ?? 1,
-                        totalAmount: totalPrice, 
+                        totalAmount: totalPrice,
                     },
                 };
             } else {
@@ -911,7 +904,6 @@ export class UserServices {
                     data: {
                         success: true,
                         data: reviewDocument,
-                        message: "Fetch Chat History successfully",
                     },
                 };
             } else {
@@ -944,7 +936,6 @@ export class UserServices {
                     status: OK,
                     data: {
                         success: true,
-                        message: 'Success',
                         data: carData,
 
                     },

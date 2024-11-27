@@ -23,7 +23,7 @@ export class ProviderController {
         if (!refreshToken)
             res
                 .status(401)
-                .json({ success: false, message: "Refresh Token Expired" });
+                .json({ success: false });
 
         try {
             const decoded = verifyRefreshToken(refreshToken);
@@ -40,7 +40,7 @@ export class ProviderController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
             })
-            res.status(200).json({ success: true, message: "Token Updated" });
+            res.status(200).json({ success: true});
         }
         catch (error) {
             next(error);
@@ -118,15 +118,13 @@ export class ProviderController {
             }
             if (OTPRecord) {
                 const providerData = req.app.locals.ProviderData
-                console.log(providerData, "providerData")
+              
                 const savedProvider = await this.providerServices.saveProvider(providerData);
 
                 if (savedProvider) {
-
-
                     return res.status(OK).json({
                         success: true,
-                        message: 'OTP verified Successfully',
+                       
                         provider: savedProvider,
                     });
                 } else {
@@ -364,7 +362,7 @@ export class ProviderController {
             const carExist = await this.providerServices.updateStatusCar(id);
 
             if (!carExist) {
-                return res.status(404).json({ message: "Car not found" });
+                return res.status(400).json({ message: "Car not found" });
             }
 
             return res.status(200).json({ message: "Car status updated successfully", car: carExist });
@@ -387,7 +385,7 @@ export class ProviderController {
             const carExist = await this.providerServices.editCar(id);
 
             if (!carExist) {
-                return res.status(404).json({ message: "Car not found" });
+                return res.status(400).json({ message: "Car not found" });
             }
 
             return res.status(200).json(carExist);
@@ -425,9 +423,6 @@ export class ProviderController {
     async updateCarImage(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
         try {
             const id = req.params.id;
-            console.log("req.files:", req.files);  // Check if files are being received
-            console.log("req.body:", req.body);
-
             if (!id) {
                 return res.status(400).json({ message: 'ID is missing' });
             }
@@ -438,16 +433,13 @@ export class ProviderController {
             const imagePaths = uploadedFiles.map((file) => `/uploads/${file.filename}`);
             carData.images = imagePaths;
             let result = await this.providerServices.updateCarImage(req.files, id);
-            console.log(carData, "cardata")
-
-            console.log(result, "result")
             if (result?.status === OK) {
                 return res.status(OK).json(result.data);
             } else {
                 return res.status(INTERNAL_SERVER_ERROR).json({ message: "Car already exists" });
             }
         } catch (error) {
-            console.error("Error during car update:", error);
+       
             return res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -465,7 +457,7 @@ export class ProviderController {
             }
             res.status(200).json(result.data);
         } catch (error) {
-            console.error("Error saving profile:", error);
+            
             res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -473,7 +465,7 @@ export class ProviderController {
     async specificBookingDetails(req: Request, res: Response): Promise<void> {
         try {
             const bookingId = req.params.id
-            console.log(bookingId, "bookingId")
+            
             const result = await this.providerServices.specificBookingDetails(bookingId);
             if (!result) {
                 res.status(500).json({ message: "Error booking history" });
@@ -481,7 +473,6 @@ export class ProviderController {
             }
             res.status(200).json(result.data);
         } catch (error) {
-            console.error("Error saving profile:", error);
             res.status(500).json({ message: "Internal server error" });
         }
     }

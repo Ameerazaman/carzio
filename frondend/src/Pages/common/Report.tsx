@@ -7,24 +7,22 @@ interface TableProps {
 const Report: React.FC<TableProps> = ({ tableData: initialTableData }) => {
   const [tableData, setTableData] = useState(initialTableData);
 
-  useEffect(() => {
-   
-  }, [tableData]);
+  useEffect(() => {}, [tableData]);
 
   const downloadCSV = () => {
     if (!tableData || tableData.length === 0) {
       alert("No data available to download!");
       return;
     }
-  
+
     // CSV headers
     const headers = ["No", "Issue Date", "Return Date", "Amount", "Time", "Payment", "Date"];
-  
+
     // Map data to rows with formatted dates
     const rows = tableData.map((data, index) => {
       const formatDate = (date: string) =>
         date ? new Date(date).toLocaleDateString("en-US") : "N/A";
-  
+
       return [
         index + 1,
         formatDate(data.IssueDate), // Format Issue Date
@@ -35,17 +33,17 @@ const Report: React.FC<TableProps> = ({ tableData: initialTableData }) => {
         new Date(data.createdAt).toLocaleDateString("en-US") || "N/A", // Format createdAt
       ];
     });
-  
+
     // Combine headers and rows into CSV string
     const csvContent = [
       headers.join(","), // Header row
       ...rows.map((row) => row.map((item) => `"${item}"`).join(",")), // Quote values for safety
     ].join("\n");
-  
+
     // Create a Blob for the CSV
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-  
+
     // Trigger download
     const a = document.createElement("a");
     a.href = url;
@@ -53,15 +51,13 @@ const Report: React.FC<TableProps> = ({ tableData: initialTableData }) => {
     document.body.appendChild(a); // Append to body to make it clickable
     a.click();
     document.body.removeChild(a); // Remove element after download
-  
+
     // Revoke URL
     URL.revokeObjectURL(url);
   };
-  
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold mb-4">Sales Report</h1>
-
       {/* Button aligned to the right */}
       <div className="flex justify-end mb-4">
         <button
@@ -73,30 +69,30 @@ const Report: React.FC<TableProps> = ({ tableData: initialTableData }) => {
         </button>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto shadow-md rounded-lg">
-        <table className="w-full bg-white text-left border-collapse">
+      {/* Responsive Table */}
+      <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+        <table className="min-w-full table-auto border-collapse bg-white">
           <thead className="bg-gray-300">
             <tr>
-              <th className="p-3 border-b">No</th>
-              <th className="p-3 border-b">Issue Date</th>
-              <th className="p-3 border-b">Return Date</th>
-              <th className="p-3 border-b">Amount</th>
-              <th className="p-3 border-b">Time</th>
-              <th className="p-3 border-b">Payment</th>
-              <th className="p-3 border-b">Date</th>
+              <th className="p-3 border-b text-sm md:text-base">No</th>
+              <th className="p-3 border-b text-sm md:text-base">Issue Date</th>
+              <th className="p-3 border-b text-sm md:text-base">Return Date</th>
+              <th className="p-3 border-b text-sm md:text-base">Amount</th>
+              <th className="p-3 border-b text-sm md:text-base">Time</th>
+              <th className="p-3 border-b text-sm md:text-base">Payment</th>
+              <th className="p-3 border-b text-sm md:text-base">Date</th>
             </tr>
           </thead>
           <tbody>
             {tableData.map((data, index) => (
               <tr key={data.id || index} className="hover:bg-gray-100">
-                <td className="p-3 border-b">{index + 1}</td>
-                <td className="p-3 border-b">{data.IssueDate || "N/A"}</td>
-                <td className="p-3 border-b">{data.ReturnDate || "N/A"}</td>
-                <td className="p-3 border-b">{data.total_Amt || "N/A"}</td>
-                <td className="p-3 border-b">{data.PickUpTime || "N/A"}</td>
-                <td className="p-3 border-b">{data.Payment || "N/A"}</td>
-                <td className="p-3 border-b">{data.createdAt || "N/A"}</td>
+                <td className="p-3 border-b text-sm md:text-base">{index + 1}</td>
+                <td className="p-3 border-b text-sm md:text-base">{data.IssueDate || "N/A"}</td>
+                <td className="p-3 border-b text-sm md:text-base">{data.ReturnDate || "N/A"}</td>
+                <td className="p-3 border-b text-sm md:text-base">{data.total_Amt || "N/A"}</td>
+                <td className="p-3 border-b text-sm md:text-base">{data.PickUpTime || "N/A"}</td>
+                <td className="p-3 border-b text-sm md:text-base">{data.Payment || "N/A"}</td>
+                <td className="p-3 border-b text-sm md:text-base">{data.createdAt || "N/A"}</td>
               </tr>
             ))}
           </tbody>

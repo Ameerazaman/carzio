@@ -14,7 +14,7 @@ const adminSlice = createSlice({
       state.loading = true;
     },
     signInSuccessAdmin: (state, action) => {
-      state. currentAdmin = action.payload;
+      state.currentAdmin = action.payload;
       state.loading = false;
       state.error = false;
     },
@@ -26,7 +26,7 @@ const adminSlice = createSlice({
       state.loading = true;
     },
     updateAdminSuccess: (state, action) => {
-      state. currentAdmin= action.payload;
+      state.currentAdmin= action.payload;
       state.loading = false;
       state.error = false;
     },
@@ -38,7 +38,7 @@ const adminSlice = createSlice({
       state.loading = true;
     },
     deleteAdminSuccess: (state) => {
-      state. currentAdmin = null;
+      state.currentAdmin = null;
       state.loading = false;
       state.error = false;
     },
@@ -48,7 +48,7 @@ const adminSlice = createSlice({
     },
 
     signOutAdmin: (state) => {
-      state. currentAdmin= null;
+      state.currentAdmin= null;
       state.loading = false;
       state.error = false;
     },

@@ -52,7 +52,7 @@ function BookingHistoryInProvider() {
           <Sidebar />
         </div>
 
-        <div className="flex-grow p-6">
+        <div className="flex-grow p-6 overflow-y-auto">
           {loading ? (
             <div className="text-center text-lg text-gray-500">Fetching your booking history...</div>
           ) : error ? (

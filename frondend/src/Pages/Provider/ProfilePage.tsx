@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { editProfileData, getProfile, submitProfileData, updateProfileImage } from '../../Api/Provider';
 import { toast } from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../App/Store';
 import { User } from '../Common/Navbar';

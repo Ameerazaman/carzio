@@ -1,42 +1,62 @@
 import React from 'react';
+import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
 
 function Footer() {
   return (
     <div
-      className="bg-cover bg-center text-white p-8"
-      style={{ backgroundImage: 'url(/images/slide2.jpg)' }}
+      className="bg-cover bg-center text-white py-12"
+      style={{ backgroundImage: 'url(/images/footer.jpg)' }}
     >
-      <div className="container mx-auto flex flex-col justify-between h-full py-16">
-        <div>
-          <h3 className="text-2xl font-bold mb-2 text-gray-400">Welcome to Our Car Rental Service</h3> {/* Changed to gray */}
-          <p className="mb-4 text-gray-400">We provide a wide range of vehicles to suit your travel needs. Enjoy your journey with us!</p> {/* Changed to gray */}
-        </div>
-        <div className="flex flex-col md:flex-row justify-between">
+      <div className="container mx-auto px-8 lg:px-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Company Info */}
+          <div>
+            <h3 className="text-2xl font-bold text-gray-200 mb-4">Welcome to Our Car Rental Service</h3>
+            <p className="text-gray-400 mb-4">
+              We provide a wide range of vehicles to suit your travel needs. Enjoy your journey with us!
+            </p>
+            <div className="flex items-center space-x-4">
+              <FaPhoneAlt className="text-red-600" />
+              <p className="text-gray-400">(123) 456-7890</p>
+            </div>
+            <div className="flex items-center space-x-4 mt-2">
+              <FaEnvelope className="text-red-600" />
+              <p className="text-gray-400">info@example.com</p>
+            </div>
+          </div>
+
           {/* Head Office Details */}
-          <div className="mb-6 md:mb-0">
-            <h3 className="text-xl font-bold mb-2 relative inline-block text-gray-400">
+          <div>
+            <h3 className="text-xl font-bold text-gray-200 mb-4 relative inline-block">
               Head Office
-              <span className="absolute left-0 bottom-0 w-full h-1 bg-red-600"></span> {/* Red underline */}
+              <span className="absolute left-0 bottom-0 w-10 h-1 bg-red-600"></span>
             </h3>
-            <p className="text-gray-400">123 Main Street</p> {/* Changed to gray */}
-            <p className="text-gray-400">City, State, Zip</p> {/* Changed to gray */}
-            <p className="text-gray-400">Phone: (123) 456-7890</p> {/* Changed to gray */}
-            <p className="text-gray-400">Email: info@example.com</p> {/* Changed to gray */}
+            <div className="flex items-center space-x-4">
+              <FaMapMarkerAlt className="text-red-600" />
+              <p className="text-gray-400">123 Main Street, City, State, Zip</p>
+            </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-xl font-bold mb-2 relative inline-block text-gray-400">
+            <h3 className="text-xl font-bold text-gray-200 mb-4 relative inline-block">
               Quick Links
-              <span className="absolute left-0 bottom-0 w-full h-1 bg-red-600"></span> {/* Red underline */}
+              <span className="absolute left-0 bottom-0 w-10 h-1 bg-red-600"></span>
             </h3>
-            <ul>
-              <li><a href="/about" className="hover:underline text-gray-400">About Us</a></li> {/* Changed to gray */}
-              <li><a href="/services" className="hover:underline text-gray-400">Services</a></li> {/* Changed to gray */}
-              <li><a href="/contact" className="hover:underline text-gray-400">Contact</a></li> {/* Changed to gray */}
-              <li><a href="/faq" className="hover:underline text-gray-400">FAQ</a></li> {/* Changed to gray */}
+            <ul className="space-y-2">
+              <li><a href="/about" className="hover:text-red-600 text-gray-400">About Us</a></li>
+              <li><a href="/services" className="hover:text-red-600 text-gray-400">Services</a></li>
+              <li><a href="/contact" className="hover:text-red-600 text-gray-400">Contact</a></li>
+              <li><a href="/faq" className="hover:text-red-600 text-gray-400">FAQ</a></li>
             </ul>
           </div>
+        </div>
+
+        {/* Footer Bottom */}
+        <div className="mt-8 border-t border-gray-700 pt-4 text-center">
+          <p className="text-gray-400 text-sm">
+            © {new Date().getFullYear()} Car Rental Service. All Rights Reserved.
+          </p>
         </div>
       </div>
     </div>
@@ -44,4 +64,3 @@ function Footer() {
 }
 
 export default Footer;
-

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { FaCar, FaMapMarkerAlt, FaCalendarCheck, FaCreditCard, FaCalendar, FaClock } from 'react-icons/fa'; // Add react-icons
+import { FaCar, FaMapMarkerAlt } from 'react-icons/fa'; // Add react-icons
 import Swal from 'sweetalert2'; // Import SweetAlert
 import { Booking } from '../../Interface/BookinDetailsInterface';
 import { specificBookingDetails, updateStatusOfBooking } from '../../Api/Provider';

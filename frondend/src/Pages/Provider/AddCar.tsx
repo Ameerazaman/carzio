@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { AiOutlineCar } from 'react-icons/ai';
 import { BiDetail } from 'react-icons/bi';
 import { GiPriceTag } from 'react-icons/gi';
-import { MdDescription } from 'react-icons/md';
 import { BsFuelPump } from 'react-icons/bs';
 import { FaRegCalendarAlt } from 'react-icons/fa';
 import { CarDataInterface } from '../../Interface/CarInterface';

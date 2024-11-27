@@ -5,7 +5,6 @@ import { AxiosError } from 'axios';
 import errorHandler from './ErrorHandler';
 import Cookies from 'js-cookie';
 import { Filter } from '../Interface/FilterInterface';
-import { string } from 'yargs';
 import { ProfileInterface } from '../Interface/ProfileInterface';
 import { AddressInterface } from '../Interface/AddressInterface';
 import { BookingFormData } from '../Interface/BookingInterface';

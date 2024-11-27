@@ -101,7 +101,6 @@ export class AdminServices {
         status: OK,
         data: {
           success: true,
-          message: 'Success',
           token: token,
           data: provider,
           refreshToken,
@@ -131,7 +130,7 @@ export class AdminServices {
           status: OK,
           data: {
             success: true,
-            message: 'Success',
+        
             data: userData,
             page: page,
             totalPage: Math.ceil(totalPage / limit) ?? 1 
@@ -223,7 +222,7 @@ export class AdminServices {
           status: OK,
           data: {
             success: true,
-            message: 'Success',
+           
             data: providerData,
             page: page,
             totalPage: Math.ceil(totalPage / limit) ?? 1 
@@ -309,7 +308,6 @@ export class AdminServices {
           status: OK,
           data: {
             success: true,
-            message: 'Success',
             data: carNotificationData,
           },
         };
@@ -369,7 +367,6 @@ export class AdminServices {
           status: OK,
           data: {
             success: true,
-            message: 'Success',
             data: carData,
             page: page,
             totalPage: Math.ceil(totalPage / limit) ?? 1 
@@ -415,7 +412,6 @@ export class AdminServices {
           status: OK,
           data: {
             success: true,
-            message: 'Success',
             data: offerData,
           },
         };
@@ -451,7 +447,6 @@ export class AdminServices {
           status: OK,
           data: {
             success: true,
-            message: 'Success',
             data: offerData,
             page: page,
             totalPage: Math.ceil(totalPage / limit) ?? 1 
@@ -536,7 +531,6 @@ export class AdminServices {
           status: OK,
           data: {
             success: true,
-            message: 'Success',
             data: offerData,
           },
         };
@@ -571,7 +565,6 @@ export class AdminServices {
           status: OK,
           data: {
             success: true,
-            message: 'Success',
             data: couponData,
             page: page,
             totalPage: Math.ceil(totalPage / limit) ?? 1 
@@ -656,7 +649,6 @@ export class AdminServices {
           status: OK,
           data: {
             success: true,
-            message: 'Success',
             data: bookingHistory,
             page: page,
             totalPage: Math.ceil(totalPage / limit) ?? 1 
@@ -788,7 +780,6 @@ async fetchSalesReport(page: number, limit: number): Promise<BookingAuthResponse
         status: OK,
         data: {
           success: true,
-          message: 'Sales report retrieved successfully',
           data: salesReport,
           page: page,
           totalPage: Math.ceil(salesReport.length / limit),

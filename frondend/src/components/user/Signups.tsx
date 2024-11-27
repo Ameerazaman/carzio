@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signup } from '../../Api/User';
-import { useDispatch } from 'react-redux';
-import { signupFormData } from '../../Interface/SignupFormInterface';
 import { toast } from 'react-hot-toast';
 
 interface Errors {
@@ -14,7 +12,6 @@ interface Errors {
 
 
 function Signup() {
-  let dispatch = useDispatch();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');

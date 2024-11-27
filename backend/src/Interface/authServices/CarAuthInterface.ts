@@ -5,7 +5,7 @@ export interface CarAuthResponse {
     status: number;
     data: {
         success: boolean;
-        message: string;
+        message?: string;
         data?: CarDataInterface | CarDataInterface[] | undefined,
         providerId?: string;
         page?: number,

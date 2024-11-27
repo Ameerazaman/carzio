@@ -1,6 +1,7 @@
 import React from 'react';
 import Navbar from '../../Pages/Common/Navbar';
 import UserProfile from '../../Pages/User/LandingPage/UserProfile';
+import Footer from '../../Pages/Common/Footer';
 
 function Profile() {
   return (
@@ -11,6 +12,7 @@ function Profile() {
           <UserProfile /> 
         </div>
       </div>
+      <Footer/>
     </div>
   );
 }

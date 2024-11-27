@@ -3,7 +3,7 @@ import { FaPlus } from 'react-icons/fa';
 import Navbar from '../../Pages/Admin/Commons/Navbar';
 import Sidebar from '../../Pages/Admin/Commons/Sidebar';
 import Table from '../../Pages/Admin/Commons/Table';
-import { carManagementt, fetchCoupon, fetchOffer } from '../../Api/Admin';
+import { fetchCoupon} from '../../Api/Admin';
 import { Link } from 'react-router-dom';
 import Pagination from '../../Pages/Common/Pagination';
 
@@ -53,7 +53,7 @@ function CouponMgt() {
         <Navbar />
         <div className="flex-1 p-6 bg-gray-100">
         <h1 className="text-2xl font-bold mb-4">Coupon Management</h1> 
-          <div className="overflow-x-auto bg-white rounded-lg shadow-md p-4">
+          <div className="overflow-x-auto bg-white rounded-lg shadow-md p-4 overflow-y-auto">
             <div className="flex justify-end mb-4">
               <Link to="/admin/add_coupon">
                 <button className="flex items-center px-4 py-2 text-white bg-gray-800 hover:bg-red-600 rounded transition duration-300 shadow-lg">

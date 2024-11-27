@@ -51,7 +51,7 @@ function BookingHistoryInAdmin() {
       <Navbar />
       <div className="flex flex-grow">
         <Sidebar />
-        <div className="flex-grow p-4">
+        <div className="flex-grow p-4 overflow-y-auto">
           {loading ? (
             <p className="text-center py-4">Loading...</p>
           ) : error ? (

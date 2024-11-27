@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { FaCalendarAlt, FaCalendarCheck, FaMoneyBillWave } from 'react-icons/fa';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../App/Store';
 import { User } from '../../Common/Navbar';
-import { carDetail, checkOffer, fetchCoupon, checkAddress, BookingConfirm, checkingBookedOrNot, userIdStoredInCoupon, checkBalanceUpdateWallet } from '../../../Api/User';
-import { BookingFormData } from '../../../Interface/BookingInterface';
+import { carDetail, checkOffer, fetchCoupon, BookingConfirm, checkingBookedOrNot, userIdStoredInCoupon, checkBalanceUpdateWallet } from '../../../Api/User';
 import { CarDataInterface } from '../../../Interface/CarInterface';
 import { CouponFormData } from '../../../Interface/CouponFormData';
-import { AddressInterface } from '../../../Interface/AddressInterface';
 import { OfferFormData } from '../../../Interface/OfferInterface';
 import toast from 'react-hot-toast';
 import { MdError } from 'react-icons/md';

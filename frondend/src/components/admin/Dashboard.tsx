@@ -17,20 +17,23 @@ function Dashboard() {
     } else {
       navigate('/admin/login');
     }
-  }, [admin, navigate]); 
+  }, [admin, navigate]);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Navbar */}
-      <Navbar />
+    <div className="flex min-h-screen">
+      {/* Sidebar on the left side */}
+      <div >
+        <Sidebar />
+      </div>
 
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <div className="hidden lg:block w-64">
-          <Sidebar />
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col">
+        {/* Navbar at the top */}
+        <div className="bg-gray-900">
+          <Navbar />
         </div>
 
-        {/* Main Content */}
+        {/* Main content */}
         <div className="flex-1 p-4 lg:p-6 bg-gray-100 overflow-y-auto">
           {/* Dashboard Heading */}
           <h1 className="text-2xl font-bold mb-4 text-center lg:text-left">Admin Dashboard</h1>
@@ -46,3 +49,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+

@@ -6,7 +6,7 @@ import { RootState } from '../../App/Store';
 import { getWalletPage } from '../../Api/User';
 import { walletInterface } from '../../Interface/WalletInterface';
 import Pagination from '../../Pages/Common/Pagination';
-import { FaWallet } from 'react-icons/fa'; // Wallet icon
+import Footer from '../../Pages/Common/Footer';
 
 function WalletPage() {
   const user = useSelector((state: RootState) => state.user.currentUser) as User | null;
@@ -96,6 +96,7 @@ function WalletPage() {
           <p className="text-lg text-gray-500 mt-4 animate-fade-in">Looks like you haven't made any transactions yet. Start adding funds to your wallet to see your balance here!</p>
         </div>
       )}
+      <Footer/>
     </div>
   );
 }

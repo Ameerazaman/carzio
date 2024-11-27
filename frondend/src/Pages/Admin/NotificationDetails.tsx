@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { useNavigate, useParams } from 'react-router-dom';
 import { notificaionDetails, verifyNotification } from '../../Api/Admin';

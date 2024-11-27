@@ -4,9 +4,9 @@ import Navbar from "../../Pages/Common/Navbar";
 import Card from "../../Pages/Common/Card";
 import { fetchCars } from "../../Api/User";
 import { CarDataInterface } from "../../Interface/CarInterface";
-import { useNavigate } from "react-router-dom";
 import { BiError } from "react-icons/bi";
 import Pagination from "../../Pages/Common/Pagination";
+import Footer from "../../Pages/Common/Footer";
 
 function CarList() {
     const [carData, setCarData] = useState<CarDataInterface[]>([]);
@@ -16,7 +16,7 @@ function CarList() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState<number>(1);
     const limit = 10
-    const navigate = useNavigate();
+    
 
     const filterData = (data: CarDataInterface[] | { message: string }) => {
         if (Array.isArray(data)) {
@@ -98,6 +98,7 @@ function CarList() {
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
             />
+            <Footer/>
         </div>
     );
 }

@@ -81,7 +81,7 @@ export class ProviderRepository {
 
     async saveProvider(providerData: ProviderInterface): Promise<ProviderInterface | null> {
         try {
-            console.log(providerData,"providerdata")
+            console.log(providerData, "providerdata")
             const newUser = new providerModel(providerData);
 
             await newUser.save();
@@ -236,11 +236,11 @@ export class ProviderRepository {
     }
 
     // ******************************fetch car for car management**********************
-    async fetchCars(page: number, limit: number): Promise<CarDataInterface[] | null> {
+    async fetchCars(providerId: string, page: number, limit: number): Promise<CarDataInterface[] | null> {
         try {
 
             const skip = (page - 1) * limit;
-            const carDocuments = await CarModel.find()
+            const carDocuments = await CarModel.find({ providerId })
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit) as CarDataInterface[];

@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 import { FaSignOutAlt } from 'react-icons/fa'; // You may want to include only the icons you use
 import Swal from 'sweetalert2';
-// import { toast } from 'react-toastify';
-// import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../App/Store';
@@ -17,10 +15,10 @@ function Navbar() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(!admin){
-        navigate("/admin/login")
+    if (!admin) {
+      navigate("/admin/login")
     }
-  }, [admin]); // Dependency array to log admin info only when it changes
+  }, [admin,navigate]); 
 
   const logoutUser = async () => {
     try {
@@ -36,7 +34,7 @@ function Navbar() {
         if (result.isConfirmed && admin) {
           try {
             const response = await adminLogout();
-           
+
             if (response) {
               dispatch(signOutAdmin()); // Clear admin from Redux store
 
@@ -59,26 +57,26 @@ function Navbar() {
   }
   return (
     <nav className="bg-gray-900 p-4 shadow-md">
-    <div className="container mx-auto flex justify-between items-center">
-      <div className="text-white text-lg font-bold">
-        <img
-          src="/images/car white.png" // Replace with your logo path
-          alt="Logo"
-          className="h-12 w-auto max-h-[48px]" // Adjusted height and width
-        />
+      <div className="container mx-auto flex justify-between items-center">
+        <div className="text-white text-lg font-bold">
+          <img
+            src="/images/car white.png" // Replace with your logo path
+            alt="Logo"
+            className="h-12 w-auto max-h-[48px]" // Adjusted height and width
+          />
+        </div>
+        <div className="flex items-center">
+          <button
+            onClick={logoutUser}
+            className="flex items-center text-white hover:text-red-500 transition duration-300"
+          >
+            <FaSignOutAlt className="mr-2" />
+            Logout
+          </button>
+        </div>
       </div>
-      <div className="flex items-center">
-        <button
-          onClick={logoutUser}
-          className="flex items-center text-white hover:text-red-500 transition duration-300"
-        >
-          <FaSignOutAlt className="mr-2" />
-          Logout
-        </button>
-      </div>
-    </div>
-  </nav>
-  
+    </nav>
+
   );
 }
 

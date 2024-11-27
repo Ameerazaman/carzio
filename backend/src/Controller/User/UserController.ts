@@ -27,7 +27,7 @@ export class UserController {
         if (!refreshToken)
             res
                 .status(401)
-                .json({ success: false, message: "Refresh Token Expired" });
+                .json({ success: false});
 
         try {
             const decoded = verifyRefreshToken(refreshToken);

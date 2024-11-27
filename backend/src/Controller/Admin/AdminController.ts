@@ -22,24 +22,24 @@ export class AdminController {
     if (!refreshToken)
       res
         .status(401)
-        .json({ success: false, message: "Refresh Token Expired" });
+        .json({ success: false});
 
     try {
       const decoded = verifyRefreshToken(refreshToken);
 
       if (!decoded || !decoded.data) {
-    
+
         res.status(401).json({ success: false, message: "Refresh Token Expired" });
       }
       const result = await this.adminServices.adminGetById(decoded.data);
       const accessTokenMaxAge = 5 * 60 * 1000;
-      const newAccessToken = result?.data?.token  
+      const newAccessToken = result?.data?.token
       res.cookie('access_token', newAccessToken, {
         maxAge: accessTokenMaxAge,
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
       })
-      res.status(200).json({ success: true, message: "Token Updated" });
+      res.status(200).json({ success: true});
     }
     catch (error) {
       next(error);
@@ -52,13 +52,12 @@ export class AdminController {
   async adminLogin(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
       const { email, password }: { email: string; password: string } = req.body;
-     
+
       const result = await this.adminServices.adminSignIn({ email, password });
-console.log(result)
       if (result?.data.success) {
         const access_token = result.data.token;
         const refresh_token = result.data.refreshToken;
-        const accessTokenMaxAge = 5 * 60 * 1000; 
+        const accessTokenMaxAge = 5 * 60 * 1000;
         const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
 
         return res.status(OK)
@@ -74,11 +73,11 @@ console.log(result)
           })
           .json({ success: true, user: result.data, message: result.data.message });
       } else {
-       
+
         return res.status(BAD_REQUEST).json({ success: false, message: result?.data.message });
       }
     } catch (error) {
-    
+
       return res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
     }
   }
@@ -166,7 +165,7 @@ console.log(result)
         return res.status(INTERNAL_SERVER_ERROR).json(result?.data);
       }
     } catch (error) {
-  
+
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -206,7 +205,6 @@ console.log(result)
         res.status(500).json({ message: "Internal server error" });
       }
     } catch (error) {
-      console.error("Error during fetch provider:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -216,7 +214,7 @@ console.log(result)
   async editProvider(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
       const id = req.params.id;
-   
+
       if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid ID parameter" });
       }
@@ -287,11 +285,11 @@ console.log(result)
   // *************************fetch notification that send by providers****************
   async fetchNotification(req: Request, res: Response): Promise<void> {
     try {
-   
-      const result = await this.adminServices.fetchNotification(); 
-      
+
+      const result = await this.adminServices.fetchNotification();
+
       if (result) {
-       
+
         res.status(result.status).json(result.data);
       } else {
         res.status(500).json({ message: "Internal server error" });
@@ -306,7 +304,7 @@ console.log(result)
 
   async notificationDetails(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-      const id = req.params.id; 
+      const id = req.params.id;
 
       if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid ID parameter" });
@@ -315,12 +313,12 @@ console.log(result)
       const carDocumentExist = await this.adminServices.notificationDetails(id);
 
       if (!carDocumentExist) {
-        return res.status(404).json({ message: "provider not found" });
+        return res.status(400).json({ message: "car documnet not found" });
       }
 
       return res.status(200).json(carDocumentExist);
     } catch (error) {
-    
+
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -329,9 +327,9 @@ console.log(result)
 
   async verifyNotification(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-      
-      const id = req.params.id; 
-      const value = req.params.value; 
+
+      const id = req.params.id;
+      const value = req.params.value;
 
       if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid ID parameter" });
@@ -347,7 +345,7 @@ console.log(result)
         }
       }
 
-      return res.status(404).json({ message: "Notification not found or invalid action" });
+      return res.status(400).json({ message: "Notification not found or invalid action" });
 
     } catch (error) {
       return res.status(500).json({ message: "Internal server error" });
@@ -359,7 +357,7 @@ console.log(result)
     try {
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
-      const result = await this.adminServices.fetchCars(page,limit); 
+      const result = await this.adminServices.fetchCars(page, limit);
 
       if (result) {
         res.status(result.status).json(result.data);
@@ -376,7 +374,7 @@ console.log(result)
   // ******************************Change car status*****************************
 
   async updateStatusCar(req: Request, res: Response): Promise<Response> {
-    try {    
+    try {
       const id = req.params.id;
       if (!id || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid car ID" });
@@ -385,7 +383,7 @@ console.log(result)
       const carExist = await this.adminServices.updateStatusCar(id);
 
       if (!carExist) {
-        return res.status(404).json({ message: "Car not found" });
+        return res.status(400).json({ message: "Car not found" });
       }
 
       return res.status(200).json({ message: "Car status updated successfully", car: carExist });
@@ -398,15 +396,15 @@ console.log(result)
   // ***********************Add offer*************************
   async addOffer(req: Request, res: Response): Promise<Response> {
     try {
-     
+
       const saveOffer = await this.adminServices.addOffer(req.body.offer);
-      
+
       if (!saveOffer) {
-        return res.status(404).json({ message: "Offer is not saved" });
+        return res.status(400).json({ message: "Offer is not saved" });
       }
       return res.status(200).json({ message: "Offer saved updated successfully", car: req.body });
     } catch (error) {
-      console.error("Error save Offer status:", error);
+    
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -416,7 +414,7 @@ console.log(result)
     try {
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
-      const result = await this.adminServices.fetchOffer(page,limit); 
+      const result = await this.adminServices.fetchOffer(page, limit);
       if (result) {
         res.status(result.status).json(result.data);
       } else {
@@ -429,8 +427,8 @@ console.log(result)
   // ************************************8edit offer***************************
   async editOffer(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-      const id = req.params.id; 
-     
+      const id = req.params.id;
+
       if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid ID parameter" });
       }
@@ -443,7 +441,7 @@ console.log(result)
 
       return res.status(200).json(offerExist);
     } catch (error) {
-    
+
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -452,13 +450,13 @@ console.log(result)
 
   async updateOffer(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-  
-      const id = req.params.id;  
+
+      const id = req.params.id;
       if (!id) {
         return res.status(400).json({ message: 'ID is missing' });
       }
 
-      const offerData = req.body; 
+      const offerData = req.body;
       if (!offerData) {
         return res.status(400).json({ message: 'offer data is missing' });
       }
@@ -479,7 +477,7 @@ console.log(result)
     try {
 
       const id = req.params.id;
-     
+
       if (!id || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid car ID" });
       }
@@ -500,9 +498,9 @@ console.log(result)
 
   async addCoupon(req: Request, res: Response): Promise<Response> {
     try {
-  
+
       const saveCoupon = await this.adminServices.addCoupon(req.body.coupon);
-    
+
       if (!saveCoupon) {
         return res.status(404).json({ message: "Coupon is not saved" });
       }
@@ -518,15 +516,15 @@ console.log(result)
     try {
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
-      const result = await this.adminServices.fetchCoupon(page,limit);
-   
+      const result = await this.adminServices.fetchCoupon(page, limit);
+
       if (result) {
         res.status(result.status).json(result.data);
       } else {
         res.status(500).json({ message: "Internal server error" });
       }
     } catch (error) {
-   
+
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -534,8 +532,8 @@ console.log(result)
   // ************************************edit coupon***************************
   async editCoupon(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-      const id = req.params.id; 
-     
+      const id = req.params.id;
+
       if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid ID parameter" });
       }
@@ -543,12 +541,12 @@ console.log(result)
       const couponExist = await this.adminServices.editCoupon(id);
 
       if (!couponExist) {
-        return res.status(404).json({ message: "Coupon not found" });
+        return res.status(400).json({ message: "Coupon not found" });
       }
 
       return res.status(200).json(couponExist);
     } catch (error) {
-     
+
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -556,12 +554,12 @@ console.log(result)
 
   async updateCoupon(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
-    
-      const id = req.params.id;  
+
+      const id = req.params.id;
       if (!id) {
         return res.status(400).json({ message: 'ID is missing' });
       }
-      const couponData = req.body;  
+      const couponData = req.body;
       if (!couponData) {
         return res.status(400).json({ message: 'coupon data is missing' });
       }
@@ -569,12 +567,12 @@ console.log(result)
       const result = await this.adminServices.updateCoupon(couponData, id);
 
       if (result?.status === OK) {
-        return res.status(OK).json(result.data);  
+        return res.status(OK).json(result.data);
       } else {
-        return res.status(INTERNAL_SERVER_ERROR).json(result?.data);  
+        return res.status(INTERNAL_SERVER_ERROR).json(result?.data);
       }
     } catch (error) {
-   
+
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -600,7 +598,7 @@ console.log(result)
     try {
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
-      const result = await this.adminServices.getBookingHistory(page,limit);
+      const result = await this.adminServices.getBookingHistory(page, limit);
       if (!result) {
         res.status(500).json({ message: "Error booking history" });
         return
@@ -655,7 +653,7 @@ console.log(result)
 
 
     } catch (error) {
-     
+
       res.status(500).json({
         "message": "Internal server error while fetching dashboard data"
       }
@@ -664,15 +662,15 @@ console.log(result)
   }
 
   // ***************************fetch sales report*********************
-  
+
   async fetchSalesReport(req: Request, res: Response): Promise<void> {
     try {
-      
+
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
-  
+
       const result = await this.adminServices.fetchSalesReport(page, limit);
-  
+
       if (!result) {
         res.status(500).json({ message: "Error fetching sales report" });
         return;
@@ -680,10 +678,10 @@ console.log(result)
 
       res.status(200).json(result.data);
     } catch (error) {
-     
+
       res.status(500).json({ message: "Internal server error" });
     }
   }
-  
+
 }
 

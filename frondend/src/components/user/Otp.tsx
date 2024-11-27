@@ -1,14 +1,11 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { resend, verifyOtp } from '../../Api/User';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 
 import { toast } from 'react-hot-toast';
 
 
 const Otp: React.FC = () => {
-  let dispatch = useDispatch()
   const [timer, setTimer] = useState<number>(50); // Set initial timer value
   const [isTimerActive, setIsTimerActive] = useState<boolean>(true); // State to control button text
   const [otp, setOtp] = useState<string[]>(Array(6).fill('')); // State to store the OTP digits
@@ -133,7 +130,7 @@ const Otp: React.FC = () => {
           {isTimerActive &&
             <p className="mt-4 text-gray-600 text-center text-sm">
               Didn't receive OTP?{' '}
-              <a onClick={handleResendOtp} className="text-red-500 hover:underline">Resend</a>
+              <p onClick={handleResendOtp} className="text-red-500 hover:underline">Resend</p>
             </p>
           }
           <p className="mt-4 text-gray-600 text-center text-sm">

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '../../Pages/Admin/Commons/Navbar';
 import Sidebar from '../../Pages/Admin/Commons/Sidebar';
 import Table from '../../Pages/Admin/Commons/Table';
-import { carManagementt, userManagement } from '../../Api/Admin';
+import { carManagementt } from '../../Api/Admin';
 import Pagination from '../../Pages/Common/Pagination';
 
 function CarsMgt() {
@@ -12,15 +12,13 @@ function CarsMgt() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const limit = 10;
-  const header: string = 'cars'; // D]efine whether this is for users or providers
+  const header: string = 'cars'; // Define whether this is for users or providers
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        console.log(page, limit,"page limit")
         const result = await carManagementt(page, limit);
-        console.log(result?.data, "Fetched car data");
 
         if (result?.data?.data) {
           setTableData(result.data.data);
@@ -29,8 +27,7 @@ function CarsMgt() {
           setError("Cars are Empty");
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
-        setError("Error fetching user data.");
+        setError("Error fetching car data.");
       } finally {
         setLoading(false);
       }
@@ -51,15 +48,17 @@ function CarsMgt() {
       <div className="flex-1 flex flex-col">
         <Navbar />
         <div className="flex-1 p-6 bg-gray-100">
-          <h1 className="text-2xl font-bold mb-4">User Management</h1>
-          <div className="overflow-x-auto bg-white rounded-lg shadow-md">
+          <h1 className="text-2xl font-bold mb-4">Car Management</h1>
+          <div className="flex-1 bg-white rounded-lg shadow-md">
             {loading ? (
               <p className="text-center py-4">Loading...</p>
             ) : error ? (
               <p className="text-center py-4 text-red-600">{error}</p>
             ) : (
               <>
-                <Table tableData={tableData} header={header} />
+                <div className="overflow-x-auto max-w-full">
+                  <Table tableData={tableData} header={header} />
+                </div>
                 <Pagination
                   currentPage={page}
                   totalPages={totalPages}

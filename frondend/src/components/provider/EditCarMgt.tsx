@@ -1,7 +1,6 @@
 
 import Navbar from '../../Pages/Common/Navbar'
 import EditCar from '../../Pages/Provider/EditCar'
-import Sidebar from '../../Pages/Provider/Sidebar'
 
 function EditCarMgt() {
 
