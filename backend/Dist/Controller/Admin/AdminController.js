@@ -26,13 +26,17 @@ class AdminController {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             const refreshToken = req.cookies.refresh_token;
+            console.log(refreshToken, "refresh token ");
             if (!refreshToken)
-                res
-                    .status(401)
-                    .json({ success: false });
+                console.log("refreshToken not get");
+            res
+                .status(401)
+                .json({ success: false });
             try {
                 const decoded = (0, VerifyTokens_1.verifyRefreshToken)(refreshToken);
+                console.log(decoded, "decoded data");
                 if (!decoded || !decoded.data) {
+                    console.log("decoded data is not get");
                     res.status(401).json({ success: false, message: "Refresh Token Expired" });
                 }
                 const result = yield this.adminServices.adminGetById(decoded.data);
@@ -61,6 +65,7 @@ class AdminController {
                     const refresh_token = result.data.refreshToken;
                     const accessTokenMaxAge = 5 * 60 * 1000;
                     const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+                    console.log(access_token, "access_token", refresh_token, "refresh_token", accessTokenMaxAge, "accessTokenMaxAge", refreshTokenMaxAge, "refreshTokenMaxAge");
                     return res.status(OK)
                         .cookie('access_token', access_token, {
                         maxAge: accessTokenMaxAge,
@@ -75,6 +80,7 @@ class AdminController {
                         .json({ success: true, user: result.data, message: result.data.message });
                 }
                 else {
+                    console.log("admin login failed");
                     return res.status(BAD_REQUEST).json({ success: false, message: result === null || result === void 0 ? void 0 : result.data.message });
                 }
             }
