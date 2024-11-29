@@ -27,7 +27,7 @@ export class UserController {
         if (!refreshToken)
             res
                 .status(401)
-                .json({ success: false});
+                .json({ success: false });
 
         try {
             const decoded = verifyRefreshToken(refreshToken);
@@ -45,7 +45,8 @@ export class UserController {
             res.cookie('access_token', newAccessToken, {
                 maxAge: accessTokenMaxAge,
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
+                secure:true,
+                sameSite: 'none',
             })
 
             res.status(200).json({ success: true });
@@ -186,12 +187,14 @@ export class UserController {
                     .cookie('access_token', access_token, {
                         maxAge: accessTokenMaxAge,
                         httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production',
+                        secure: true,
+                        sameSite: 'none',
                     })
                     .cookie('refresh_token', refresh_token, {
                         maxAge: refreshTokenMaxAge,
                         httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production',
+                        secure: true,
+                        sameSite: 'none',
                     })
                     .json({ success: true, user: result.data, message: result.data.message });
 
@@ -217,7 +220,7 @@ export class UserController {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production'
             });
-           
+
             res.status(200).json({ success: true, message: "Logged out successfully" });
         } catch (error) {
             res.status(500).json({ message: "Internal server error" });
@@ -228,16 +231,16 @@ export class UserController {
     // ****************************fetch  car for card***************************
     async fetchCars(req: Request, res: Response): Promise<void> {
         try {
-            
+
             const page = req.query.page ? Number(req.query.page) : undefined;
             const limit = req.query.limit ? Number(req.query.limit) : undefined;
 
             if (page !== undefined && limit !== undefined) {
-                
+
                 const result = await this.userServices.fetchCars(page, limit);
-               
+
                 if (result) {
-                 
+
                     res.status(200).json(result.data);
                 } else {
                     res.status(500).json({ message: "Internal server error" });
@@ -246,7 +249,7 @@ export class UserController {
                 res.status(400).json({ message: "Invalid page or limit" });
             }
         } catch (error) {
-           
+
             res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -254,8 +257,8 @@ export class UserController {
     // *********************************car details page********************
     async carDetails(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
         try {
-            const id = req.params.id; 
-          
+            const id = req.params.id;
+
             if (!id || typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
                 return res.status(400).json({ message: "Invalid ID parameter" });
             }
@@ -269,7 +272,7 @@ export class UserController {
 
             return res.status(200).json(carExist.data);
         } catch (error) {
-          
+
             return res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -278,7 +281,7 @@ export class UserController {
 
     async filterCar(req: Request, res: Response): Promise<Response> {
         try {
-          
+
             const { engineType, fuelType, sortPrice, searchQuery } = req.body.params;
 
             const carExist = await this.userServices.carFilter(engineType, fuelType, sortPrice);
@@ -289,16 +292,16 @@ export class UserController {
 
             return res.status(200).json(carExist);
         } catch (error) {
-           
+
             return res.status(500).json({ message: "Internal server error" });
         }
     }
     // ***********************************search Car************************
     async searchCar(req: Request, res: Response): Promise<Response> {
         try {
-           
+
             const carExist = await this.userServices.searchCar(req.body.searchQuery)
-            
+
             if (!carExist) {
                 return res.status(404).json({ message: "Car not found" });
             }
@@ -313,14 +316,14 @@ export class UserController {
     async fetchOffer(req: Request, res: Response): Promise<void> {
         try {
             const result = await this.userServices.fetchOffer(); // Fetch offers from service
-         
+
             if (result) {
                 res.status(result.status).json(result.data);
             } else {
                 res.status(500).json({ message: "Internal server error" });
             }
         } catch (error) {
-         
+
             res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -337,7 +340,7 @@ export class UserController {
             }
             res.status(200).json(result);
         } catch (error) {
-       
+
             res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -382,7 +385,7 @@ export class UserController {
                 data: result
             });
         } catch (error) {
-          
+
             res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -397,14 +400,14 @@ export class UserController {
                 res.status(500).json({ message: "Address not found" });
                 return
             }
-          
+
             res.status(200).json({
                 success: true,
                 data: result
             });
 
         } catch (error) {
-            
+
             res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -547,7 +550,7 @@ export class UserController {
             const userId = req.query.userId as string | undefined;
             const page = req.query.page ? Number(req.query.page) : 1;
             const limit = req.query.limit ? Number(req.query.limit) : 10;
-            
+
             if (!userId) {
                 res.status(400).json({ message: "User ID is required." });
                 return;
@@ -571,13 +574,13 @@ export class UserController {
             const result = await this.userServices.specificBookingDetails(bookingId);
 
             if (!result) {
-                res.status(404).json({ message: "Booking not found" }); 
+                res.status(404).json({ message: "Booking not found" });
                 return;
             }
 
-            res.status(200).json(result.data); 
+            res.status(200).json(result.data);
         } catch (error) {
-           
+
             res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -586,7 +589,7 @@ export class UserController {
     // *********************cancel booking By user add amount to wallet**********************
     async cancelBookingByUser(req: Request, res: Response): Promise<void> {
         try {
-            
+
             const bookingId = req.query.bookingId as string | undefined;
             const userId = req.query.userId as string | undefined;
             const amount = req.query.amount ? Number(req.query.amount) : undefined;
@@ -652,7 +655,7 @@ export class UserController {
     async checkAndUpdateWallet(req: Request, res: Response): Promise<void> {
         try {
             const userId = req.params.userId as string;
-            const amount = Number(req.params.amount); 
+            const amount = Number(req.params.amount);
             if (!userId || isNaN(amount)) {
                 res.status(400).json({ message: "Both userId and a valid amount are required" });
                 return;
@@ -666,7 +669,7 @@ export class UserController {
 
             res.status(200).json(result);
         } catch (error) {
-      
+
             res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -674,7 +677,7 @@ export class UserController {
     // ************************ get wallet ***********************
     async getWallet(req: Request, res: Response): Promise<void> {
         try {
-           
+
             const userId = req.query.userId as string | undefined;
             const page = req.query.page ? Number(req.query.page) : 1;
             const limit = req.query.limit ? Number(req.query.limit) : 2;
@@ -691,7 +694,7 @@ export class UserController {
             }
             res.status(200).json(result.data);
         } catch (error) {
-          
+
             res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -732,7 +735,7 @@ export class UserController {
     // ***************************check BookId exist in review*****************
     async checkBookIdinReview(req: Request, res: Response): Promise<void> {
         try {
-            
+
             const bookId = req.query.bookId as string | undefined;
             if (!bookId) {
                 res.status(400).json({ success: false, message: "BookId is required." });
@@ -763,7 +766,7 @@ export class UserController {
     // *********************************fetch chat history***********************8
     async fetchChatHistory(req: Request, res: Response): Promise<void> {
         try {
-           
+
             const userId = req.params.userId as string | undefined | '';
             const providerId = req.params.providerId as string | undefined | '';
             if (!userId || !providerId) {
@@ -783,7 +786,7 @@ export class UserController {
                 });
             }
         } catch (error) {
-          
+
             res.status(500).json({
                 success: false,
                 message: "An unexpected error occurred while fetching chat history",
@@ -800,7 +803,7 @@ export class UserController {
                 const result = await this.userServices.searchCarAvailability(issueDate, returnDate);
 
                 if (result) {
-                    
+
                     res.status(200).json(result.data);
                 } else {
                     res.status(500).json({ message: "Internal server error" });
@@ -809,7 +812,7 @@ export class UserController {
                 res.status(400).json({ message: "Invalid issueDate or returnDate" });
             }
         } catch (error) {
-           
+
             res.status(500).json({ message: "Internal server error" });
         }
     }

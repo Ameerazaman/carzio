@@ -26,26 +26,29 @@ class AdminController {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             const refreshToken = req.cookies.refresh_token;
-            console.log(refreshToken, "refresh token ");
-            if (!refreshToken)
-                console.log("refreshToken not get");
-            res
-                .status(401)
-                .json({ success: false });
+            console.log(refreshToken, "refresh token");
+            if (!refreshToken) {
+                console.log("refreshToken not received");
+                return res.status(401).json({ success: false });
+            }
             try {
                 const decoded = (0, VerifyTokens_1.verifyRefreshToken)(refreshToken);
                 console.log(decoded, "decoded data");
                 if (!decoded || !decoded.data) {
-                    console.log("decoded data is not get");
-                    res.status(401).json({ success: false, message: "Refresh Token Expired" });
+                    console.log("decoded data is not found");
+                    return res.status(401).json({ success: false, message: "Refresh Token Expired" });
                 }
                 const result = yield this.adminServices.adminGetById(decoded.data);
                 const accessTokenMaxAge = 5 * 60 * 1000;
                 const newAccessToken = (_a = result === null || result === void 0 ? void 0 : result.data) === null || _a === void 0 ? void 0 : _a.token;
+                if (!newAccessToken) {
+                    return res.status(401).json({ success: false, message: "Access token not generated" });
+                }
                 res.cookie('access_token', newAccessToken, {
                     maxAge: accessTokenMaxAge,
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'none', // Ensure 'none' is in lowercase
+                    secure: true, // Ensure you set this correctly for your environment
                 });
                 res.status(200).json({ success: true });
             }
@@ -70,13 +73,13 @@ class AdminController {
                         .cookie('access_token', access_token, {
                         maxAge: accessTokenMaxAge,
                         httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production',
+                        secure: true,
                         sameSite: 'none',
                     })
                         .cookie('refresh_token', refresh_token, {
                         maxAge: refreshTokenMaxAge,
                         httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production',
+                        secure: true,
                         sameSite: 'none',
                     })
                         .json({ success: true, user: result.data, message: result.data.message });

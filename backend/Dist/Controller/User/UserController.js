@@ -45,7 +45,8 @@ class UserController {
                 res.cookie('access_token', newAccessToken, {
                     maxAge: accessTokenMaxAge,
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
+                    secure: true,
+                    sameSite: 'none',
                 });
                 res.status(200).json({ success: true });
             }
@@ -160,12 +161,14 @@ class UserController {
                         .cookie('access_token', access_token, {
                         maxAge: accessTokenMaxAge,
                         httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production',
+                        secure: true,
+                        sameSite: 'none',
                     })
                         .cookie('refresh_token', refresh_token, {
                         maxAge: refreshTokenMaxAge,
                         httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production',
+                        secure: true,
+                        sameSite: 'none',
                     })
                         .json({ success: true, user: result.data, message: result.data.message });
                 }
