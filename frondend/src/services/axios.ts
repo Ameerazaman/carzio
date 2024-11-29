@@ -13,9 +13,10 @@ import { signOutAdmin } from "../App/Slice/AdminSlice";
 export { }
 const userApi: AxiosInstance = axios.create({
   baseURL: "http://localhost:5000/api/users",
-  withCredentials: true   
+  // baseURL: "https://carzio.store/api/users",
+  withCredentials: true
 });
-   
+
 userApi.interceptors.response.use(
   (response) => {
     if (response.data.message) {
@@ -28,18 +29,18 @@ userApi.interceptors.response.use(
     if (error?.response?.status === 401 && error.response.data.message === 'User Credentials Invalid please SignIn') {
       await userLogout();
       store.dispatch(signOut())
-     
+
     }
     if (error.response?.status === 401 && error.response.data?.message === 'Refresh Token Expired') {
       await userLogout();
       store.dispatch(signOut())
-  
+
     }
     if (error.response?.status === 401 && error.response.data?.message === "User is blocked by Admin") {
       await userLogout();
       store.dispatch(signOut())
-      
-     
+
+
     }
     if (error.response?.status === 404) {
       window.location.href = '/error/404';
@@ -59,13 +60,14 @@ userApi.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }    
+  }
 );
 
 // **********************************Axios instance for Provider********************
 
 const providerAPI: AxiosInstance = axios.create({
   baseURL: "http://localhost:5000/api",
+  // baseURL: "https://carzio.store/api",
   withCredentials: true
 });
 
@@ -114,6 +116,8 @@ providerAPI.interceptors.response.use(
 
 const adminAPI: AxiosInstance = axios.create({
   baseURL: "http://localhost:5000/api",
+  // baseURL: "https://carzio.store/api",
+
   withCredentials: true
 });
 

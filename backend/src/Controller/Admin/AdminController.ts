@@ -18,17 +18,18 @@ export class AdminController {
   async refreshToken(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
 
     const refreshToken = req.cookies.refresh_token;
-
+    console.log(refreshToken, "refresh token ")
     if (!refreshToken)
-      res
-        .status(401)
-        .json({ success: false});
+      console.log("refreshToken not get")
+    res
+      .status(401)
+      .json({ success: false });
 
     try {
       const decoded = verifyRefreshToken(refreshToken);
-
+      console.log(decoded, "decoded data")
       if (!decoded || !decoded.data) {
-
+        console.log("decoded data is not get")
         res.status(401).json({ success: false, message: "Refresh Token Expired" });
       }
       const result = await this.adminServices.adminGetById(decoded.data);
@@ -39,7 +40,7 @@ export class AdminController {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
       })
-      res.status(200).json({ success: true});
+      res.status(200).json({ success: true });
     }
     catch (error) {
       next(error);
@@ -47,7 +48,6 @@ export class AdminController {
   }
 
   // ***********************************admin Login**************************8
-
 
   async adminLogin(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
@@ -59,7 +59,7 @@ export class AdminController {
         const refresh_token = result.data.refreshToken;
         const accessTokenMaxAge = 5 * 60 * 1000;
         const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
-
+        console.log(access_token, "access_token", refresh_token, "refresh_token", accessTokenMaxAge, "accessTokenMaxAge", refreshTokenMaxAge, "refreshTokenMaxAge")
         return res.status(OK)
           .cookie('access_token', access_token, {
             maxAge: accessTokenMaxAge,
@@ -73,7 +73,7 @@ export class AdminController {
           })
           .json({ success: true, user: result.data, message: result.data.message });
       } else {
-
+        console.log("admin login failed")
         return res.status(BAD_REQUEST).json({ success: false, message: result?.data.message });
       }
     } catch (error) {
@@ -404,7 +404,7 @@ export class AdminController {
       }
       return res.status(200).json({ message: "Offer saved updated successfully", car: req.body });
     } catch (error) {
-    
+
       return res.status(500).json({ message: "Internal server error" });
     }
   }

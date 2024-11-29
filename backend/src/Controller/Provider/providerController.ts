@@ -19,7 +19,7 @@ export class ProviderController {
     async refreshToken(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
 
         const refreshToken = req.cookies.refresh_token;
-
+        console.log(refreshToken, "refresh token provider")
         if (!refreshToken)
             res
                 .status(401)
@@ -28,6 +28,7 @@ export class ProviderController {
         try {
             const decoded = verifyRefreshToken(refreshToken);
             if (!decoded || !decoded.data) {
+                console.log("refresh token expired in controler")
                 res.status(401).json({ success: false, message: "Refresh Token Expired" });
             }
 
@@ -35,12 +36,13 @@ export class ProviderController {
 
             const accessTokenMaxAge = 5 * 60 * 1000;
             const newAccessToken = result?.data?.token
+            console.log("accessnew token", newAccessToken)
             res.cookie('access_token', newAccessToken, {
                 maxAge: accessTokenMaxAge,
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
             })
-            res.status(200).json({ success: true});
+            res.status(200).json({ success: true });
         }
         catch (error) {
             next(error);
@@ -118,13 +120,13 @@ export class ProviderController {
             }
             if (OTPRecord) {
                 const providerData = req.app.locals.ProviderData
-              
+
                 const savedProvider = await this.providerServices.saveProvider(providerData);
 
                 if (savedProvider) {
                     return res.status(OK).json({
                         success: true,
-                       
+
                         provider: savedProvider,
                     });
                 } else {
@@ -170,7 +172,7 @@ export class ProviderController {
                     })
                     .json({ success: true, user: result.data, message: result.data.message });
             } else {
-
+                console.log("login failed")
                 return res.status(BAD_REQUEST).json({ success: false, message: result?.data.message });
             }
         } catch (error) {
@@ -207,7 +209,7 @@ export class ProviderController {
                 return res.status(400).json({ message: "Invalid ID parameter" });
             }
             const address = await this.providerServices.checkProviderAddress(id);
-            
+
             if (address) {
 
                 return res.status(200).json(address);
@@ -439,7 +441,7 @@ export class ProviderController {
                 return res.status(INTERNAL_SERVER_ERROR).json({ message: "Car already exists" });
             }
         } catch (error) {
-       
+
             return res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -457,7 +459,7 @@ export class ProviderController {
             }
             res.status(200).json(result.data);
         } catch (error) {
-            
+
             res.status(500).json({ message: "Internal server error" });
         }
     }
@@ -465,7 +467,7 @@ export class ProviderController {
     async specificBookingDetails(req: Request, res: Response): Promise<void> {
         try {
             const bookingId = req.params.id
-            
+
             const result = await this.providerServices.specificBookingDetails(bookingId);
             if (!result) {
                 res.status(500).json({ message: "Error booking history" });
