@@ -23,6 +23,7 @@ const adminRepository = new AdminRepostries_1.AdminRepository();
 dotenv_1.default.config();
 const adminAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log(req.cookies, "cookies");
         let token = req.cookies.access_token;
         let refresh_token = req.cookies.refresh_token;
         console.log(token, "admin token");

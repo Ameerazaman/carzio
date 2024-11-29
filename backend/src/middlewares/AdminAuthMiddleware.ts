@@ -24,6 +24,7 @@ declare global {
 
 const adminAuth = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        console.log(req.cookies,"cookies")
         let token = req.cookies.access_token;
         let refresh_token = req.cookies.refresh_token;
         console.log(token, "admin token")

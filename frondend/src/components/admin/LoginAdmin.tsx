@@ -14,7 +14,7 @@ function LoginAdmin() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [errors, setErrors] = useState<Errors>({});
-let dispatch=useDispatch()
+  let dispatch = useDispatch()
   const navigate = useNavigate();
 
   const validation = (): Errors => {
@@ -55,10 +55,11 @@ let dispatch=useDispatch()
     try {
       // Call loginUser with form data
       const response = await adminLogin(formData);
-
+      console.log()
+      console.log(response, "response")
       if (response) {
         localStorage.setItem('token', response.data.token);
-        dispatch( signInSuccessAdmin(response.data.user.data)) // Store the token
+        dispatch(signInSuccessAdmin(response.data.user.data)) // Store the token
         navigate('/admin/dashboard'); // Redirect to home page
       } else {
 
@@ -135,7 +136,7 @@ let dispatch=useDispatch()
 
           {/* Already have an account? */}
           <div className="mt-4 text-center">
-            
+
           </div>
         </div>
       </div>

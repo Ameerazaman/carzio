@@ -65,17 +65,19 @@ class AdminController {
                     const refresh_token = result.data.refreshToken;
                     const accessTokenMaxAge = 5 * 60 * 1000;
                     const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
-                    console.log(access_token, "access_token", refresh_token, "refresh_token", accessTokenMaxAge, "accessTokenMaxAge", refreshTokenMaxAge, "refreshTokenMaxAge");
+                    // console.log(access_token, "access_token", refresh_token, "refresh_token", accessTokenMaxAge, "accessTokenMaxAge", refreshTokenMaxAge, "refreshTokenMaxAge")
                     return res.status(OK)
                         .cookie('access_token', access_token, {
                         maxAge: accessTokenMaxAge,
                         httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production'
+                        secure: process.env.NODE_ENV === 'production',
+                        sameSite: 'none',
                     })
                         .cookie('refresh_token', refresh_token, {
                         maxAge: refreshTokenMaxAge,
                         httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production'
+                        secure: process.env.NODE_ENV === 'production',
+                        sameSite: 'none',
                     })
                         .json({ success: true, user: result.data, message: result.data.message });
                 }
