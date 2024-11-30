@@ -19,7 +19,6 @@ export class ProviderController {
     async refreshToken(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
 
         const refreshToken = req.cookies.refresh_token;
-        console.log(refreshToken, "refresh token provider")
         if (!refreshToken)
             res
                 .status(401)
@@ -28,7 +27,6 @@ export class ProviderController {
         try {
             const decoded = verifyRefreshToken(refreshToken);
             if (!decoded || !decoded.data) {
-                console.log("refresh token expired in controler")
                 res.status(401).json({ success: false, message: "Refresh Token Expired" });
             }
 
@@ -36,7 +34,6 @@ export class ProviderController {
 
             const accessTokenMaxAge = 5 * 60 * 1000;
             const newAccessToken = result?.data?.token
-            console.log("accessnew token", newAccessToken)
             res.cookie('access_token', newAccessToken, {
                 maxAge: accessTokenMaxAge,
                 httpOnly: true,

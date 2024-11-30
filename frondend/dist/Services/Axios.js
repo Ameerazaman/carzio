@@ -44,7 +44,8 @@ import { signOut } from "../App/Slice/UserSlice";
 import { signOutProvider } from "../App/Slice/ProviderSlice";
 import { signOutAdmin } from "../App/Slice/AdminSlice";
 var userApi = axios.create({
-    baseURL: "http://localhost:5000/api/users",
+    // baseURL: "http://localhost:5000/api/users",
+    baseURL: "https://carzio.store/api/users",
     withCredentials: true
 });
 userApi.interceptors.response.use(function (response) {
@@ -106,7 +107,8 @@ userApi.interceptors.response.use(function (response) {
 }); });
 // **********************************Axios instance for Provider********************
 var providerAPI = axios.create({
-    baseURL: "http://localhost:5000/api",
+    // baseURL: "http://localhost:5000/api",
+    baseURL: "https://carzio.store/api",
     withCredentials: true
 });
 providerAPI.interceptors.response.use(function (response) {
@@ -168,7 +170,8 @@ providerAPI.interceptors.response.use(function (response) {
 }); });
 // **********************************Axios instance for Admin********************
 var adminAPI = axios.create({
-    baseURL: "http://localhost:5000/api",
+    // baseURL: "http://localhost:5000/api",
+    baseURL: "https://carzio.store/api",
     withCredentials: true
 });
 adminAPI.interceptors.response.use(function (response) {

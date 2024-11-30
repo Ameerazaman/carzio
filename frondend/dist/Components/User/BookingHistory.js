@@ -42,6 +42,7 @@ import Pagination from '../../Pages/Common/Pagination';
 import { useSelector } from 'react-redux';
 import { getBookingHistory } from '../../Api/User';
 import Footer from '../../Pages/Common/Footer';
+import Loading from '../../Pages/Common/Loading';
 function BookingHistory() {
     var _this = this;
     var user = useSelector(function (state) { var _a; return (_a = state.user) === null || _a === void 0 ? void 0 : _a.currentUser; });
@@ -85,11 +86,11 @@ function BookingHistory() {
         }
     };
     if (loading) {
-        return _jsx("div", { className: "text-center", children: "Loading booking history..." });
+        return _jsx("div", { className: "text-center", children: _jsx(Loading, {}) });
     }
     if (error) {
         return _jsx("div", { className: "text-center text-red-500", children: error });
     }
-    return (_jsxs("div", { children: [_jsx(Navbar, {}), loading ? (_jsx("div", { className: "text-center text-lg text-gray-500", children: "Fetching your booking history..." })) : bookingHistory && bookingHistory.length > 0 ? (_jsxs(_Fragment, { children: [_jsx(BookingHistoryUser, { bookingHistory: bookingHistory }), _jsx(Pagination, { currentPage: page, totalPages: totalPages, onPageChange: handlePageChange })] })) : (_jsxs("div", { className: "flex items-center justify-center min-h-screen flex-col", children: [_jsx("div", { className: "text-2xl font-semibold text-gray-600 mb-4 animate-pulse", children: "No bookings available yet" }), _jsx("div", { className: "w-40 h-40 bg-gray-200 rounded-full flex items-center justify-center animate-bounce", children: _jsx("svg", { xmlns: "http://www.w3.org/2000/svg", className: "w-20 h-20 text-gray-400", viewBox: "0 0 20 20", fill: "currentColor", children: _jsx("path", { fillRule: "evenodd", d: "M4 3C4 2.44772 4.44772 2 5 2H15C15.5523 2 16 2.44772 16 3V17C16 17.5523 15.5523 18 15 18H5C4.44772 18 4 17.5523 4 17V3ZM5 4V16H15V4H5Z", clipRule: "evenodd" }) }) }), _jsx("p", { className: "text-lg text-gray-500 mt-4 animate-fade-in", children: "You haven't made any bookings yet. Once you do, they will show up here!" })] })), _jsx(Footer, {})] }));
+    return (_jsxs("div", { children: [_jsx(Navbar, {}), loading ? (_jsx("div", { className: "text-center text-lg text-gray-500", children: "Fetching your booking history..." })) : bookingHistory && bookingHistory.length > 0 ? (_jsxs(_Fragment, { children: [_jsx(BookingHistoryUser, { bookingHistory: bookingHistory }), _jsx(Pagination, { currentPage: page, totalPages: totalPages, onPageChange: handlePageChange })] })) : (_jsxs("div", { className: "flex items-center justify-center min-h-screen flex-col", children: [_jsx("div", { className: "text-2xl font-semibold text-gray-600 mb-4 animate-pulse", children: "No bookings available yet" }), _jsx("div", { className: "w-40 h-40 bg-gray-200 rounded-full flex items-center justify-center animate-bounce", children: _jsx("svg", { xmlns: "http://www.w3.org/2000/svg", className: "w-20 h-20 text-gray-400", viewBox: "0 0 20 20", fill: "currentColor", children: _jsx("path", { fillRule: "evenodd", d: "M4 3C4 2.44772 4.44772 2 5 2H15C15.5523 2 16 2.44772 16 3V17C16 17.5523 15.5523 18 15 18H5C4.44772 18 4 17.5523 4 17V3ZM5 4V16H15V4H5Z", clipRule: "evenodd" }) }) }), _jsx("p", { className: "text-lg text-gray-500 mt-4 animate-fade-in", children: "You haven't made any bookings yet. Once you do, they will show up here!" })] })), _jsx("div", { className: "mt-12", children: _jsx(Footer, {}) })] }));
 }
 export default BookingHistory;

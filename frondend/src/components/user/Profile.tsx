@@ -8,11 +8,13 @@ function Profile() {
     <div className="flex flex-col h-screen">
       <Navbar />
       <div className="flex flex-grow">
-        <div className="flex-grow pt-0 pb-0"> 
-          <UserProfile /> 
+        <div className="flex-grow pt-0 pb-0">
+          <UserProfile />
         </div>
       </div>
-      <Footer/>
+      <div className="mt-12">
+                <Footer />
+            </div>
     </div>
   );
 }

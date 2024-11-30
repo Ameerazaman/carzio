@@ -21,35 +21,30 @@ function UserAddress({ onAddressIdChange }: AddressMgtInProps) {
         state: '',
         district: '',
         zip: '',
-        userId: user?._id
+        userId: user?._id || ''
     });
     const [addressErrors, setAddressErrors] = useState<Partial<AddressInterface>>({});
 
     useEffect(() => {
         const fetchProfile = async () => {
-            if (user && user._id) {
-                try {
-                    const response = await checkAddress(user._id);
-                    if (response?.status === 200) {
-                        setCurrentAddress(response.data.data);
-                        setAddressId(response.data.data._id);
-                        setIsEditingAddress(true);
-                        onAddressIdChange(response.data.data._id); // Pass addressId to the parent component
-                    } else {
-                        toast.error('No address found. Please create a new address.');
-                    }
-                } catch {
-                    toast.error('Error fetching address data.');
-                }
+            try {
+                const response = await checkAddress(user?._id || '');
+                if (response?.status === 200) {
+                    const addressData = response.data.data;
+                    setCurrentAddress(addressData);
+                    setAddressId(addressData._id);
+                    setIsEditingAddress(true);
+                    onAddressIdChange(addressData._id);
+                } 
+            } catch {
+                toast.error('Error fetching address data.');
             }
         };
 
-        // Check if the addressId is already set before fetching it again
-        if (!addressId) {
+        if (user?._id && !addressId) {
             fetchProfile();
         }
-    }, [user, addressId, onAddressIdChange]); // Depend on addressId to prevent multiple calls
-
+    }, [user?._id, addressId, onAddressIdChange]);
 
     const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -66,9 +61,7 @@ function UserAddress({ onAddressIdChange }: AddressMgtInProps) {
         if (!currentAddress.city) newErrors.city = 'City is required';
         if (!currentAddress.state) newErrors.state = 'State is required';
         if (!currentAddress.district) newErrors.district = 'District is required';
-        if (!currentAddress.zip) {
-            newErrors.zip = 'ZIP is required';
-        } else if (!/^\d{5,6}$/.test(currentAddress.zip)) {
+        if (!currentAddress.zip || !/^\d{5,6}$/.test(currentAddress.zip)) {
             newErrors.zip = 'ZIP should be 5 or 6 digits';
         }
         setAddressErrors(newErrors);
@@ -77,39 +70,26 @@ function UserAddress({ onAddressIdChange }: AddressMgtInProps) {
 
     const saveAddress = async (e: React.FormEvent) => {
         e.preventDefault();
-
         if (!validateAddress()) {
             toast.error('Please fill all fields correctly.');
             return;
         }
 
-        const formData = {
-            houseName: currentAddress.houseName,
-            street: currentAddress.street,
-            city: currentAddress.city,
-            state: currentAddress.state,
-            district: currentAddress.district,
-            zip: currentAddress.zip,
-            userId: user?._id
-        };
-
+        const formData = { ...currentAddress };
         try {
-            let result;
-            if (isEditingAddress) {
-                result = await editAddress(formData, addressId);
-            } else {
-                result = await saveAddressData(formData);
-                if (result?.data) {
-                    setIsEditingAddress(true);
-                    setAddressId(result.data._id); // Update the addressId for newly created address
-                    onAddressIdChange(result.data._id); // Pass addressId to the parent component
-                }
-            }
+            const result = isEditingAddress
+                ? await editAddress(formData, addressId)
+                : await saveAddressData(formData);
 
             if (result?.status === 200) {
-                toast.success(isEditingAddress ? 'Address updated successfully.' : 'Address saved successfully.');
+                if (!isEditingAddress) {
+                    const newAddressId = result.data._id;
+                    setAddressId(newAddressId);
+                    onAddressIdChange(newAddressId);
+                    setIsEditingAddress(true);
+                }
             } else {
-                toast.error(isEditingAddress ? 'Failed to update address.' : 'Failed to save address.');
+                toast.error('Failed to save address.');
             }
         } catch (error) {
             console.error('Error saving address:', error);
@@ -122,13 +102,12 @@ function UserAddress({ onAddressIdChange }: AddressMgtInProps) {
             <h1 className="text-xl font-bold mb-3 text-red-600">Manage Address</h1>
             <form onSubmit={saveAddress}>
                 <div className="grid grid-cols-3 gap-4 text-sm text-gray-700">
-                    <input type="text" value={user?._id} style={{ display: "none" }} />
                     {(['houseName', 'street', 'city', 'state', 'district', 'zip'] as (keyof AddressInterface)[]).map((field) => (
                         <div className="relative mb-4" key={field}>
                             <input
-                                type='text'
+                                type="text"
                                 name={field}
-                                value={currentAddress[field]}
+                                value={currentAddress[field] || ''}
                                 onChange={handleAddressChange}
                                 placeholder=" "
                                 className={`peer block w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-900 focus:border-red-500 focus:outline-none focus:ring-0 ${isEditingAddress ? 'bg-white' : 'bg-gray-200'} ${addressErrors[field] ? 'border-red-500' : ''}`}
@@ -144,7 +123,7 @@ function UserAddress({ onAddressIdChange }: AddressMgtInProps) {
                     ))}
                 </div>
                 <div className="mt-4 flex justify-end">
-                    <button onClick={saveAddress} className="bg-gray-900 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">
+                    <button type="submit" className="bg-gray-900 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">
                         {isEditingAddress ? 'Edit' : 'Save'}
                     </button>
                 </div>
@@ -153,5 +132,5 @@ function UserAddress({ onAddressIdChange }: AddressMgtInProps) {
     );
 }
 
-export default UserAddress;
+export default React.memo(UserAddress);
 

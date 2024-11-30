@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../App/Store';
@@ -238,12 +238,12 @@ function BookingPage() {
   };
 
 
-  const handleAddressId = (id: string) => {
+  const handleAddressId = useCallback((id: string) => {
     setFormData((prevData) => ({
       ...prevData,
       UserAddressId: id,
     }));
-  };
+  }, []);
 
   const handleCouponApply = () => {
     if (couponData && Array.isArray(couponData)) {  // Check if couponData is not null

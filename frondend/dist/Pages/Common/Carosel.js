@@ -39,7 +39,6 @@ import { useState, useRef, useEffect } from 'react';
 import { searchCarAvailabilty } from '../../Api/User';
 // Sample slide data
 var slides = [
-    { image: '/images/carousel1.jpg', title: 'Affordable Cars for Rent', date: '2024-01-01' },
     { image: '/images/hyundai-creta.webp', title: 'Affordable Cars for Rent', date: '2024-01-01' },
     { image: '/images/family-car.jpg', title: 'Perfect Family Cars for Every Journey', date: '2024-02-01' },
 ];

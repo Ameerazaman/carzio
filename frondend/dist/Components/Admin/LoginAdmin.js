@@ -87,6 +87,8 @@ function LoginAdmin() {
                     return [4 /*yield*/, adminLogin(formData)];
                 case 2:
                     response = _a.sent();
+                    console.log();
+                    console.log(response, "response");
                     if (response) {
                         localStorage.setItem('token', response.data.token);
                         dispatch(signInSuccessAdmin(response.data.user.data)); // Store the token

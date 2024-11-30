@@ -58,7 +58,7 @@ function Navbar() {
         <div className="flex items-center space-x-4 text-white">
 
           <FaPhone />
-          <span className="hover:text-red-400 transition duration-300"> +123 456 7890</span>
+          <span className="hover:text-red-900 transition duration-300"> +123 456 7890</span>
         </div>
 
         <button

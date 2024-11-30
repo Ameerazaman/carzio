@@ -7,6 +7,7 @@ import { getWalletPage } from '../../Api/User';
 import { walletInterface } from '../../Interface/WalletInterface';
 import Pagination from '../../Pages/Common/Pagination';
 import Footer from '../../Pages/Common/Footer';
+import Loading from '../../Pages/Common/Loading';
 
 function WalletPage() {
   const user = useSelector((state: RootState) => state.user.currentUser) as User | null;
@@ -55,7 +56,7 @@ function WalletPage() {
     <div>
       <Navbar />
       {loading ? (
-        <div className="text-center text-lg text-gray-500">Fetching your wallet data...</div>
+        <div className="text-center text-lg text-gray-500"><Loading/></div>
       ) : walletData && walletData.length > 0 ? (
         <>
           {/* Wallet Table */}
@@ -96,7 +97,9 @@ function WalletPage() {
           <p className="text-lg text-gray-500 mt-4 animate-fade-in">Looks like you haven't made any transactions yet. Start adding funds to your wallet to see your balance here!</p>
         </div>
       )}
-      <Footer/>
+     <div className="mt-12">
+                <Footer />
+            </div>
     </div>
   );
 }

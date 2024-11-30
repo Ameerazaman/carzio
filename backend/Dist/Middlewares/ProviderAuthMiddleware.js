@@ -25,37 +25,26 @@ const providerAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     try {
         let token = req.cookies.access_token;
         let refresh_token = req.cookies.refresh_token;
-        console.log(token, "token", refresh_token, "refersh token");
         if (!refresh_token) {
-            console.log("refresh_token is not get");
             return res.status(401).json({ success: false, message: 'Refresh Token Expired' });
         }
         const refreshTokenValid = (0, VerifyTokens_1.verifyRefreshToken)(refresh_token);
-        console.log(refreshTokenValid, "refreshTokenValid");
         const provider = yield providerRepository.getProviderById(refreshTokenValid.data);
-        console.log(provider, "provider");
         if ((provider === null || provider === void 0 ? void 0 : provider.isBlocked) === true) {
-            console.log("blocked");
             return res.status(401).json({ success: false, message: "Provider is blocked by Admin" });
         }
         if (!token) {
-            console.log(token, "token");
             return res.status(401).json({ success: false, message: "Access Token Expired" });
         }
         const decoded = (0, VerifyTokens_1.verifyAccessToken)(token);
-        console.log(decoded, "decoded");
         if (!(decoded === null || decoded === void 0 ? void 0 : decoded.data)) {
-            console.log("decoded data not get");
             return res.status(401).json({ success: false, message: "Access Token Expired" });
         }
         const existingProvider = yield providerRepository.getProviderById(decoded.data);
-        console.log(existingProvider, "existing provider");
         if (!existingProvider) {
-            console.log("existing provider is not get");
             return res.status(404).json({ message: "provider not found" });
         }
         if (existingProvider === null || existingProvider === void 0 ? void 0 : existingProvider.isBlocked) {
-            console.log("existingProvider is blocked");
             return res.status(401).json({ success: false, message: "Provider is blocked by admin!" });
         }
         else {

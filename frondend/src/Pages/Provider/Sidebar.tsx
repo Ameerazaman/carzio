@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { FaUser, FaCar, FaCog, FaCalendarAlt, FaComments, FaFileAlt, FaBars } from 'react-icons/fa';
-import { NavLink } from 'react-router-dom'; // Use NavLink from react-router-dom
+import { NavLink } from 'react-router-dom'; 
 
 function Sidebar() {
-  const [isOpen, setIsOpen] = useState(true); // state to handle the toggling of sidebar
+  const [isOpen, setIsOpen] = useState(true); 
 
   const toggleSidebar = () => {
-    setIsOpen(!isOpen); // toggle sidebar state
+    setIsOpen(!isOpen); 
   };
 
   return (

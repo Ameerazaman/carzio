@@ -358,7 +358,7 @@ class UserController {
                 const userId = req.params.id;
                 const result = yield this.userServices.checkAddress(userId);
                 if (!result) {
-                    res.status(500).json({ message: "Address not found" });
+                    res.status(500).json({ message: 'No address found. Please create a new address.' });
                     return;
                 }
                 res.status(200).json({

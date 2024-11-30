@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { User } from '../../Common/Navbar';
 import { RootState } from '../../../App/Store';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { MdHouse, MdLocationOn, MdOutlineDomain, MdOutlineHome, MdOutlineLocationCity, MdOutlinePinDrop } from 'react-icons/md';
 import { ProfileInterface } from '../../../Interface/ProfileInterface';
 import { AddressInterface } from '../../../Interface/AddressInterface';
@@ -94,9 +94,10 @@ const UserProfile = () => {
     };
 
 
-    const handleAddressId = (id: string) => {
-        setAddressId(id)
-    };
+    const handleAddressId = useCallback((id: string) => {
+        setAddressId(id);
+    }, []);
+
     const saveProfile = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validateForm()) {
@@ -123,7 +124,6 @@ const UserProfile = () => {
                 const result = await editProfile(formData, profileId);
                 if (result) {
                     setIsEditing(true)
-                    toast.success('Profile updated successfully.');
                 } else {
                     toast.error('Failed to update profile.');
                 }
@@ -132,7 +132,7 @@ const UserProfile = () => {
                 const result = await saveProfileData(formData);
                 setIsEditing(true)
                 if (result) {
-                    toast.success('Profile saved successfully.');
+    
                 } else {
                     toast.error('Failed to save profile.');
                 }

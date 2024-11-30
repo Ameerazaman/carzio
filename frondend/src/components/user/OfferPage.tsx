@@ -6,9 +6,11 @@ import Footer from '../../Pages/Common/Footer'
 function OfferPage() {
   return (
     <div>
-      <Navbar/>
-      <OfferCard/>
-      <Footer/>
+      <Navbar />
+      <OfferCard />
+      <div className="mt-12">
+        <Footer />
+      </div>
     </div>
   )
 }

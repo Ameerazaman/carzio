@@ -28,7 +28,6 @@ class ProviderController {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             const refreshToken = req.cookies.refresh_token;
-            console.log(refreshToken, "refresh token provider");
             if (!refreshToken)
                 res
                     .status(401)
@@ -36,13 +35,11 @@ class ProviderController {
             try {
                 const decoded = (0, VerifyTokens_1.verifyRefreshToken)(refreshToken);
                 if (!decoded || !decoded.data) {
-                    console.log("refresh token expired in controler");
                     res.status(401).json({ success: false, message: "Refresh Token Expired" });
                 }
                 const result = yield this.providerServices.providerGetById(decoded.data);
                 const accessTokenMaxAge = 5 * 60 * 1000;
                 const newAccessToken = (_a = result === null || result === void 0 ? void 0 : result.data) === null || _a === void 0 ? void 0 : _a.token;
-                console.log("accessnew token", newAccessToken);
                 res.cookie('access_token', newAccessToken, {
                     maxAge: accessTokenMaxAge,
                     httpOnly: true,

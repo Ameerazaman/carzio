@@ -7,6 +7,7 @@ import { RootState } from '../../App/Store';
 import { Booking } from '../../Interface/BookinDetailsInterface';
 import { getBookingHistory } from '../../Api/User';
 import Footer from '../../Pages/Common/Footer';
+import Loading from '../../Pages/Common/Loading';
 
 
 function BookingHistory() {
@@ -30,7 +31,7 @@ function BookingHistory() {
         } catch (error) {
           setError("Error fetching booking history.");
           setLoading(false);
- 
+
         }
       }
     };
@@ -45,7 +46,7 @@ function BookingHistory() {
   };
 
   if (loading) {
-    return <div className="text-center">Loading booking history...</div>;
+    return <div className="text-center"><Loading /></div>;
   }
 
   if (error) {
@@ -76,8 +77,9 @@ function BookingHistory() {
           <p className="text-lg text-gray-500 mt-4 animate-fade-in">You haven't made any bookings yet. Once you do, they will show up here!</p>
         </div>
       )}
-
-<Footer/>
+      <div className="mt-12">
+        <Footer />
+      </div>
     </div>
   )
 }

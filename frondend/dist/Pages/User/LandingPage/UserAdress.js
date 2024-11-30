@@ -46,7 +46,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { editAddress, checkAddress, saveAddressData } from '../../../Api/User';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
@@ -63,45 +63,39 @@ function UserAddress(_a) {
         state: '',
         district: '',
         zip: '',
-        userId: user === null || user === void 0 ? void 0 : user._id
+        userId: (user === null || user === void 0 ? void 0 : user._id) || ''
     }), currentAddress = _d[0], setCurrentAddress = _d[1];
     var _e = useState({}), addressErrors = _e[0], setAddressErrors = _e[1];
     useEffect(function () {
         var fetchProfile = function () { return __awaiter(_this, void 0, void 0, function () {
-            var response, _a;
+            var response, addressData, _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        if (!(user && user._id)) return [3 /*break*/, 4];
-                        _b.label = 1;
+                        _b.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, checkAddress((user === null || user === void 0 ? void 0 : user._id) || '')];
                     case 1:
-                        _b.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, checkAddress(user._id)];
-                    case 2:
                         response = _b.sent();
                         if ((response === null || response === void 0 ? void 0 : response.status) === 200) {
-                            setCurrentAddress(response.data.data);
-                            setAddressId(response.data.data._id);
+                            addressData = response.data.data;
+                            setCurrentAddress(addressData);
+                            setAddressId(addressData._id);
                             setIsEditingAddress(true);
-                            onAddressIdChange(response.data.data._id); // Pass addressId to the parent component
+                            onAddressIdChange(addressData._id);
                         }
-                        else {
-                            toast.error('No address found. Please create a new address.');
-                        }
-                        return [3 /*break*/, 4];
-                    case 3:
+                        return [3 /*break*/, 3];
+                    case 2:
                         _a = _b.sent();
                         toast.error('Error fetching address data.');
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
                 }
             });
         }); };
-        // Check if the addressId is already set before fetching it again
-        if (!addressId) {
+        if ((user === null || user === void 0 ? void 0 : user._id) && !addressId) {
             fetchProfile();
         }
-    }, [user, addressId, onAddressIdChange]); // Depend on addressId to prevent multiple calls
+    }, [user === null || user === void 0 ? void 0 : user._id, addressId, onAddressIdChange]);
     var handleAddressChange = function (e) {
         var _a = e.target, name = _a.name, value = _a.value;
         setCurrentAddress(function (prev) {
@@ -127,62 +121,51 @@ function UserAddress(_a) {
             newErrors.state = 'State is required';
         if (!currentAddress.district)
             newErrors.district = 'District is required';
-        if (!currentAddress.zip) {
-            newErrors.zip = 'ZIP is required';
-        }
-        else if (!/^\d{5,6}$/.test(currentAddress.zip)) {
+        if (!currentAddress.zip || !/^\d{5,6}$/.test(currentAddress.zip)) {
             newErrors.zip = 'ZIP should be 5 or 6 digits';
         }
         setAddressErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
     var saveAddress = function (e) { return __awaiter(_this, void 0, void 0, function () {
-        var formData, result, error_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var formData, result, _a, newAddressId, error_1;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
                     e.preventDefault();
                     if (!validateAddress()) {
                         toast.error('Please fill all fields correctly.');
                         return [2 /*return*/];
                     }
-                    formData = {
-                        houseName: currentAddress.houseName,
-                        street: currentAddress.street,
-                        city: currentAddress.city,
-                        state: currentAddress.state,
-                        district: currentAddress.district,
-                        zip: currentAddress.zip,
-                        userId: user === null || user === void 0 ? void 0 : user._id
-                    };
-                    _a.label = 1;
+                    formData = __assign({}, currentAddress);
+                    _b.label = 1;
                 case 1:
-                    _a.trys.push([1, 6, , 7]);
-                    result = void 0;
+                    _b.trys.push([1, 6, , 7]);
                     if (!isEditingAddress) return [3 /*break*/, 3];
                     return [4 /*yield*/, editAddress(formData, addressId)];
                 case 2:
-                    result = _a.sent();
+                    _a = _b.sent();
                     return [3 /*break*/, 5];
                 case 3: return [4 /*yield*/, saveAddressData(formData)];
                 case 4:
-                    result = _a.sent();
-                    if (result === null || result === void 0 ? void 0 : result.data) {
-                        setIsEditingAddress(true);
-                        setAddressId(result.data._id); // Update the addressId for newly created address
-                        onAddressIdChange(result.data._id); // Pass addressId to the parent component
-                    }
-                    _a.label = 5;
+                    _a = _b.sent();
+                    _b.label = 5;
                 case 5:
+                    result = _a;
                     if ((result === null || result === void 0 ? void 0 : result.status) === 200) {
-                        toast.success(isEditingAddress ? 'Address updated successfully.' : 'Address saved successfully.');
+                        if (!isEditingAddress) {
+                            newAddressId = result.data._id;
+                            setAddressId(newAddressId);
+                            onAddressIdChange(newAddressId);
+                            setIsEditingAddress(true);
+                        }
                     }
                     else {
-                        toast.error(isEditingAddress ? 'Failed to update address.' : 'Failed to save address.');
+                        toast.error('Failed to save address.');
                     }
                     return [3 /*break*/, 7];
                 case 6:
-                    error_1 = _a.sent();
+                    error_1 = _b.sent();
                     console.error('Error saving address:', error_1);
                     toast.error('Error saving address. Please try again.');
                     return [3 /*break*/, 7];
@@ -190,6 +173,6 @@ function UserAddress(_a) {
             }
         });
     }); };
-    return (_jsxs("div", { className: "bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl mb-8", children: [_jsx("h1", { className: "text-xl font-bold mb-3 text-red-600", children: "Manage Address" }), _jsxs("form", { onSubmit: saveAddress, children: [_jsxs("div", { className: "grid grid-cols-3 gap-4 text-sm text-gray-700", children: [_jsx("input", { type: "text", value: user === null || user === void 0 ? void 0 : user._id, style: { display: "none" } }), ['houseName', 'street', 'city', 'state', 'district', 'zip'].map(function (field) { return (_jsxs("div", { className: "relative mb-4", children: [_jsx("input", { type: 'text', name: field, value: currentAddress[field], onChange: handleAddressChange, placeholder: " ", className: "peer block w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-900 focus:border-red-500 focus:outline-none focus:ring-0 ".concat(isEditingAddress ? 'bg-white' : 'bg-gray-200', " ").concat(addressErrors[field] ? 'border-red-500' : '') }), _jsx("label", { htmlFor: field, className: "absolute left-3 top-2.5 z-10 origin-[0] -translate-y-4 scale-75 transform select-none bg-white px-2 text-sm text-gray-500 transition-all peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-red-500", children: field.charAt(0).toUpperCase() + field.slice(1) }), addressErrors[field] && _jsx("p", { className: "text-xs text-red-500 mt-1", children: addressErrors[field] })] }, field)); })] }), _jsx("div", { className: "mt-4 flex justify-end", children: _jsx("button", { onClick: saveAddress, className: "bg-gray-900 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition", children: isEditingAddress ? 'Edit' : 'Save' }) })] })] }));
+    return (_jsxs("div", { className: "bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl mb-8", children: [_jsx("h1", { className: "text-xl font-bold mb-3 text-red-600", children: "Manage Address" }), _jsxs("form", { onSubmit: saveAddress, children: [_jsx("div", { className: "grid grid-cols-3 gap-4 text-sm text-gray-700", children: ['houseName', 'street', 'city', 'state', 'district', 'zip'].map(function (field) { return (_jsxs("div", { className: "relative mb-4", children: [_jsx("input", { type: "text", name: field, value: currentAddress[field] || '', onChange: handleAddressChange, placeholder: " ", className: "peer block w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm text-gray-900 focus:border-red-500 focus:outline-none focus:ring-0 ".concat(isEditingAddress ? 'bg-white' : 'bg-gray-200', " ").concat(addressErrors[field] ? 'border-red-500' : '') }), _jsx("label", { htmlFor: field, className: "absolute left-3 top-2.5 z-10 origin-[0] -translate-y-4 scale-75 transform select-none bg-white px-2 text-sm text-gray-500 transition-all peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-red-500", children: field.charAt(0).toUpperCase() + field.slice(1) }), addressErrors[field] && _jsx("p", { className: "text-xs text-red-500 mt-1", children: addressErrors[field] })] }, field)); }) }), _jsx("div", { className: "mt-4 flex justify-end", children: _jsx("button", { type: "submit", className: "bg-gray-900 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition", children: isEditingAddress ? 'Edit' : 'Save' }) })] })] }));
 }
-export default UserAddress;
+export default React.memo(UserAddress);

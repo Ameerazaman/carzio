@@ -47,7 +47,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { editProfile, checkProfile, saveProfileData } from '../../../Api/User';
 import UserAddress from './UserAdress';
@@ -136,9 +136,9 @@ var UserProfile = function () {
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
-    var handleAddressId = function (id) {
+    var handleAddressId = useCallback(function (id) {
         setAddressId(id);
-    };
+    }, []);
     var saveProfile = function (e) { return __awaiter(void 0, void 0, void 0, function () {
         var formData, result, result, error_1;
         return __generator(this, function (_a) {
@@ -170,7 +170,6 @@ var UserProfile = function () {
                     result = _a.sent();
                     if (result) {
                         setIsEditing(true);
-                        toast.success('Profile updated successfully.');
                     }
                     else {
                         toast.error('Failed to update profile.');
@@ -181,7 +180,6 @@ var UserProfile = function () {
                     result = _a.sent();
                     setIsEditing(true);
                     if (result) {
-                        toast.success('Profile saved successfully.');
                     }
                     else {
                         toast.error('Failed to save profile.');

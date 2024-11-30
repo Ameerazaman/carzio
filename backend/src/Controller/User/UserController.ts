@@ -397,7 +397,7 @@ export class UserController {
             const result = await this.userServices.checkAddress(userId);
 
             if (!result) {
-                res.status(500).json({ message: "Address not found" });
+                res.status(500).json({ message: 'No address found. Please create a new address.' });
                 return
             }
 

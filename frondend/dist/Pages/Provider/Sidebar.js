@@ -1,11 +1,11 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState } from 'react';
 import { FaUser, FaCar, FaCog, FaCalendarAlt, FaComments, FaFileAlt, FaBars } from 'react-icons/fa';
-import { NavLink } from 'react-router-dom'; // Use NavLink from react-router-dom
+import { NavLink } from 'react-router-dom';
 function Sidebar() {
-    var _a = useState(true), isOpen = _a[0], setIsOpen = _a[1]; // state to handle the toggling of sidebar
+    var _a = useState(true), isOpen = _a[0], setIsOpen = _a[1];
     var toggleSidebar = function () {
-        setIsOpen(!isOpen); // toggle sidebar state
+        setIsOpen(!isOpen);
     };
     return (_jsxs("div", { className: "relative bg-gray-900 text-white h-screen p-4 shadow-lg transition-all duration-300 ease-in-out ".concat(isOpen ? 'w-64' : 'w-20'), children: [_jsx("button", { onClick: toggleSidebar, className: "absolute top-4 right-4 md:hidden text-white p-2 hover:bg-red-600 rounded-full", children: _jsx(FaBars, {}) }), _jsxs("ul", { className: "space-y-4 mt-8", children: [_jsx("li", { children: _jsxs(NavLink, { to: "/provider/home", className: function (_a) {
                                 var isActive = _a.isActive;

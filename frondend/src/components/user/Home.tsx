@@ -8,6 +8,7 @@ import { CarDataInterface } from '../../Interface/CarInterface';
 import { useNavigate } from 'react-router-dom';
 import ServicesCard from '../../Pages/User/LandingPage/ServicesCard';
 import Pagination from '../../Pages/Common/Pagination';
+import Loading from '../../Pages/Common/Loading';
 
 function Home() {
   const [carData, setCarData] = useState<CarDataInterface[]>([]);
@@ -65,7 +66,7 @@ function Home() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
         {loading ? (
-          <p>Loading...</p>
+          <Loading/>
         ) : error ? (
           <p className="text-red-500">{error}</p>
         ) : (
@@ -78,7 +79,10 @@ function Home() {
         totalPages={totalPages}
         onPageChange={handlePageChange}
       />
-      <Footer />
+        
+        <div className="mt-12">
+                <Footer />
+            </div>
     </div>
   );
 }

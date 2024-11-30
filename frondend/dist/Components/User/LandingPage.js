@@ -7,6 +7,6 @@ import Footer from '../../Pages/Common/Footer';
 function LandingPage() {
     var handleSearhCar = function (data) {
     };
-    return (_jsxs("div", { children: [_jsx(Navbar, {}), _jsx(Carosel, { onEvent: handleSearhCar }), _jsx(About, {}), _jsx(ServicesCard, {}), _jsx(Footer, {})] }));
+    return (_jsxs("div", { children: [_jsx(Navbar, {}), _jsx(Carosel, { onEvent: handleSearhCar }), _jsx(About, {}), _jsx(ServicesCard, {}), _jsx("div", { className: "mt-12", children: _jsx(Footer, {}) })] }));
 }
 export default LandingPage;

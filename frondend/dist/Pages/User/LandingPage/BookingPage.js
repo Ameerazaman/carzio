@@ -46,7 +46,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { carDetail, checkOffer, fetchCoupon, BookingConfirm, checkingBookedOrNot, userIdStoredInCoupon, checkBalanceUpdateWallet } from '../../../Api/User';
@@ -293,9 +293,9 @@ function BookingPage() {
             }
         });
     }); };
-    var handleAddressId = function (id) {
+    var handleAddressId = useCallback(function (id) {
         setFormData(function (prevData) { return (__assign(__assign({}, prevData), { UserAddressId: id })); });
-    };
+    }, []);
     var handleCouponApply = function () {
         if (couponData && Array.isArray(couponData)) { // Check if couponData is not null
             var selectedCoupon = couponData.find(function (coupon) { return coupon.code === formData.Coupon; });

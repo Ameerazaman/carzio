@@ -3,11 +3,11 @@ import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
 
 function Footer() {
   return (
-    <div
-      className="bg-cover bg-center text-white py-12"
-      style={{ backgroundImage: 'url(/images/footer.jpg)' }}
-    >
-      <div className="container mx-auto px-8 lg:px-16">
+    <div className="relative bg-cover bg-center text-white py-12" style={{ backgroundImage: 'url(/images/footer.jpg)' }}>
+      {/* Black overlay with increased opacity */}
+      <div className="absolute inset-0 bg-black bg-opacity-75"></div> {/* Increased opacity to 75 */}
+      
+      <div className="container mx-auto px-8 lg:px-16 relative">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Company Info */}
           <div>

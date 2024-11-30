@@ -48,8 +48,8 @@ function BookingHistoryInProvider() {
     <div className="h-screen flex flex-col bg-gray-100">
       <Navbar />
       <div className="flex flex-1">
-        <div className="w-64 bg-gray-800 text-white h-full">
-          <Sidebar />
+      <div className="flex flex-grow"> {/* Add margin-top to push content below the navbar */}
+      <Sidebar />
         </div>
 
         <div className="flex-grow p-6 overflow-y-auto">

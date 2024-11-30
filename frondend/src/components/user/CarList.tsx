@@ -16,7 +16,7 @@ function CarList() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState<number>(1);
     const limit = 10
-    
+
 
     const filterData = (data: CarDataInterface[] | { message: string }) => {
         if (Array.isArray(data)) {
@@ -98,7 +98,10 @@ function CarList() {
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
             />
-            <Footer/>
+            <div className="mt-12">
+                <Footer />
+            </div>
+
         </div>
     );
 }

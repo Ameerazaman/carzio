@@ -9,7 +9,9 @@ function UserHistoryDetails() {
     <div>
         <Navbar/>
         <HistoryDetail/>
-        <Footer/>
+        <div className="mt-12">
+                <Footer />
+            </div>
     </div>
   )
 }

@@ -11,7 +11,7 @@ function CarMgt() {
   const provider = useSelector(
     (state: RootState) => state.provider.currentProvider
   ) as User | null;
-  
+
   const [tableData, setTableData] = useState<Array<{ [key: string]: any }>>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,9 +54,8 @@ function CarMgt() {
       <Navbar />
       <div className="flex flex-grow">
         <Sidebar />
-
         <div className="flex-1 p-6 bg-gray-100 overflow-y-auto">
-          
+
           <div className="overflow-x-auto bg-white rounded-lg shadow-md">
             {loading ? (
               <p className="text-center py-4">Loading...</p>

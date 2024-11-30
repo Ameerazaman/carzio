@@ -17,19 +17,15 @@ export class AdminController {
 
   async refreshToken(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     const refreshToken = req.cookies.refresh_token;
-    console.log(refreshToken, "refresh token");
     
     if (!refreshToken) {
-      console.log("refreshToken not received");
       return res.status(401).json({ success: false });
     }
   
     try {
       const decoded = verifyRefreshToken(refreshToken);
-      console.log(decoded, "decoded data");
-  
+
       if (!decoded || !decoded.data) {
-        console.log("decoded data is not found");
         return res.status(401).json({ success: false, message: "Refresh Token Expired" });
       }
   
@@ -78,12 +74,12 @@ export class AdminController {
           .cookie('refresh_token', refresh_token, {
             maxAge: refreshTokenMaxAge,
             httpOnly: true,
+            // secure: process.env.NODE_ENV === 'production',
             secure:true,
             sameSite: 'none',
           })
           .json({ success: true, user: result.data, message: result.data.message });
       } else {
-        console.log("admin login failed")
         return res.status(BAD_REQUEST).json({ success: false, message: result?.data.message });
       }
     } catch (error) {
@@ -106,11 +102,12 @@ export class AdminController {
       });
       res.status(200).json({ success: true, message: "Logged out successfully" });
     } catch (error) {
-      console.error("Error during admin logout:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
+  
   // ******************************fetch users**************************
+
   async fetchUsers(req: Request, res: Response): Promise<void> {
     try {
       const page = req.query.page ? Number(req.query.page) : 1;

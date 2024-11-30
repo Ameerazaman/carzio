@@ -44,6 +44,7 @@ import { fetchCars } from '../../Api/User';
 import { useNavigate } from 'react-router-dom';
 import ServicesCard from '../../Pages/User/LandingPage/ServicesCard';
 import Pagination from '../../Pages/Common/Pagination';
+import Loading from '../../Pages/Common/Loading';
 function Home() {
     var _this = this;
     var _a = useState([]), carData = _a[0], setCarData = _a[1];
@@ -95,6 +96,6 @@ function Home() {
         setCarData(data);
         setTotalPages(1);
     };
-    return (_jsxs("div", { children: [_jsx(Navbar, {}), _jsx(Carosel, { onEvent: handleSearhCar }), _jsx(ServicesCard, {}), _jsxs("div", { className: "text-center mb-1", children: [_jsx("h3", { className: "text-3xl font-bold text-gray-800 mb-1", children: "Come with" }), _jsx("h4", { className: "text-lg font-semibold text-red-600", children: "Our Products" })] }), _jsx("div", { className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4", children: loading ? (_jsx("p", { children: "Loading..." })) : error ? (_jsx("p", { className: "text-red-500", children: error })) : (carData.map(function (car, index) { return _jsx(Card, { carData: car }, index); })) }), _jsx(Pagination, { currentPage: page, totalPages: totalPages, onPageChange: handlePageChange }), _jsx(Footer, {})] }));
+    return (_jsxs("div", { children: [_jsx(Navbar, {}), _jsx(Carosel, { onEvent: handleSearhCar }), _jsx(ServicesCard, {}), _jsxs("div", { className: "text-center mb-1", children: [_jsx("h3", { className: "text-3xl font-bold text-gray-800 mb-1", children: "Come with" }), _jsx("h4", { className: "text-lg font-semibold text-red-600", children: "Our Products" })] }), _jsx("div", { className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4", children: loading ? (_jsx(Loading, {})) : error ? (_jsx("p", { className: "text-red-500", children: error })) : (carData.map(function (car, index) { return _jsx(Card, { carData: car }, index); })) }), _jsx(Pagination, { currentPage: page, totalPages: totalPages, onPageChange: handlePageChange }), _jsx("div", { className: "mt-12", children: _jsx(Footer, {}) })] }));
 }
 export default Home;

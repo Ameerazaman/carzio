@@ -26,16 +26,12 @@ class AdminController {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             const refreshToken = req.cookies.refresh_token;
-            console.log(refreshToken, "refresh token");
             if (!refreshToken) {
-                console.log("refreshToken not received");
                 return res.status(401).json({ success: false });
             }
             try {
                 const decoded = (0, VerifyTokens_1.verifyRefreshToken)(refreshToken);
-                console.log(decoded, "decoded data");
                 if (!decoded || !decoded.data) {
-                    console.log("decoded data is not found");
                     return res.status(401).json({ success: false, message: "Refresh Token Expired" });
                 }
                 const result = yield this.adminServices.adminGetById(decoded.data);
@@ -79,13 +75,13 @@ class AdminController {
                         .cookie('refresh_token', refresh_token, {
                         maxAge: refreshTokenMaxAge,
                         httpOnly: true,
+                        // secure: process.env.NODE_ENV === 'production',
                         secure: true,
                         sameSite: 'none',
                     })
                         .json({ success: true, user: result.data, message: result.data.message });
                 }
                 else {
-                    console.log("admin login failed");
                     return res.status(BAD_REQUEST).json({ success: false, message: result === null || result === void 0 ? void 0 : result.data.message });
                 }
             }
@@ -109,7 +105,6 @@ class AdminController {
                 res.status(200).json({ success: true, message: "Logged out successfully" });
             }
             catch (error) {
-                console.error("Error during admin logout:", error);
                 res.status(500).json({ message: "Internal server error" });
             }
         });

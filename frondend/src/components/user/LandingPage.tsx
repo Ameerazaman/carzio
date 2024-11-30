@@ -20,7 +20,9 @@ function LandingPage() {
       <About />
       <ServicesCard />
       
-      <Footer />
+      <div className="mt-12">
+                <Footer />
+            </div>
     </div>
   )
 }
