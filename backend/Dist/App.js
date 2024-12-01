@@ -26,11 +26,13 @@ const io = (0, Socket_1.default)(server);
 app.use((0, morgan_1.default)("dev"));
 app.use((0, cookie_parser_1.default)());
 const corsOptions = {
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "https://carzio-frondend.vercel.app"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
 };
+app.use((0, cors_1.default)(corsOptions));
+;
 app.use((0, cors_1.default)(corsOptions));
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use(express_1.default.json());

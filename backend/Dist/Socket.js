@@ -17,7 +17,7 @@ const ChatModel_1 = __importDefault(require("./Model/User/ChatModel"));
 const setupSocket = (httpServer) => {
     const io = new socket_io_1.Server(httpServer, {
         cors: {
-            origin: "http://localhost:3000",
+            origin: ["http://localhost:3000", "https://carzio-frondend.vercel.app"],
             methods: ["GET", "POST"],
         },
     });
