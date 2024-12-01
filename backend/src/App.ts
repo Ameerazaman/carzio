@@ -27,11 +27,13 @@ const io = setupSocket(server);
 app.use(morgan("dev"));
 app.use(cookieParser());
 const corsOptions = {
-    origin: ["http://localhost:3000",'https://carzio-frondend.vercel.app/'],
+    origin: ["http://localhost:3000", "https://carzio-frondend.vercel.app"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
 };
+app.use(cors(corsOptions));
+
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
