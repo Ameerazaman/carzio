@@ -124,7 +124,7 @@ function ProviderLogin() {
                 <input
                   className="mt-4 w-full cursor-pointer rounded-lg bg-red-600 pt-3 pb-3 text-white shadow-lg hover:bg-red-500"
                   type="submit"
-                  value="Create account"
+                  value="Sign in"
                 />
               </form>
               <div className="mt-4 text-center">

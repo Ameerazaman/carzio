@@ -6,8 +6,6 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
-// import { ToastContainer } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
 import { Toaster  } from 'react-hot-toast';
 import { persistor, store } from './App/Store';
 // Get the root element
