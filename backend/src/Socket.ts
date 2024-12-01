@@ -7,6 +7,7 @@ const setupSocket = (httpServer: any) => {
     cors: {
       origin: ["http://localhost:3000", "https://carzio-frondend.vercel.app"],
       methods: ["GET", "POST"],
+      
     },
   });
 

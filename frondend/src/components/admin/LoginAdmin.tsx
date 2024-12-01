@@ -55,8 +55,6 @@ let dispatch=useDispatch()
     try {
       // Call loginUser with form data
       const response = await adminLogin(formData);
-      console.log()
-console.log(response,"response")
       if (response) {
         localStorage.setItem('token', response.data.token);
         dispatch( signInSuccessAdmin(response.data.user.data)) // Store the token
