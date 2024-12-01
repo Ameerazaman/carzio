@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import {  useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../App/Store';
 import { User } from '../../Common/Navbar';
@@ -23,10 +23,7 @@ function BookingPage() {
   const { carId } = useParams<string>();
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<BookingDetails | null>(null);
   const [carData, setCarData] = useState<CarDataInterface | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [offerData, setOfferData] = useState<OfferFormData | null>(null);
   const [couponData, setCouponData] = useState<CouponFormData[] | null>(null);
   const [formData, setFormData] = useState({
     IssueDate: '',

@@ -2,11 +2,10 @@ import { useSelector } from 'react-redux';
 import { User } from '../../Common/Navbar';
 import { RootState } from '../../../App/Store';
 import { useCallback, useEffect, useState } from 'react';
-import { MdHouse, MdLocationOn, MdOutlineDomain, MdOutlineHome, MdOutlineLocationCity, MdOutlinePinDrop } from 'react-icons/md';
 import { ProfileInterface } from '../../../Interface/ProfileInterface';
-import { AddressInterface } from '../../../Interface/AddressInterface';
+
 import toast from 'react-hot-toast';
-import { editAddress, editProfile, checkAddress, checkProfile, saveAddressData, saveProfileData } from '../../../Api/User';
+import {  editProfile, checkProfile, saveProfileData } from '../../../Api/User';
 import UserAddress from './UserAdress';
 
 const UserProfile = () => {

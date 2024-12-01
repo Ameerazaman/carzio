@@ -8,7 +8,7 @@ import Pagination from '../../Pages/Common/Pagination';
 function NotificationMgt() {
   const [tableData, setTableData] = useState<Array<{ [key: string]: any }>>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const limit = 10;
@@ -23,12 +23,10 @@ function NotificationMgt() {
         if (result?.data?.data) {
           setTableData(result.data.data);
           setTotalPages(result.data.totalPage || 1);
-        } else {
-          setError('No notifications available at the moment.');
         }
       } catch (error) {
         console.error('Error fetching data:', error);
-        setError('Error fetching notifications.');
+     
       } finally {
         setLoading(false);
       }

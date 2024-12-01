@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import {CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import toast from 'react-hot-toast';
 import { userApi } from '../../../Services/Axios';
 import { BookingConfirm, userIdStoredInCoupon } from '../../../Api/User';
@@ -14,9 +14,9 @@ const CheckoutForm = () => {
   const [paymentIntent, setPaymentIntent] = useState<any>(null);
   const stripe = useStripe();
   const elements = useElements();
-  const [cardError, setCardError] = useState<string | null>(null); // To store card validation errors
-
-  // Create Payment Intent (called once the component mounts)
+  const [cardError, setCardError] = useState<string | null>(null); 
+  
+  
   useEffect(() => {
     const createPaymentIntent = async () => {
       try {

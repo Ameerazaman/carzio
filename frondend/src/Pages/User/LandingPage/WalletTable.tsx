@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+
 import { walletInterface } from '../../../Interface/WalletInterface';
 
 interface walletDataUserProps {

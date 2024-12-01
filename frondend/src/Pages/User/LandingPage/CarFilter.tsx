@@ -1,5 +1,4 @@
 import { useState } from "react";
-import axios from "axios";
 import { FaSearch } from "react-icons/fa"; // Import the search icon
 import { Filter } from "../../../Interface/FilterInterface";
 import { applyFilters, searchCar } from "../../../Api/User";

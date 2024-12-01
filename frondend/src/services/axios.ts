@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast';
 import { refreshUserAccessToken, userLogout } from "../Api/User";
 import { providerLogout, refreshProviderAccessToken } from "../Api/Provider";
 import { adminLogout, refreshAdminAccessToken } from '../Api/Admin'
-import { Component } from 'react';
+
 
 import { store } from "../App/Store";
 import { signOut } from "../App/Slice/UserSlice";

@@ -68,7 +68,7 @@ function HistoryDetail() {
                         bookingHistory?.total_Amt
                     );
                     if (bookingHistory.Payment === "Wallet" || bookingHistory.Payment === "Online payment") {
-                        const result = await storeCancelAmtToWallet(bookingHistory?.UserId, bookingHistory?.total_Amt)
+                       await storeCancelAmtToWallet(bookingHistory?.UserId, bookingHistory?.total_Amt)
                     }
 
                     setCancel(true);
