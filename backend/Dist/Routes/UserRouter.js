@@ -31,6 +31,8 @@ userRouter.post('/verify-otp', (req, res) => userController.verifyOtp(req, res))
 userRouter.post('/login', (req, res) => userController.userLogin(req, res));
 userRouter.post('/refresh-token', (req, res, next) => userController.refreshToken(req, res, next));
 userRouter.get('/logout', (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.userLogout(req, res); }));
+userRouter.post('/forgot_password', (req, res) => userController.forgotPassword(req, res));
+userRouter.post('/change_password', (req, res) => userController.changePassword(req, res));
 userRouter.get('/cars', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.fetchCars(req, res); }));
 userRouter.get('/car_details/:id', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.carDetails(req, res); }));
 userRouter.get('/chat_history/:userId/:providerId', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.fetchChatHistory(req, res); }));
@@ -51,12 +53,7 @@ userRouter.post('/create-payment-intent', UserAuthMiddleware_1.default, (req, re
 userRouter.post('/userid_in_coupon/:coupon/:userId', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.userIdInCoupon(req, res); }));
 userRouter.put('/check_update_wallet/:userId/:amount', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.checkAndUpdateWallet(req, res); }));
 userRouter.get('/booking_history', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.getBookingHistory(req, res); }));
-userRouter.get('/details_of_specifc_order/:id', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("Route accessed: /details_of_specifc_order/:id");
-    console.log("Request Params:", req.params);
-    console.log("Request Query:", req.query);
-    userController.specificBookingDetails(req, res);
-}));
+userRouter.get('/details_of_specifc_order/:id', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.specificBookingDetails(req, res); }));
 userRouter.put('/cancel_booking', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.cancelBookingByUser(req, res); }));
 userRouter.put('/credit_to_wallet', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.creditToWallet(req, res); }));
 userRouter.get('/wallet', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.getWallet(req, res); }));

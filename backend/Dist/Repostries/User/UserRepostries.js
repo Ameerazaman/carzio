@@ -24,6 +24,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const WalletModel_1 = __importDefault(require("../../Model/User/WalletModel"));
 const ReviewModel_1 = __importDefault(require("../../Model/User/ReviewModel"));
 const ChatModel_1 = __importDefault(require("../../Model/User/ChatModel"));
+const OtpModel_1 = require("../../Model/User/OtpModel");
 class UserRepository {
     // *************************email Exist**************************
     emailExistCheck(email) {
@@ -34,6 +35,25 @@ class UserRepository {
             }
             catch (error) {
                 console.log("Error checking email existence:", error);
+                return null;
+            }
+        });
+    }
+    //*******This function creates or updates an OTP for a given email*************
+    createOtp(otp, email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let existUserOtp = yield OtpModel_1.Otp.findOne({ email });
+                if (existUserOtp) {
+                    const updatedOtp = yield OtpModel_1.Otp.findOneAndUpdate({ email }, { otp }, { new: true });
+                    return updatedOtp;
+                }
+                else {
+                    const newOtp = yield OtpModel_1.Otp.create({ email, otp });
+                    return newOtp;
+                }
+            }
+            catch (error) {
                 return null;
             }
         });
@@ -74,6 +94,34 @@ class UserRepository {
             }
             catch (error) {
                 console.log("Error checking email and password:", error);
+                return null;
+            }
+        });
+    }
+    // **************************change password**********************
+    changePassword(email, password) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const changeUserpassword = yield UserModel_1.default.findOneAndUpdate({ email: email, password: password });
+                return changeUserpassword;
+            }
+            catch (error) {
+                return null;
+            }
+        });
+    }
+    // ***********************find Otp*****************************88
+    findOtp(email, otp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const existProviderOtp = yield OtpModel_1.Otp.findOne({ email });
+                if (existProviderOtp && existProviderOtp.otp.toString() === otp) {
+                    yield OtpModel_1.Otp.deleteOne({ email });
+                    return existProviderOtp;
+                }
+                return null;
+            }
+            catch (error) {
                 return null;
             }
         });

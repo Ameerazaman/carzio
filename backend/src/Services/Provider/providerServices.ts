@@ -54,14 +54,27 @@ export class ProviderServices {
         }
 
     }
-    // *******************************8Signup logic************************8
-    async userSignup(providerData: ProviderInterface): Promise<ProviderInterface | null> {
+    async emailExistCheck(email: string): Promise<ProviderInterface | null> {
         try {
-            return await this.providerRepostry.emailExistCheck(providerData.email);
+            return await this.providerRepostry.emailExistCheck(email);
+        } catch (error) {
+            console.log(error as Error);
+            return null;
+        }
+
+    }
+
+    // ********************************change password******************************
+
+    async changePassword(email: string, password: string): Promise<ProviderInterface | null> {
+        try {
+            const hashedPassword = await this.encrypt.hashPassword(password);
+            return await this.providerRepostry.changePassword(email, hashedPassword);
         } catch (error) {
             return null;
         }
     }
+
 
     //********************************8 */ OTP creation logic**************************
     async createOtp(email: string, otp: number): Promise<OtpDocument | null> {

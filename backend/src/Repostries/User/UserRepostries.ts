@@ -12,7 +12,6 @@ import Offer from '../../Model/Admin/OfferModel';
 import CarModel from '../../Model/Provider/CarModel';
 import UserAddressModel from '../../Model/User/AddressModel';
 import BookingModel from '../../Model/User/BookingModel';
-import { Otp } from '../../Model/User/OtpModel';
 import UserProfileModel from '../../Model/User/ProfileModel';
 import userModel from '../../Model/User/UserModel';
 import mongoose from 'mongoose';
@@ -20,6 +19,7 @@ import WalletModel from '../../Model/User/WalletModel';
 import { ReviewDataInterface } from '../../Interface/ReviewInterface';
 import ReviewModel from '../../Model/User/ReviewModel';
 import ChatModel, { IChat } from '../../Model/User/ChatModel';
+import { Otp, OtpDocument } from '../../Model/User/OtpModel';
 
 
 interface UserLoginResponse {
@@ -42,6 +42,28 @@ export class UserRepository {
             return null;
         }
     }
+    //*******This function creates or updates an OTP for a given email*************
+    async createOtp(otp: number, email: string): Promise<OtpDocument | null> {
+        try {
+            let existUserOtp = await Otp.findOne({ email });
+
+            if (existUserOtp) {
+
+                const updatedOtp = await Otp.findOneAndUpdate(
+                    { email },
+                    { otp },
+                    { new: true }
+                );
+                return updatedOtp;
+            } else {
+                const newOtp = await Otp.create({ email, otp });
+                return newOtp;
+            }
+        } catch (error) {
+            return null;
+        }
+    }
+
     //********************** */ Save a new user***************************8
     async saveUser(userData: UserInterface): Promise<UserInterface | null> {
         try {
@@ -75,7 +97,30 @@ export class UserRepository {
             return null;
         }
     }
+    // **************************change password**********************
+    async changePassword(email: string, password: string): Promise<UserInterface | null> {
+        try {
+            const changeUserpassword = await userModel.findOneAndUpdate({ email: email, password: password });
+            return changeUserpassword as UserInterface;
+        } catch (error) {
 
+            return null;
+        }
+    }
+      // ***********************find Otp*****************************88
+      async findOtp(email: string, otp: string): Promise<OtpDocument | null> {
+        try {
+            const existProviderOtp = await Otp.findOne({ email });
+            if (existProviderOtp && existProviderOtp.otp.toString() === otp) {
+                await Otp.deleteOne({ email })
+                return existProviderOtp;
+            }
+
+            return null;
+        } catch (error) {
+            return null;
+        }
+    }
     //*****************check user for tooken validation**********************
 
     async getUserById(id: string): Promise<UserInterface | null> {
@@ -606,13 +651,13 @@ export class UserRepository {
 
     async countWalletDocuments(userId: string): Promise<number | null> {
         try {
-           
+
             const total = await WalletModel.aggregate([
                 { $match: { UserId: userId } }])
-           
+
             return total.length;
         } catch (error) {
-           
+
             return null;
         }
     }
@@ -697,7 +742,7 @@ export class UserRepository {
             return cars;
         } catch (error) {
 
-            throw error; 
+            throw error;
         }
     }
 

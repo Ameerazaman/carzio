@@ -121,6 +121,8 @@ const adminAPI: AxiosInstance = axios.create({
   withCredentials: true
 });
 
+
+
 adminAPI.interceptors.response.use(
   (response) => {
     if (response.data.message) {

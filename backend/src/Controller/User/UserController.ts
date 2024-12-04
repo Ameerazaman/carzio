@@ -45,7 +45,7 @@ export class UserController {
             res.cookie('access_token', newAccessToken, {
                 maxAge: accessTokenMaxAge,
                 httpOnly: true,
-                secure:true,
+                secure: true,
                 sameSite: 'none',
             })
 
@@ -60,9 +60,9 @@ export class UserController {
     async userSignup(req: Request, res: Response): Promise<void> {
         try {
 
-            req.app.locals.userData = req.body;
+            req.app.locals.userEmail = req.body;
 
-            const existingUser = await this.userServices.userSignup(req.app.locals.userData);
+            const existingUser = await this.userServices.emailExistCheck(req.app.locals.userData.email);
 
             if (existingUser) {
 
@@ -72,7 +72,7 @@ export class UserController {
                 req.app.locals.userEmail = req.body.email;
                 const otp = await generateAndSendOTP(req.body.email);
 
-                await Otp.create({ otp: otp, email: req.body.email });
+                const otpData = await this.userServices.createOtp(req.body.email, Number(otp))
 
                 res.status(OK).json({ userId: null, success: true, message: 'OTP sent for verification...' });
             }
@@ -81,13 +81,14 @@ export class UserController {
             res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
         }
     }
-
+ 
     // ***********************************resend otp********************
 
     async resendOtp(req: Request, res: Response): Promise<Response> {
         try {
-
+            console.log("resend otp")
             const email = req.app.locals.userEmail;
+            console.log("resend otp", email)
             console.log(email);
 
             const otp = await generateAndSendOTP(email);
@@ -127,7 +128,7 @@ export class UserController {
             const { otp } = req.body;
             let email = req.app.locals.userEmail;
 
-            const OTPRecord = await Otp.findOne({ email });
+            var OTPRecord = await this.userServices.verifyOtp(email, otp)
 
             if (!OTPRecord) {
 
@@ -162,6 +163,61 @@ export class UserController {
         } catch (error) {
 
             return res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error.' });
+        }
+    }
+   // ****************************forgot Password*******************************
+   async forgotPassword(req: Request, res: Response): Promise<void> {
+    try {
+        req.app.locals.userEmail = req.body.email
+        const existingUser = await this.userServices.emailExistCheck(req.body.email);
+        if (!existingUser) {
+            res.status(BAD_REQUEST).json({ success: false, message: 'The email is already in use!' });
+        } else {
+
+            const otp = await generateAndSendOTP(req.body.email);
+            const otpData = await this.userServices.createOtp(req.body.email, Number(otp))
+            res.status(OK).json({ userId: null, success: true, message: 'OTP sent for verification...' });
+        }
+    } catch (error) {
+        console.log(error as Error);
+        res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
+    }
+}
+    // ********************************verify otp for forgot password*********************
+    async verifyOtpForgotPassword(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
+        try {
+            const { otp } = req.body;
+            let email = req.app.locals.userEmail;
+            var OTPRecord = await this.userServices.verifyOtp(email, otp)
+            if (!OTPRecord) {
+                return res.status(BAD_REQUEST).json({ success: false, message: 'No OTP record found!' });
+            }
+            if (otp === OTPRecord.otp.toString()) {
+                return res.status(OK).json({
+                    success: true,
+                    message: 'OTP verified Successfully',
+                })
+            }
+            else {
+                return res.status(BAD_REQUEST).json({ success: false, message: 'Incorrect OTP!' });
+            }
+        } catch (error) {
+
+            return res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error.' });
+        }
+    }
+    // **********************************change password*****************************
+    async changePassword(req: Request, res: Response): Promise<Response<any>> {
+        try {
+            const  password  = req.body.password;
+            const email = req.app.locals.userEmail;
+            const result = await this.userServices.changePassword(email, password);
+            if (!result) {
+                return res.status(BAD_REQUEST).json({ success: false, message: 'Password change failed!' });
+            }
+            return res.status(OK).json({ success: true, message: 'Password changed successfully!' });
+        } catch (error) {
+            return res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error.' });
         }
     }
 
@@ -227,7 +283,6 @@ export class UserController {
         }
     }
 
-
     // ****************************fetch  car for card***************************
     async fetchCars(req: Request, res: Response): Promise<void> {
         try {
@@ -236,11 +291,8 @@ export class UserController {
             const limit = req.query.limit ? Number(req.query.limit) : undefined;
 
             if (page !== undefined && limit !== undefined) {
-
                 const result = await this.userServices.fetchCars(page, limit);
-
                 if (result) {
-
                     res.status(200).json(result.data);
                 } else {
                     res.status(500).json({ message: "Internal server error" });

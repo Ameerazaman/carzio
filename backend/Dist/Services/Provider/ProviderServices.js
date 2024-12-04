@@ -53,11 +53,23 @@ class ProviderServices {
             }
         });
     }
-    // *******************************8Signup logic************************8
-    userSignup(providerData) {
+    emailExistCheck(email) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.providerRepostry.emailExistCheck(providerData.email);
+                return yield this.providerRepostry.emailExistCheck(email);
+            }
+            catch (error) {
+                console.log(error);
+                return null;
+            }
+        });
+    }
+    // ********************************change password******************************
+    changePassword(email, password) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const hashedPassword = yield this.encrypt.hashPassword(password);
+                return yield this.providerRepostry.changePassword(email, hashedPassword);
             }
             catch (error) {
                 return null;

@@ -13,7 +13,7 @@ const Db_1 = __importDefault(require("./Config/Db"));
 const ProviderRouter_1 = __importDefault(require("./Routes/ProviderRouter"));
 const AdminRouter_1 = __importDefault(require("./Routes/AdminRouter"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const morgan_1 = __importDefault(require("morgan"));
+const Logger_1 = __importDefault(require("./Logger")); // Import the logger
 const Socket_1 = __importDefault(require("./Socket"));
 dotenv_1.default.config();
 (0, Db_1.default)();
@@ -22,8 +22,9 @@ const server = http_1.default.createServer(app);
 const PORT = process.env.PORT || 3000;
 // Setup Socket.IO
 const io = (0, Socket_1.default)(server);
+// Use the custom logger
+app.use(Logger_1.default);
 // Middlewares
-app.use((0, morgan_1.default)("dev"));
 app.use((0, cookie_parser_1.default)());
 const corsOptions = {
     origin: ["http://localhost:3000", "https://carzio-frondend.vercel.app"],
@@ -31,8 +32,6 @@ const corsOptions = {
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
 };
-app.use((0, cors_1.default)(corsOptions));
-;
 app.use((0, cors_1.default)(corsOptions));
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use(express_1.default.json());

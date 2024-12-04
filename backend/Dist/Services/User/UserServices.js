@@ -54,13 +54,47 @@ class UserServices {
         });
     }
     // *********************************Signup logic***************************
-    userSignup(userData) {
+    emailExistCheck(email) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.userRepository.emailExistCheck(userData.email);
+                return yield this.userRepository.emailExistCheck(email);
             }
             catch (error) {
                 console.log(error);
+                return null;
+            }
+        });
+    }
+    // ********************************change password******************************
+    changePassword(email, password) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const hashedPassword = yield this.encrypt.hashPassword(password);
+                return yield this.userRepository.changePassword(email, hashedPassword);
+            }
+            catch (error) {
+                return null;
+            }
+        });
+    }
+    //*********************************/ OTP creation logic**************************
+    createOtp(email, otp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield this.userRepository.createOtp(otp, email);
+            }
+            catch (error) {
+                return null;
+            }
+        });
+    }
+    //    ***********************************Verify otp******************************
+    verifyOtp(email, otp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield this.userRepository.findOtp(email, otp);
+            }
+            catch (error) {
                 return null;
             }
         });

@@ -53,7 +53,7 @@ export class ProviderController {
     async ProviderSignup(req: Request, res: Response): Promise<void> {
         try {
             req.app.locals.ProviderData = req.body;
-            const existingUser = await this.providerServices.userSignup(req.app.locals.ProviderData);
+            const existingUser = await this.providerServices.emailExistCheck(req.app.locals.ProviderData.email);
 
             if (existingUser) {
 
@@ -124,7 +124,6 @@ export class ProviderController {
                 if (savedProvider) {
                     return res.status(OK).json({
                         success: true,
-
                         provider: savedProvider,
                     });
                 } else {
@@ -143,7 +142,65 @@ export class ProviderController {
             return res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error.' });
         }
     }
+ // ****************************forgot Password*******************************
+ async forgotPassword(req: Request, res: Response): Promise<void> {
+    try {
+        req.app.locals.providerEmail = req.body.email
+        const existingUser = await this.providerServices.emailExistCheck(req.body.email);
+        if (!existingUser) {
+            res.status(BAD_REQUEST).json({ success: false, message: 'The email is already in use!' });
+        } else {
 
+            const otp = await generateAndSendOTP(req.body.email);
+            const otpData = await this.providerServices.createOtp(req.body.email, Number(otp))
+            res.status(OK).json({ userId: null, success: true, message: 'OTP sent for verification...' });
+        }
+    } catch (error) {
+        console.log(error as Error);
+        res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
+    }
+}
+    // ********************************verify otp for forgot password*********************
+    async verifyOtpForgotPassword(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
+        try {
+            const { otp } = req.body;
+            let email = req.app.locals.providerEmail;
+            console.log(otp,email)
+            var OTPRecord = await this.providerServices.verifyOtp(email, otp)
+            console.log(otp,email)
+            if (!OTPRecord) {
+                return res.status(BAD_REQUEST).json({ success: false, message: 'No OTP record found!' });
+            }
+            if (otp === OTPRecord.otp.toString()) {
+                return res.status(OK).json({
+                    success: true,
+                    message: 'OTP verified Successfully',
+                })
+            }
+            else {
+                return res.status(BAD_REQUEST).json({ success: false, message: 'Incorrect OTP!' });
+            }
+        } catch (error) {
+
+            return res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error.' });
+        }
+    }
+    // **********************************change password*****************************
+    async changePassword(req: Request, res: Response): Promise<Response<any>> {
+        try {
+            const  password  = req.body.password;
+            const email = req.app.locals.providerEmail;
+           
+            const result = await this.providerServices.changePassword(email, password);
+
+            if (!result) {
+                return res.status(BAD_REQUEST).json({ success: false, message: 'Password change failed!' });
+            }
+            return res.status(OK).json({ success: true, message: 'Password changed successfully!' });
+        } catch (error) {
+            return res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error.' });
+        }
+    }
     // **************************************************provider Login*******************
 
     async providerLogin(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {

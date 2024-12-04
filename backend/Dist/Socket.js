@@ -30,6 +30,7 @@ const setupSocket = (httpServer) => {
             const { senderId, receiverId, message, username } = data;
             const chat = new ChatModel_1.default({ senderId, receiverId, message, username });
             const savedChat = yield chat.save();
+            console.log(savedChat, "chat");
             if (userSockets[receiverId]) {
                 io.to(userSockets[receiverId]).emit("receive_message", data);
             }

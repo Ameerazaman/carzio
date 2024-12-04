@@ -46,6 +46,18 @@ class ProviderRepository {
             }
         });
     }
+    // **************************change password**********************
+    changePassword(email, password) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const changeUserpassword = yield ProviderModel_1.default.findOneAndUpdate({ email: email, password: password });
+                return changeUserpassword;
+            }
+            catch (error) {
+                return null;
+            }
+        });
+    }
     //*******This function creates or updates an OTP for a given email*************
     createOtp(otp, email) {
         return __awaiter(this, void 0, void 0, function* () {

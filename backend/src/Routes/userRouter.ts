@@ -19,6 +19,8 @@ userRouter.post('/verify-otp', (req, res) => userController.verifyOtp(req, res))
 userRouter.post('/login', (req, res) => userController.userLogin(req, res))
 userRouter.post('/refresh-token', (req, res, next) => userController.refreshToken(req, res, next))
 userRouter.get('/logout', async (req, res) => userController.userLogout(req, res))
+userRouter.post('/forgot_password', (req, res) => userController.forgotPassword(req, res));
+userRouter.post('/change_password', (req, res) => userController.changePassword(req, res));
 
 userRouter.get('/cars', userAuth, async (req, res) => userController.fetchCars(req, res))
 userRouter.get('/car_details/:id', userAuth, async (req, res) => userController.carDetails(req, res))
@@ -44,12 +46,7 @@ userRouter.post('/userid_in_coupon/:coupon/:userId', userAuth, async (req, res) 
 userRouter.put('/check_update_wallet/:userId/:amount', userAuth, async (req, res) => userController.checkAndUpdateWallet(req, res));
 
 userRouter.get('/booking_history', userAuth, async (req, res) => userController.getBookingHistory(req, res))
-userRouter.get('/details_of_specifc_order/:id', userAuth, async (req, res) => {
-    console.log("Route accessed: /details_of_specifc_order/:id");
-    console.log("Request Params:", req.params);
-    console.log("Request Query:", req.query);
-    userController.specificBookingDetails(req, res);
-});
+userRouter.get('/details_of_specifc_order/:id', userAuth, async (req, res) => userController.specificBookingDetails(req, res));
 
 userRouter.put('/cancel_booking', userAuth, async (req, res) => userController.cancelBookingByUser(req, res));
 userRouter.put('/credit_to_wallet', userAuth, async (req, res) => userController.creditToWallet(req, res));

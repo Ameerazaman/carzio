@@ -113,7 +113,22 @@ const userLogout = async () => {
     }
 };
 
+//**********************const forgot password******************************
+const forgotPassword = async (email:string) => {
+    try {
+        const result = await userApi.get(userRouter.forgotPassword, {
+            params: {
+                email
+            }
+        })
+        if (result) {
+            return result
+        }
+    } catch (error) {
+        errorHandler(error as Error);
+    }
 
+}
 // **************************fetch cars ******************************
 const fetchCars = async (page: number, limit: number) => {
     try {
@@ -405,7 +420,7 @@ const checkBalanceUpdateWallet = async (amount: number, userId: string) => {
     }
 };
 
-// ********************************get Wallet Page ***********************
+// ********************************get Wallet Page **************************
 const getWalletPage = async (userId: string, page: number, limit: number) => {
     try {
         const result = await userApi.get(userRouter.getWallet, {
@@ -469,7 +484,6 @@ const fetchChat = async (userId: string, providerId: string): Promise<any> => {
 // *****************************search car availabilty*******************
 const searchCarAvailabilty = async (issueDate: string, returnDate: string): Promise<any> => {
     try {
-
       const result = await userApi.get(userRouter.searchCarAvailabilty, {
         params: {
           issueDate,
@@ -478,12 +492,13 @@ const searchCarAvailabilty = async (issueDate: string, returnDate: string): Prom
       });
       return result;
     } catch (error) {
-
       errorHandler(error as Error); 
       throw error;
     }
   };
   
+// **********************************************************************
+
 
 export {
     signup,
@@ -518,6 +533,7 @@ export {
     createReviewAndRatings,
     checkBookidInReview,
     fetchChat,
-    searchCarAvailabilty
+    searchCarAvailabilty,
+    forgotPassword
 
 };

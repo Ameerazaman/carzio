@@ -22,6 +22,7 @@ import { useDeprecatedInvertedScale } from 'framer-motion';
 import { ReviewDataInterface } from '../../Interface/ReviewInterface';
 import { ReviewAuthInterface } from '../../Interface/AuthServices/ReviewAuthResponse';
 import { chatAuthInterface } from '../../Interface/AuthServices/ChatAuthResponse';
+import { OtpDocument } from '../../Model/User/OtpModel';
 
 
 
@@ -68,14 +69,44 @@ export class UserServices {
     }
     // *********************************Signup logic***************************
 
-    async userSignup(userData: UserInterface): Promise<UserInterface | null> {
+    async emailExistCheck(email: string): Promise<UserInterface | null> {
         try {
-            return await this.userRepository.emailExistCheck(userData.email);
+            return await this.userRepository.emailExistCheck(email);
         } catch (error) {
             console.log(error as Error);
             return null;
         }
 
+    }
+
+    // ********************************change password******************************
+
+    async changePassword(email: string, password: string): Promise<UserInterface | null> {
+        try {
+            const hashedPassword = await this.encrypt.hashPassword(password);
+            return await this.userRepository.changePassword(email, hashedPassword);
+        } catch (error) {
+            return null;
+        }
+    }
+
+    //*********************************/ OTP creation logic**************************
+    async createOtp(email: string, otp: number): Promise<OtpDocument | null> {
+        try {
+            return await this.userRepository.createOtp(otp, email);
+        } catch (error) {
+            return null;
+        }
+    }
+    //    ***********************************Verify otp******************************
+    async verifyOtp(email: string, otp: string): Promise<OtpDocument | null> {
+        try {
+            return await this.userRepository.findOtp(email, otp)
+        }
+        catch (error) {
+
+            return null;
+        }
     }
 
     // ********************************Save user logic************************

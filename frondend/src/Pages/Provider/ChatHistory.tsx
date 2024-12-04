@@ -29,9 +29,8 @@ const ChatHistory: React.FC = () => {
   const senderId = provider?._id || "";
 
   useEffect(() => {
-    const socket = io("https://carzio.store", {
-      withCredentials: true, 
-    });
+    const socket = io("https://carzio.store");
+
     setSocket(socket);
 
     const fetchUsers = async () => {

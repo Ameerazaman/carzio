@@ -34,6 +34,8 @@ providerRouter.post('/verify-otp', (req, res) => providerController.verifyOtp(re
 providerRouter.post('/login', (req, res) => providerController.providerLogin(req, res));
 providerRouter.get('/logout', (req, res) => __awaiter(void 0, void 0, void 0, function* () { return providerController.providerLogout(req, res); }));
 providerRouter.post('/refresh-token', (req, res, next) => providerController.refreshToken(req, res, next));
+providerRouter.post('/forgot_password', (req, res) => providerController.forgotPassword(req, res));
+providerRouter.post('/change_password', (req, res) => providerController.changePassword(req, res));
 providerRouter.get('/home/:id', ProviderAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return providerController.checkProviderAddrress(req, res); }));
 providerRouter.post('/save_profile', ProviderAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return providerController.saveProfile(req, res); }));
 providerRouter.put('/edit_profile/:id', ProviderAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return providerController.editProfile(req, res); }));
@@ -49,14 +51,7 @@ providerRouter.get('/details_of_specifc_order/:id', ProviderAuthMiddleware_1.def
 providerRouter.get('/update_status/:id/:status', ProviderAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return providerController.updateStatusOfBooking(req, res); }));
 providerRouter.get('/fetch_users_chat/:providerId', ProviderAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return providerController.fetchUsersChat(req, res); }));
 // providerRouter.get('/chat_history/:providerId/:userId', providerAuthenticate, async (req, res) => providerController.fetchChatHistory(req, res));
-providerRouter.get('/chat_history/:providerId/:userId', (req, res, next) => {
-    console.log("Route hit: /chat_history/:providerId/:userId");
-    console.log("Params:", req.params);
-    console.log("Headers:", req.headers);
-    next(); // Pass control to the middleware or controller
-}, ProviderAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield providerController.fetchChatHistory(req, res);
-}));
+providerRouter.get('/chat_history/:providerId/:userId', ProviderAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return providerController.fetchChatHistory(req, res); }));
 providerRouter.get('/dashboard/:providerId', ProviderAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return providerController.getDashboardConstData(req, res); }));
 providerRouter.get('/sales_report', ProviderAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return providerController.fetchSalesReport(req, res); }));
 exports.default = providerRouter;

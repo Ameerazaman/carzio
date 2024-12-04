@@ -11,6 +11,7 @@ import providerModel from "../../Model/Provider/ProviderModel";
 import BookingModel from "../../Model/User/BookingModel";
 import { Otp, OtpDocument } from "../../Model/User/OtpModel";
 import ChatModel, { IChat } from "../../Model/User/ChatModel";
+import { UserInterface } from "../../Interface/UserInterface";
 
 
 export class ProviderRepository {
@@ -39,7 +40,16 @@ export class ProviderRepository {
             return null;
         }
     }
+    // **************************change password**********************
+    async changePassword(email: string, password: string): Promise<ProviderInterface | null> {
+        try {
+            const changeUserpassword = await providerModel.findOneAndUpdate({ email: email, password: password });
+            return changeUserpassword as ProviderInterface;
+        } catch (error) {
 
+            return null;
+        }
+    }
     //*******This function creates or updates an OTP for a given email*************
     async createOtp(otp: number, email: string): Promise<OtpDocument | null> {
         try {

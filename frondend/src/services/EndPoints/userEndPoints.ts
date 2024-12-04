@@ -22,7 +22,8 @@ const userRouter = {
     createReviewRatings:'/create_review_and_ratings',
     checkBookIdInReview:'/check_bookid_in_Review',
     chatHistory:'/chat_history',
-    searchCarAvailabilty:'/search_car_availability'
+    searchCarAvailabilty:'/search_car_availability',
+    forgotPassword:'/forgot_password'
   };
   
   export default userRouter;

@@ -24,6 +24,7 @@ const setupSocket = (httpServer: any) => {
       const { senderId, receiverId, message, username } = data;
       const chat = new ChatModel({ senderId, receiverId, message, username });
       const savedChat = await chat.save();
+      console.log(savedChat,"chat")
 
 
       if (userSockets[receiverId]) {

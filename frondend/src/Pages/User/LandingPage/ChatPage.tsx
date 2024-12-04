@@ -25,16 +25,14 @@ const ChatPage: React.FC<ChatProps> = ({ senderId, receiverId, username }) => {
     const chatEndRef = useRef<HTMLDivElement>(null); // Reference to the chat end
 
     useEffect(() => {
-        // Initialize socket connection once
-        const socket = io("https://carzio.store", {
-            withCredentials: true, // Enables sending cookies and authorization headers
-          });
+       
+          const socket = io("https://carzio.store");
 
-        // Fetch chat history
+        
         const fetchChatHistory = async () => {
             const response = await fetchChat(senderId, receiverId);
             const data: Message[] = await response.data;
-            setChatHistory(data.reverse()); // Reverse to show latest at the bottom
+            setChatHistory(data); // Reverse to show latest at the bottom
         };
 
         fetchChatHistory();
