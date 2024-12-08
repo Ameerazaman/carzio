@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 const http_1 = __importDefault(require("http"));
 const UserRouter_1 = __importDefault(require("./Routes/UserRouter"));
@@ -15,6 +14,7 @@ const AdminRouter_1 = __importDefault(require("./Routes/AdminRouter"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const Logger_1 = __importDefault(require("./Logger")); // Import the logger
 const Socket_1 = __importDefault(require("./Socket"));
+const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 (0, Db_1.default)();
 const app = (0, express_1.default)();

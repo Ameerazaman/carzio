@@ -335,6 +335,7 @@ class AdminServices {
             var _a;
             try {
                 const carData = yield this.adminRepostry.fetchCars(page, limit);
+                console.log(carData, "cardata services");
                 const totalPage = (yield this.adminRepostry.countCars()) || 0;
                 if (carData && carData.length > 0) {
                     return {

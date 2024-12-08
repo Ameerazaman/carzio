@@ -1,5 +1,4 @@
 import express, { Application, Request, Response, NextFunction, ErrorRequestHandler } from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 import http from "http";
 import userRouter from "./Routes/UserRouter";
@@ -10,6 +9,7 @@ import adminRouter from "./Routes/AdminRouter";
 import cookieParser from "cookie-parser";
 import logger from "./Logger"; // Import the logger
 import setupSocket from "./Socket";
+import dotenv from "dotenv";
 
 dotenv.config();
 connectDB();

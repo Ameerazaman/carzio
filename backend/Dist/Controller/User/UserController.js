@@ -16,9 +16,10 @@ exports.UserController = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const GenerateAndSendOtp_1 = require("../../Utlis/GenerateAndSendOtp");
 const HttpStatusCode_1 = require("../../Constants/HttpStatusCode");
-const OtpModel_1 = require("../../Model/User/OtpModel");
 const VerifyTokens_1 = require("../../Utlis/VerifyTokens");
 const stripe_1 = __importDefault(require("stripe"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED, } = HttpStatusCode_1.STATUS_CODES;
 class UserController {
     constructor(userServices) {
@@ -40,7 +41,9 @@ class UserController {
                     res.status(401).json({ success: false, message: "Refresh Token Expired" });
                 }
                 const result = yield this.userServices.userGetById(decoded.data);
-                const accessTokenMaxAge = 5 * 60 * 1000;
+                const accessTokenMaxAge = process.env.ACCESS_TOKEN_MAX_AGE
+                    ? parseInt(process.env.ACCESS_TOKEN_MAX_AGE, 10)
+                    : 5 * 60 * 1000;
                 const newAccessToken = (_a = result === null || result === void 0 ? void 0 : result.data) === null || _a === void 0 ? void 0 : _a.token;
                 res.cookie('access_token', newAccessToken, {
                     maxAge: accessTokenMaxAge,
@@ -59,8 +62,10 @@ class UserController {
     userSignup(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                req.app.locals.userEmail = req.body;
+                console.log(req.body, "req.body");
+                req.app.locals.userData = req.body;
                 const existingUser = yield this.userServices.emailExistCheck(req.app.locals.userData.email);
+                console.log(existingUser, "existingUser");
                 if (existingUser) {
                     res.status(BAD_REQUEST).json({ success: false, message: 'The email is already in use!' });
                 }
@@ -68,7 +73,8 @@ class UserController {
                     req.app.locals.newUser = true;
                     req.app.locals.userEmail = req.body.email;
                     const otp = yield (0, GenerateAndSendOtp_1.generateAndSendOTP)(req.body.email);
-                    const otpData = yield this.userServices.createOtp(req.body.email, Number(otp));
+                    console.log(otp, "otp");
+                    const otpData = yield this.userServices.createOtp(req.body.email, otp);
                     res.status(OK).json({ userId: null, success: true, message: 'OTP sent for verification...' });
                 }
             }
@@ -82,13 +88,10 @@ class UserController {
     resendOtp(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("resend otp");
                 const email = req.app.locals.userEmail;
-                console.log("resend otp", email);
-                console.log(email);
                 const otp = yield (0, GenerateAndSendOtp_1.generateAndSendOTP)(email);
                 if (otp) {
-                    const result = yield OtpModel_1.Otp.updateMany({ email: email }, { $set: { otp: otp } });
+                    const result = yield this.userServices.updateOtp(email, otp);
                     req.app.locals.userOtp = otp;
                     req.app.locals.resendOtp = otp;
                     return res.status(OK).json({
@@ -125,7 +128,7 @@ class UserController {
                     const userData = req.app.locals.userData;
                     const savedUser = yield this.userServices.saveUser(userData);
                     if (savedUser) {
-                        yield OtpModel_1.Otp.deleteOne({ email });
+                        const deleteOtp = yield this.userServices.deleteOtp(email);
                         return res.status(OK).json({
                             success: true,
                             message: 'OTP verified Successfully',
@@ -159,7 +162,7 @@ class UserController {
                 }
                 else {
                     const otp = yield (0, GenerateAndSendOtp_1.generateAndSendOTP)(req.body.email);
-                    const otpData = yield this.userServices.createOtp(req.body.email, Number(otp));
+                    const otpData = yield this.userServices.createOtp(req.body.email, otp);
                     res.status(OK).json({ userId: null, success: true, message: 'OTP sent for verification...' });
                 }
             }
@@ -220,8 +223,10 @@ class UserController {
                 if (result === null || result === void 0 ? void 0 : result.data.success) {
                     const access_token = result.data.token;
                     const refresh_token = result.data.refreshToken;
-                    const accessTokenMaxAge = 5 * 60 * 1000;
-                    const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+                    const accessTokenMaxAge = process.env.ACCESS_TOKEN_MAX_AGE
+                        ? parseInt(process.env.ACCESS_TOKEN_MAX_AGE, 10) : 5 * 60 * 1000;
+                    const refreshTokenMaxAge = process.env.REFRESH_TOKEN_MAX_AGE
+                        ? parseInt(process.env.REFRESH_TOKEN_MAX_AGE, 10) : 48 * 60 * 60 * 1000;
                     return res.status(200)
                         .cookie('access_token', access_token, {
                         maxAge: accessTokenMaxAge,

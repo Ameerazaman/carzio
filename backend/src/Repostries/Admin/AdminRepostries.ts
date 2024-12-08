@@ -15,6 +15,7 @@ import { CouponInterface } from "../../Interface/CouponInterface";
 import mongoose, { ObjectId } from "mongoose";
 import { BookingInterface } from "../../Interface/BookingInterface";
 import BookingModel from "../../Model/User/BookingModel";
+import { IAdminRepository } from "./IAdminRepostry";
 
 
 interface UserDocument extends Document {
@@ -25,7 +26,8 @@ interface UserDocument extends Document {
   isBlocked: boolean
 }
 
-export class AdminRepository {
+export class AdminRepository implements IAdminRepository {
+
   async emailExistCheck(email: string): Promise<adminInterface | null> {
     try {
       const existingAdmin = await adminModel.findOne({ email });
@@ -113,7 +115,7 @@ export class AdminRepository {
     } catch (error) {
 
       return null;
-    }   
+    }
   }
 
   // *********************8update status*******************
@@ -225,7 +227,7 @@ export class AdminRepository {
     try {
 
       const data = await CarNotification.find() as CarDataInterface[];
-
+      console.log(data, "data")
       const notification: CarDataInterface[] = data.map((carDocument: any) => ({
         id: carDocument._id?.toString(),
         car_name: carDocument.car_name,
@@ -241,11 +243,11 @@ export class AdminRepository {
         insuranceExpiry: carDocument.insuranceExpiry,
         pollutionCertificateNumber: carDocument.pollutionCertificateNumber,
         pollutionExpiry: carDocument.pollutionExpiry,
-        isStatus: carDocument.isStatus,
+        isBlocked: carDocument.isBlocked,
         providerId: carDocument.providerId ? carDocument.providerId.toString() : undefined,
         createdAt: carDocument.createdAt,
       }));
-
+      console.log(notification, "notification")
       return notification;
     } catch (error) {
 
@@ -315,7 +317,7 @@ export class AdminRepository {
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit) as CarDataInterface[];
-
+      console.log(carDocuments, "cardocumnets")
       const cars: CarDataInterface[] = carDocuments.map((car: CarDataInterface) => ({
         car_name: car.car_name,
         model: car.model,
@@ -331,11 +333,11 @@ export class AdminRepository {
         pollutionCertificateNumber: car.pollutionCertificateNumber,
         pollutionExpiry: car.pollutionExpiry,
         providerId: car.providerId,
-        isStatus: car.isStatus,
+        isBlocked: car.isBlocked,
         createdAt: car.createdAt,
         id: car.id
       }));
-
+      console.log(cars, "cars")
       return cars;
     } catch (error) {
       return null;

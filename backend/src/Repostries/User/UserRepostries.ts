@@ -20,16 +20,17 @@ import { ReviewDataInterface } from '../../Interface/ReviewInterface';
 import ReviewModel from '../../Model/User/ReviewModel';
 import ChatModel, { IChat } from '../../Model/User/ChatModel';
 import { Otp, OtpDocument } from '../../Model/User/OtpModel';
+import { IUserRepository } from './IUserRepostry';
 
 
-interface UserLoginResponse {
+export interface UserLoginResponse {
     exists: boolean;
     userData?: any;
 }
 
 
 
-export class UserRepository {
+export class UserRepository implements IUserRepository {
 
     // *************************email Exist**************************
     async emailExistCheck(email: string): Promise<UserInterface | null> {
@@ -43,7 +44,7 @@ export class UserRepository {
         }
     }
     //*******This function creates or updates an OTP for a given email*************
-    async createOtp(otp: number, email: string): Promise<OtpDocument | null> {
+    async createOtp(otp: string, email: string): Promise<OtpDocument | null> {
         try {
             let existUserOtp = await Otp.findOne({ email });
 
@@ -63,7 +64,32 @@ export class UserRepository {
             return null;
         }
     }
+    // ***************************Delete Otp***********************************
 
+    async deleteOtp(email: string): Promise<OtpDocument | null> {
+        try {
+            const result = await Otp.findOneAndDelete({ email });
+            return result;
+        } catch (error) {
+            console.error("Error deleting OTP:", error);
+            return null;
+        }
+    }
+    // **************************Update otp*********************************
+
+    async updateOtp(email: string, otp: string): Promise<OtpDocument | null> {
+        try {
+            const result = await Otp.findOneAndUpdate(
+                { email: email },
+                { $set: { otp: otp } },
+                { new: true }
+            );
+            return result;
+        } catch (error) {
+            console.error("Error updating OTP:", error);
+            return null;
+        }
+    }
     //********************** */ Save a new user***************************8
     async saveUser(userData: UserInterface): Promise<UserInterface | null> {
         try {
@@ -107,8 +133,8 @@ export class UserRepository {
             return null;
         }
     }
-      // ***********************find Otp*****************************88
-      async findOtp(email: string, otp: string): Promise<OtpDocument | null> {
+    // ***********************find Otp*****************************88
+    async findOtp(email: string, otp: string): Promise<OtpDocument | null> {
         try {
             const existProviderOtp = await Otp.findOne({ email });
             if (existProviderOtp && existProviderOtp.otp.toString() === otp) {
@@ -140,10 +166,12 @@ export class UserRepository {
         try {
 
             const skip = (page - 1) * limit;
-            const carDocuments = await CarModel.find()
-                .sort({ createdAt: -1 })
-                .skip(skip)
-                .limit(limit) as CarDataInterface[];
+            const carDocuments = await CarModel.find({ isBlocked: false }) 
+            .sort({ createdAt: -1 })
+            .skip(skip) 
+            .limit(limit)
+            .exec() as CarDataInterface[];
+        
 
             const cars: CarDataInterface[] = carDocuments.map((car: CarDataInterface) => ({
                 car_name: car.car_name,
@@ -160,7 +188,7 @@ export class UserRepository {
                 pollutionCertificateNumber: car.pollutionCertificateNumber,
                 pollutionExpiry: car.pollutionExpiry,
                 providerId: car.providerId,
-                isStatus: car.isStatus,
+                isBlocked: car.isBlocked,
                 createdAt: car.createdAt,
                 id: car.id,
 
@@ -253,7 +281,7 @@ export class UserRepository {
                 pollutionCertificateNumber: car.pollutionCertificateNumber,
                 pollutionExpiry: car.pollutionExpiry,
                 providerId: car.providerId,
-                isStatus: car.isStatus,
+                isBlocked: car.isBlocked,
                 createdAt: car.createdAt,
                 id: car.id
             }));
@@ -734,7 +762,7 @@ export class UserRepository {
                 pollutionCertificateNumber: car.pollutionCertificateNumber,
                 pollutionExpiry: car.pollutionExpiry,
                 providerId: car.providerId,
-                isStatus: car.isStatus,
+                isBlocked: car.isBlocked,
                 createdAt: car.createdAt,
                 id: car.id,
             }));

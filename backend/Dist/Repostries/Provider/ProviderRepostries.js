@@ -93,6 +93,32 @@ class ProviderRepository {
             }
         });
     }
+    // ***************************Delete Otp***********************************
+    deleteOtp(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield OtpModel_1.Otp.findOneAndDelete({ email });
+                return result;
+            }
+            catch (error) {
+                console.error("Error deleting OTP:", error);
+                return null;
+            }
+        });
+    }
+    // **************************Update otp*********************************
+    updateOtp(email, otp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield OtpModel_1.Otp.findOneAndUpdate({ email: email }, { $set: { otp: otp } }, { new: true });
+                return result;
+            }
+            catch (error) {
+                console.error("Error updating OTP:", error);
+                return null;
+            }
+        });
+    }
     // *************************Save provider***************************
     saveProvider(providerData) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -257,7 +283,7 @@ class ProviderRepository {
                     pollutionCertificateNumber: car.pollutionCertificateNumber,
                     pollutionExpiry: car.pollutionExpiry,
                     providerId: car.providerId,
-                    isStatus: car.isStatus,
+                    isBlocked: car.isBlocked,
                     createdAt: car.createdAt,
                     id: car.id,
                 }));
@@ -305,7 +331,7 @@ class ProviderRepository {
                         pollutionCertificateNumber: car.pollutionCertificateNumber,
                         pollutionExpiry: car.pollutionExpiry,
                         providerId: car.providerId,
-                        isStatus: car.isStatus,
+                        isBlocked: car.isBlocked,
                         createdAt: car.createdAt,
                         id: car.id
                     };

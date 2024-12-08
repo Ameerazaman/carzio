@@ -11,10 +11,10 @@ import providerModel from "../../Model/Provider/ProviderModel";
 import BookingModel from "../../Model/User/BookingModel";
 import { Otp, OtpDocument } from "../../Model/User/OtpModel";
 import ChatModel, { IChat } from "../../Model/User/ChatModel";
-import { UserInterface } from "../../Interface/UserInterface";
+import { IProviderRepository } from "./IProviderRepostry";
 
 
-export class ProviderRepository {
+export class ProviderRepository implements IProviderRepository {
 
     //*******************check provider for tooken validation*************
 
@@ -86,7 +86,32 @@ export class ProviderRepository {
             return null;
         }
     }
+    // ***************************Delete Otp***********************************
 
+    async deleteOtp(email: string): Promise<OtpDocument | null> {
+        try {
+            const result = await Otp.findOneAndDelete({ email });
+            return result;
+        } catch (error) {
+            console.error("Error deleting OTP:", error);
+            return null;
+        }
+    }
+    // **************************Update otp*********************************
+
+    async updateOtp(email: string, otp: string): Promise<OtpDocument | null> {
+        try {
+            const result = await Otp.findOneAndUpdate(
+                { email: email },
+                { $set: { otp: otp } },
+                { new: true }
+            );
+            return result;
+        } catch (error) {
+            console.error("Error updating OTP:", error);
+            return null;
+        }
+    }
     // *************************Save provider***************************
 
     async saveProvider(providerData: ProviderInterface): Promise<ProviderInterface | null> {
@@ -208,17 +233,14 @@ export class ProviderRepository {
 
     async addCarDetails(carData: CarDataInterface): Promise<CarDataInterface | undefined> {
         try {
-
             let carExist = await CarModel.findOne({
                 providerId: carData.providerId,
                 rcNumber: carData.rcNumber
             });
-
             if (carExist) {
 
                 return undefined;
             }
-
             const newCar = new CarNotification({
                 car_name: carData.car_name,
                 model: carData.model,
@@ -270,7 +292,7 @@ export class ProviderRepository {
                 pollutionCertificateNumber: car.pollutionCertificateNumber,
                 pollutionExpiry: car.pollutionExpiry,
                 providerId: car.providerId,
-                isStatus: car.isStatus,
+                isBlocked: car.isBlocked,
                 createdAt: car.createdAt,
                 id: car.id,
 
@@ -330,7 +352,7 @@ export class ProviderRepository {
                     pollutionCertificateNumber: car.pollutionCertificateNumber,
                     pollutionExpiry: car.pollutionExpiry,
                     providerId: car.providerId,
-                    isStatus: car.isStatus,
+                    isBlocked: car.isBlocked,
                     createdAt: car.createdAt,
                     id: car.id
                 } as CarDataInterface;

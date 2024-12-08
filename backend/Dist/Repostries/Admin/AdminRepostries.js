@@ -189,6 +189,7 @@ class AdminRepository {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const data = yield CarNotification_1.default.find();
+                console.log(data, "data");
                 const notification = data.map((carDocument) => {
                     var _a;
                     return ({
@@ -206,11 +207,12 @@ class AdminRepository {
                         insuranceExpiry: carDocument.insuranceExpiry,
                         pollutionCertificateNumber: carDocument.pollutionCertificateNumber,
                         pollutionExpiry: carDocument.pollutionExpiry,
-                        isStatus: carDocument.isStatus,
+                        isBlocked: carDocument.isBlocked,
                         providerId: carDocument.providerId ? carDocument.providerId.toString() : undefined,
                         createdAt: carDocument.createdAt,
                     });
                 });
+                console.log(notification, "notification");
                 return notification;
             }
             catch (error) {
@@ -276,6 +278,7 @@ class AdminRepository {
                     .sort({ createdAt: -1 })
                     .skip(skip)
                     .limit(limit);
+                console.log(carDocuments, "cardocumnets");
                 const cars = carDocuments.map((car) => ({
                     car_name: car.car_name,
                     model: car.model,
@@ -291,10 +294,11 @@ class AdminRepository {
                     pollutionCertificateNumber: car.pollutionCertificateNumber,
                     pollutionExpiry: car.pollutionExpiry,
                     providerId: car.providerId,
-                    isStatus: car.isStatus,
+                    isBlocked: car.isBlocked,
                     createdAt: car.createdAt,
                     id: car.id
                 }));
+                console.log(cars, "cars");
                 return cars;
             }
             catch (error) {

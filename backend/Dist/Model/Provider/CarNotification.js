@@ -41,7 +41,7 @@ const carNotificationSchema = new mongoose.Schema({
     pollutionExpiry: {
         type: Date,
     },
-    isStatus: {
+    isBlocked: {
         type: Boolean,
         default: false
     },

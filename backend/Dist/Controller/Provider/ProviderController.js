@@ -38,7 +38,8 @@ class ProviderController {
                     res.status(401).json({ success: false, message: "Refresh Token Expired" });
                 }
                 const result = yield this.providerServices.providerGetById(decoded.data);
-                const accessTokenMaxAge = 5 * 60 * 1000;
+                const accessTokenMaxAge = process.env.ACCESS_TOKEN_MAX_AGE
+                    ? parseInt(process.env.ACCESS_TOKEN_MAX_AGE, 10) : 5 * 60 * 1000;
                 const newAccessToken = (_a = result === null || result === void 0 ? void 0 : result.data) === null || _a === void 0 ? void 0 : _a.token;
                 res.cookie('access_token', newAccessToken, {
                     maxAge: accessTokenMaxAge,
@@ -82,8 +83,10 @@ class ProviderController {
             try {
                 const email = req.app.locals.providerEmail;
                 const otp = yield (0, GenerateAndSendOtp_1.generateAndSendOTP)(email);
-                var otpData = yield this.providerServices.createOtp(email, Number(otp));
-                if (otpData) {
+                if (otp) {
+                    const result = yield this.providerServices.updateOtp(email, otp);
+                    req.app.locals.userOtp = otp;
+                    req.app.locals.resendOtp = otp;
                     return res.status(OK).json({
                         success: true,
                         message: 'Resend OTP successfully',
@@ -118,6 +121,7 @@ class ProviderController {
                     const providerData = req.app.locals.ProviderData;
                     const savedProvider = yield this.providerServices.saveProvider(providerData);
                     if (savedProvider) {
+                        const deleteOtp = yield this.providerServices.deleteOtp(email);
                         return res.status(OK).json({
                             success: true,
                             provider: savedProvider,
@@ -213,8 +217,10 @@ class ProviderController {
                 if (result === null || result === void 0 ? void 0 : result.data.success) {
                     const access_token = result.data.token;
                     const refresh_token = result.data.refreshToken;
-                    const accessTokenMaxAge = 5 * 60 * 1000;
-                    const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+                    const accessTokenMaxAge = process.env.ACCESS_TOKEN_MAX_AGE
+                        ? parseInt(process.env.ACCESS_TOKEN_MAX_AGE, 10) : 5 * 60 * 1000;
+                    const refreshTokenMaxAge = process.env.REFRESH_TOKEN_MAX_AGE
+                        ? parseInt(process.env.REFRESH_TOKEN_MAX_AGE, 10) : 48 * 60 * 60 * 1000;
                     return res.status(OK)
                         .cookie('access_token', access_token, {
                         maxAge: accessTokenMaxAge,
@@ -231,7 +237,6 @@ class ProviderController {
                         .json({ success: true, user: result.data, message: result.data.message });
                 }
                 else {
-                    console.log("login failed");
                     return res.status(BAD_REQUEST).json({ success: false, message: result === null || result === void 0 ? void 0 : result.data.message });
                 }
             }

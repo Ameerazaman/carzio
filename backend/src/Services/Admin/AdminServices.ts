@@ -360,6 +360,7 @@ export class AdminServices {
   async fetchCars(page:number,limit:number): Promise<CarAuthResponse | undefined> {
     try {
       const carData = await this.adminRepostry.fetchCars(page,limit);
+      console.log(carData,"cardata services")
       const totalPage = (await this.adminRepostry.countCars()) || 0;
      
       if (carData && carData.length > 0) {

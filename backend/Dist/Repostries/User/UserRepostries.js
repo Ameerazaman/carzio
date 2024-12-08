@@ -58,6 +58,32 @@ class UserRepository {
             }
         });
     }
+    // ***************************Delete Otp***********************************
+    deleteOtp(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield OtpModel_1.Otp.findOneAndDelete({ email });
+                return result;
+            }
+            catch (error) {
+                console.error("Error deleting OTP:", error);
+                return null;
+            }
+        });
+    }
+    // **************************Update otp*********************************
+    updateOtp(email, otp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield OtpModel_1.Otp.findOneAndUpdate({ email: email }, { $set: { otp: otp } }, { new: true });
+                return result;
+            }
+            catch (error) {
+                console.error("Error updating OTP:", error);
+                return null;
+            }
+        });
+    }
     //********************** */ Save a new user***************************8
     saveUser(userData) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -143,10 +169,11 @@ class UserRepository {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const skip = (page - 1) * limit;
-                const carDocuments = yield CarModel_1.default.find()
+                const carDocuments = yield CarModel_1.default.find({ isBlocked: false })
                     .sort({ createdAt: -1 })
                     .skip(skip)
-                    .limit(limit);
+                    .limit(limit)
+                    .exec();
                 const cars = carDocuments.map((car) => ({
                     car_name: car.car_name,
                     model: car.model,
@@ -162,7 +189,7 @@ class UserRepository {
                     pollutionCertificateNumber: car.pollutionCertificateNumber,
                     pollutionExpiry: car.pollutionExpiry,
                     providerId: car.providerId,
-                    isStatus: car.isStatus,
+                    isBlocked: car.isBlocked,
                     createdAt: car.createdAt,
                     id: car.id,
                 }));
@@ -254,7 +281,7 @@ class UserRepository {
                     pollutionCertificateNumber: car.pollutionCertificateNumber,
                     pollutionExpiry: car.pollutionExpiry,
                     providerId: car.providerId,
-                    isStatus: car.isStatus,
+                    isBlocked: car.isBlocked,
                     createdAt: car.createdAt,
                     id: car.id
                 }));
@@ -721,7 +748,7 @@ class UserRepository {
                     pollutionCertificateNumber: car.pollutionCertificateNumber,
                     pollutionExpiry: car.pollutionExpiry,
                     providerId: car.providerId,
-                    isStatus: car.isStatus,
+                    isBlocked: car.isBlocked,
                     createdAt: car.createdAt,
                     id: car.id,
                 }));

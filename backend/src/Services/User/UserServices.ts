@@ -91,7 +91,7 @@ export class UserServices {
     }
 
     //*********************************/ OTP creation logic**************************
-    async createOtp(email: string, otp: number): Promise<OtpDocument | null> {
+    async createOtp(email: string, otp: string): Promise<OtpDocument | null> {
         try {
             return await this.userRepository.createOtp(otp, email);
         } catch (error) {
@@ -108,7 +108,24 @@ export class UserServices {
             return null;
         }
     }
-
+    // *************************************Delete Otp***************************
+    async deleteOtp(email: string): Promise<OtpDocument | null> {
+        try {
+            return await this.userRepository.deleteOtp(email)
+        }
+        catch (error) {
+            return null;
+        }
+    }
+    // **********************************update Otp**************************
+    async updateOtp(email: string, otp: string): Promise<OtpDocument | null> {
+        try {
+            return await this.userRepository.updateOtp(email, otp)
+        }
+        catch (error) {
+            return null;
+        }
+    }
     // ********************************Save user logic************************
 
     async saveUser(userData: UserInterface): Promise<UserAuthResponse | undefined> {
@@ -219,7 +236,7 @@ export class UserServices {
                     status: BAD_REQUEST,
                     data: {
                         success: false,
-                        message: 'No cars found',
+                        message: 'Car  is blocked or not found',
                     },
                 };
             }

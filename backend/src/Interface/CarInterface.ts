@@ -4,7 +4,7 @@ export interface CarDataInterface {
     model: string;
     rentalPrice: string;
     engineType: string;
-    isStatus:boolean;
+    isBlocked:boolean;
     fuelType: string;
     color: string;
     images: string[];

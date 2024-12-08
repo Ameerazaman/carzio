@@ -9,6 +9,10 @@ import { verifyRefreshToken } from '../../Utlis/VerifyTokens';
 import { BookingInterface } from '../../Interface/BookingInterface';
 import Stripe from 'stripe';
 import { ReviewDataInterface } from '../../Interface/ReviewInterface';
+import dotenv from "dotenv";
+import { outputJson } from 'fs-extra';
+
+dotenv.config();
 const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED, } = STATUS_CODES;
 
 export class UserController {
@@ -39,7 +43,10 @@ export class UserController {
 
             const result = await this.userServices.userGetById(decoded.data);
 
-            const accessTokenMaxAge = 5 * 60 * 1000;
+            const accessTokenMaxAge = process.env.ACCESS_TOKEN_MAX_AGE
+                ? parseInt(process.env.ACCESS_TOKEN_MAX_AGE, 10)
+                : 5 * 60 * 1000;
+
             const newAccessToken = result?.data?.token
 
             res.cookie('access_token', newAccessToken, {
@@ -59,20 +66,19 @@ export class UserController {
     // ***********************user signup************************
     async userSignup(req: Request, res: Response): Promise<void> {
         try {
-
-            req.app.locals.userEmail = req.body;
+            console.log(req.body, "req.body")
+            req.app.locals.userData = req.body;
 
             const existingUser = await this.userServices.emailExistCheck(req.app.locals.userData.email);
-
+            console.log(existingUser, "existingUser")
             if (existingUser) {
-
                 res.status(BAD_REQUEST).json({ success: false, message: 'The email is already in use!' });
             } else {
                 req.app.locals.newUser = true;
                 req.app.locals.userEmail = req.body.email;
                 const otp = await generateAndSendOTP(req.body.email);
-
-                const otpData = await this.userServices.createOtp(req.body.email, Number(otp))
+                console.log(otp, "otp")
+                const otpData = await this.userServices.createOtp(req.body.email, otp)
 
                 res.status(OK).json({ userId: null, success: true, message: 'OTP sent for verification...' });
             }
@@ -81,22 +87,16 @@ export class UserController {
             res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
         }
     }
- 
+
     // ***********************************resend otp********************
 
     async resendOtp(req: Request, res: Response): Promise<Response> {
         try {
-            console.log("resend otp")
             const email = req.app.locals.userEmail;
-            console.log("resend otp", email)
-            console.log(email);
 
             const otp = await generateAndSendOTP(email);
             if (otp) {
-                const result = await Otp.updateMany(
-                    { email: email },
-                    { $set: { otp: otp } }
-                );
+                const result = await this.userServices.updateOtp(email, otp)
 
                 req.app.locals.userOtp = otp;
                 req.app.locals.resendOtp = otp;
@@ -127,7 +127,6 @@ export class UserController {
 
             const { otp } = req.body;
             let email = req.app.locals.userEmail;
-
             var OTPRecord = await this.userServices.verifyOtp(email, otp)
 
             if (!OTPRecord) {
@@ -143,7 +142,7 @@ export class UserController {
 
                 if (savedUser) {
 
-                    await Otp.deleteOne({ email });
+                    const deleteOtp = await this.userServices.deleteOtp(email);
 
                     return res.status(OK).json({
                         success: true,
@@ -165,25 +164,28 @@ export class UserController {
             return res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error.' });
         }
     }
-   // ****************************forgot Password*******************************
-   async forgotPassword(req: Request, res: Response): Promise<void> {
-    try {
-        req.app.locals.userEmail = req.body.email
-        const existingUser = await this.userServices.emailExistCheck(req.body.email);
-        if (!existingUser) {
-            res.status(BAD_REQUEST).json({ success: false, message: 'The email is already in use!' });
-        } else {
+    // ****************************forgot Password*******************************
 
-            const otp = await generateAndSendOTP(req.body.email);
-            const otpData = await this.userServices.createOtp(req.body.email, Number(otp))
-            res.status(OK).json({ userId: null, success: true, message: 'OTP sent for verification...' });
+    async forgotPassword(req: Request, res: Response): Promise<void> {
+        try {
+            req.app.locals.userEmail = req.body.email
+            const existingUser = await this.userServices.emailExistCheck(req.body.email);
+            if (!existingUser) {
+                res.status(BAD_REQUEST).json({ success: false, message: 'The email is already in use!' });
+            } else {
+
+                const otp = await generateAndSendOTP(req.body.email);
+                const otpData = await this.userServices.createOtp(req.body.email, otp)
+                res.status(OK).json({ userId: null, success: true, message: 'OTP sent for verification...' });
+            }
+        } catch (error) {
+            console.log(error as Error);
+            res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
         }
-    } catch (error) {
-        console.log(error as Error);
-        res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
     }
-}
+
     // ********************************verify otp for forgot password*********************
+
     async verifyOtpForgotPassword(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
         try {
             const { otp } = req.body;
@@ -206,10 +208,12 @@ export class UserController {
             return res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error.' });
         }
     }
+
     // **********************************change password*****************************
+
     async changePassword(req: Request, res: Response): Promise<Response<any>> {
         try {
-            const  password  = req.body.password;
+            const password = req.body.password;
             const email = req.app.locals.userEmail;
             const result = await this.userServices.changePassword(email, password);
             if (!result) {
@@ -231,13 +235,17 @@ export class UserController {
 
             const result = await this.userServices.userSignIn({ email, password });
 
-
             if (result?.data.success) {
                 const access_token = result.data.token;
                 const refresh_token = result.data.refreshToken;
 
-                const accessTokenMaxAge = 5 * 60 * 1000;
-                const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+                const accessTokenMaxAge = process.env.ACCESS_TOKEN_MAX_AGE
+                    ? parseInt(process.env.ACCESS_TOKEN_MAX_AGE, 10) : 5 * 60 * 1000;
+
+                const refreshTokenMaxAge = process.env.REFRESH_TOKEN_MAX_AGE
+                    ? parseInt(process.env.REFRESH_TOKEN_MAX_AGE, 10) : 48 * 60 * 60 * 1000;
+
+
 
                 return res.status(200)
                     .cookie('access_token', access_token, {

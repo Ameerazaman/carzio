@@ -27,7 +27,7 @@ exports.Otp = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const otpSchema = new mongoose_1.Schema({
     email: { type: String, required: true },
-    otp: { type: Number, required: true },
+    otp: { type: String, required: true },
     createdAt: { type: Date, default: Date.now, index: { expires: '5m' } }, // TTL index for 5 minutes
 });
 exports.Otp = mongoose_1.default.model('Otp', otpSchema);

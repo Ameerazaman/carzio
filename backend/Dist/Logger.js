@@ -15,6 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const morgan_1 = __importDefault(require("morgan"));
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const path_1 = __importDefault(require("path"));
+// Load configuration from environment variables
+const LOG_FILE_AGE_THRESHOLD = parseInt(process.env.LOG_FILE_AGE_THRESHOLD || '20', 10); // Default: 20 days
+const LOG_CLEANUP_INTERVAL = parseInt(process.env.LOG_CLEANUP_INTERVAL || '86400000', 10); // Default: 24 hours
 // Log directory
 const logDirectory = path_1.default.join(__dirname, 'logs');
 // Ensure the log directory exists
@@ -26,7 +29,7 @@ const logger = (0, morgan_1.default)('combined', {
     skip: (req, res) => res.statusCode < 400,
     stream: errorLogStream,
 });
-// Cleanup function to delete logs older than 20 days
+// Cleanup function to delete logs older than the configured threshold
 const deleteOldLogs = () => __awaiter(void 0, void 0, void 0, function* () {
     const files = yield fs_extra_1.default.readdir(logDirectory);
     files.forEach((file) => __awaiter(void 0, void 0, void 0, function* () {
@@ -34,12 +37,12 @@ const deleteOldLogs = () => __awaiter(void 0, void 0, void 0, function* () {
         const stats = yield fs_extra_1.default.stat(filePath);
         const now = Date.now();
         const fileAgeInDays = (now - stats.mtime.getTime()) / (1000 * 60 * 60 * 24);
-        if (fileAgeInDays > 20) {
+        if (fileAgeInDays > LOG_FILE_AGE_THRESHOLD) {
             yield fs_extra_1.default.remove(filePath);
             console.log(`Deleted old log file: ${filePath}`);
         }
     }));
 });
-// Run cleanup every 24 hours
-setInterval(deleteOldLogs, 24 * 60 * 60 * 1000);
+// Run cleanup at the configured interval
+setInterval(deleteOldLogs, LOG_CLEANUP_INTERVAL);
 exports.default = logger;

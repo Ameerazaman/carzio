@@ -98,6 +98,28 @@ class ProviderServices {
             }
         });
     }
+    // *************************************Delete Otp***************************
+    deleteOtp(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield this.providerRepostry.deleteOtp(email);
+            }
+            catch (error) {
+                return null;
+            }
+        });
+    }
+    // **********************************update Otp**************************
+    updateOtp(email, otp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield this.providerRepostry.updateOtp(email, otp);
+            }
+            catch (error) {
+                return null;
+            }
+        });
+    }
     // ******************************************save Provider*****************************
     saveProvider(providerData) {
         return __awaiter(this, void 0, void 0, function* () {

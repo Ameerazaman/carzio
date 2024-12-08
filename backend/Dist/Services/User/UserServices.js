@@ -99,6 +99,28 @@ class UserServices {
             }
         });
     }
+    // *************************************Delete Otp***************************
+    deleteOtp(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield this.userRepository.deleteOtp(email);
+            }
+            catch (error) {
+                return null;
+            }
+        });
+    }
+    // **********************************update Otp**************************
+    updateOtp(email, otp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield this.userRepository.updateOtp(email, otp);
+            }
+            catch (error) {
+                return null;
+            }
+        });
+    }
     // ********************************Save user logic************************
     saveUser(userData) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -206,7 +228,7 @@ class UserServices {
                         status: BAD_REQUEST,
                         data: {
                             success: false,
-                            message: 'No cars found',
+                            message: 'Car  is blocked or not found',
                         },
                     };
                 }

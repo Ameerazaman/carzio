@@ -95,7 +95,24 @@ export class ProviderServices {
             return null;
         }
     }
-
+    // *************************************Delete Otp***************************
+    async deleteOtp(email: string): Promise<OtpDocument | null> {
+        try {
+            return await this.providerRepostry.deleteOtp(email)
+        }
+        catch (error) {
+            return null;
+        }
+    }
+    // **********************************update Otp**************************
+    async updateOtp(email: string, otp: string): Promise<OtpDocument | null> {
+        try {
+            return await this.providerRepostry.updateOtp(email, otp)
+        }
+        catch (error) {
+            return null;
+        }
+    }
     // ******************************************save Provider*****************************
     async saveProvider(providerData: ProviderInterface): Promise<ProviderAuthResponse | undefined> {
         try {
@@ -445,7 +462,7 @@ export class ProviderServices {
                 status: 200,
                 data: {
                     success: true,
-                
+
                 },
             };
         } catch (error) {

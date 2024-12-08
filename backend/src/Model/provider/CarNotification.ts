@@ -51,7 +51,7 @@ const carNotificationSchema = new mongoose.Schema({
         type: Date,
 
     },
-    isStatus: {
+    isBlocked: {
         type: Boolean,
         default: false
     },

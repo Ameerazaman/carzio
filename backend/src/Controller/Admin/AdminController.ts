@@ -17,39 +17,41 @@ export class AdminController {
 
   async refreshToken(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     const refreshToken = req.cookies.refresh_token;
-    
+
     if (!refreshToken) {
       return res.status(401).json({ success: false });
     }
-  
+
     try {
       const decoded = verifyRefreshToken(refreshToken);
 
       if (!decoded || !decoded.data) {
         return res.status(401).json({ success: false, message: "Refresh Token Expired" });
       }
-  
+
       const result = await this.adminServices.adminGetById(decoded.data);
-      const accessTokenMaxAge = 5 * 60 * 1000;
+      const accessTokenMaxAge = process.env.ACCESS_TOKEN_MAX_AGE
+        ? parseInt(process.env.ACCESS_TOKEN_MAX_AGE, 10) : 5 * 60 * 1000;
+
       const newAccessToken = result?.data?.token;
-  
+
       if (!newAccessToken) {
         return res.status(401).json({ success: false, message: "Access token not generated" });
       }
-  
+
       res.cookie('access_token', newAccessToken, {
         maxAge: accessTokenMaxAge,
         httpOnly: true,
         sameSite: 'none', // Ensure 'none' is in lowercase
         secure: true, // Ensure you set this correctly for your environment
       });
-  
+
       res.status(200).json({ success: true });
     } catch (error) {
       next(error);
     }
   }
-  
+
 
   // ***********************************admin Login**************************8
 
@@ -61,21 +63,26 @@ export class AdminController {
       if (result?.data.success) {
         const access_token = result.data.token;
         const refresh_token = result.data.refreshToken;
-        const accessTokenMaxAge = 5 * 60 * 1000;
-        const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+        const accessTokenMaxAge = process.env.ACCESS_TOKEN_MAX_AGE
+          ? parseInt(process.env.ACCESS_TOKEN_MAX_AGE, 10) : 5 * 60 * 1000;
+
+        const refreshTokenMaxAge = process.env.REFRESH_TOKEN_MAX_AGE
+          ? parseInt(process.env.REFRESH_TOKEN_MAX_AGE, 10) : 48 * 60 * 60 * 1000;
+
+
         // console.log(access_token, "access_token", refresh_token, "refresh_token", accessTokenMaxAge, "accessTokenMaxAge", refreshTokenMaxAge, "refreshTokenMaxAge")
         return res.status(OK)
           .cookie('access_token', access_token, {
             maxAge: accessTokenMaxAge,
             httpOnly: true,
-            secure:true,
+            secure: true,
             sameSite: 'none',
           })
           .cookie('refresh_token', refresh_token, {
             maxAge: refreshTokenMaxAge,
             httpOnly: true,
             // secure: process.env.NODE_ENV === 'production',
-            secure:true,
+            secure: true,
             sameSite: 'none',
           })
           .json({ success: true, user: result.data, message: result.data.message });
@@ -105,7 +112,7 @@ export class AdminController {
       res.status(500).json({ message: "Internal server error" });
     }
   }
-  
+
   // ******************************fetch users**************************
 
   async fetchUsers(req: Request, res: Response): Promise<void> {
@@ -365,7 +372,6 @@ export class AdminController {
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
       const result = await this.adminServices.fetchCars(page, limit);
-
       if (result) {
         res.status(result.status).json(result.data);
       } else {

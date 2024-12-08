@@ -32,7 +32,9 @@ export class ProviderController {
 
             const result = await this.providerServices.providerGetById(decoded.data);
 
-            const accessTokenMaxAge = 5 * 60 * 1000;
+            const accessTokenMaxAge = process.env.ACCESS_TOKEN_MAX_AGE
+          ? parseInt(process.env.ACCESS_TOKEN_MAX_AGE, 10) : 5 * 60 * 1000;
+
             const newAccessToken = result?.data?.token
             res.cookie('access_token', newAccessToken, {
                 maxAge: accessTokenMaxAge,
@@ -80,15 +82,17 @@ export class ProviderController {
 
             const email = req.app.locals.providerEmail;
             const otp = await generateAndSendOTP(email);
-            var otpData = await this.providerServices.createOtp(email, Number(otp))
-            if (otpData) {
+            if (otp) {
+                const result = await this.providerServices.updateOtp(email, otp)
+
+                req.app.locals.userOtp = otp;
+                req.app.locals.resendOtp = otp;
 
                 return res.status(OK).json({
                     success: true,
                     message: 'Resend OTP successfully',
                 });
             } else {
-
                 return res.status(BAD_REQUEST).json({
                     success: false,
                     message: 'Error during OTP resend'
@@ -122,6 +126,7 @@ export class ProviderController {
                 const savedProvider = await this.providerServices.saveProvider(providerData);
 
                 if (savedProvider) {
+                    const deleteOtp = await this.providerServices.deleteOtp(email);
                     return res.status(OK).json({
                         success: true,
                         provider: savedProvider,
@@ -142,32 +147,32 @@ export class ProviderController {
             return res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error.' });
         }
     }
- // ****************************forgot Password*******************************
- async forgotPassword(req: Request, res: Response): Promise<void> {
-    try {
-        req.app.locals.providerEmail = req.body.email
-        const existingUser = await this.providerServices.emailExistCheck(req.body.email);
-        if (!existingUser) {
-            res.status(BAD_REQUEST).json({ success: false, message: 'The email is already in use!' });
-        } else {
+    // ****************************forgot Password*******************************
+    async forgotPassword(req: Request, res: Response): Promise<void> {
+        try {
+            req.app.locals.providerEmail = req.body.email
+            const existingUser = await this.providerServices.emailExistCheck(req.body.email);
+            if (!existingUser) {
+                res.status(BAD_REQUEST).json({ success: false, message: 'The email is already in use!' });
+            } else {
 
-            const otp = await generateAndSendOTP(req.body.email);
-            const otpData = await this.providerServices.createOtp(req.body.email, Number(otp))
-            res.status(OK).json({ userId: null, success: true, message: 'OTP sent for verification...' });
+                const otp = await generateAndSendOTP(req.body.email);
+                const otpData = await this.providerServices.createOtp(req.body.email, Number(otp))
+                res.status(OK).json({ userId: null, success: true, message: 'OTP sent for verification...' });
+            }
+        } catch (error) {
+            console.log(error as Error);
+            res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
         }
-    } catch (error) {
-        console.log(error as Error);
-        res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
     }
-}
     // ********************************verify otp for forgot password*********************
     async verifyOtpForgotPassword(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
         try {
             const { otp } = req.body;
             let email = req.app.locals.providerEmail;
-            console.log(otp,email)
+            console.log(otp, email)
             var OTPRecord = await this.providerServices.verifyOtp(email, otp)
-            console.log(otp,email)
+            console.log(otp, email)
             if (!OTPRecord) {
                 return res.status(BAD_REQUEST).json({ success: false, message: 'No OTP record found!' });
             }
@@ -188,9 +193,9 @@ export class ProviderController {
     // **********************************change password*****************************
     async changePassword(req: Request, res: Response): Promise<Response<any>> {
         try {
-            const  password  = req.body.password;
+            const password = req.body.password;
             const email = req.app.locals.providerEmail;
-           
+
             const result = await this.providerServices.changePassword(email, password);
 
             if (!result) {
@@ -211,8 +216,13 @@ export class ProviderController {
             if (result?.data.success) {
                 const access_token = result.data.token;
                 const refresh_token = result.data.refreshToken;
-                const accessTokenMaxAge = 5 * 60 * 1000;
-                const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+
+                const accessTokenMaxAge = process.env.ACCESS_TOKEN_MAX_AGE
+                    ? parseInt(process.env.ACCESS_TOKEN_MAX_AGE, 10) : 5 * 60 * 1000;
+
+                const refreshTokenMaxAge = process.env.REFRESH_TOKEN_MAX_AGE
+                    ? parseInt(process.env.REFRESH_TOKEN_MAX_AGE, 10) : 48 * 60 * 60 * 1000;
+
 
                 return res.status(OK)
                     .cookie('access_token', access_token, {
@@ -229,7 +239,7 @@ export class ProviderController {
                     })
                     .json({ success: true, user: result.data, message: result.data.message });
             } else {
-                console.log("login failed")
+             
                 return res.status(BAD_REQUEST).json({ success: false, message: result?.data.message });
             }
         } catch (error) {

@@ -35,7 +35,8 @@ class AdminController {
                     return res.status(401).json({ success: false, message: "Refresh Token Expired" });
                 }
                 const result = yield this.adminServices.adminGetById(decoded.data);
-                const accessTokenMaxAge = 5 * 60 * 1000;
+                const accessTokenMaxAge = process.env.ACCESS_TOKEN_MAX_AGE
+                    ? parseInt(process.env.ACCESS_TOKEN_MAX_AGE, 10) : 5 * 60 * 1000;
                 const newAccessToken = (_a = result === null || result === void 0 ? void 0 : result.data) === null || _a === void 0 ? void 0 : _a.token;
                 if (!newAccessToken) {
                     return res.status(401).json({ success: false, message: "Access token not generated" });
@@ -62,8 +63,10 @@ class AdminController {
                 if (result === null || result === void 0 ? void 0 : result.data.success) {
                     const access_token = result.data.token;
                     const refresh_token = result.data.refreshToken;
-                    const accessTokenMaxAge = 5 * 60 * 1000;
-                    const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+                    const accessTokenMaxAge = process.env.ACCESS_TOKEN_MAX_AGE
+                        ? parseInt(process.env.ACCESS_TOKEN_MAX_AGE, 10) : 5 * 60 * 1000;
+                    const refreshTokenMaxAge = process.env.REFRESH_TOKEN_MAX_AGE
+                        ? parseInt(process.env.REFRESH_TOKEN_MAX_AGE, 10) : 48 * 60 * 60 * 1000;
                     // console.log(access_token, "access_token", refresh_token, "refresh_token", accessTokenMaxAge, "accessTokenMaxAge", refreshTokenMaxAge, "refreshTokenMaxAge")
                     return res.status(OK)
                         .cookie('access_token', access_token, {
