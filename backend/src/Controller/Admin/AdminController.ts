@@ -68,10 +68,8 @@ export class AdminController {
 
         const refreshTokenMaxAge = process.env.REFRESH_TOKEN_MAX_AGE
           ? parseInt(process.env.REFRESH_TOKEN_MAX_AGE, 10) : 48 * 60 * 60 * 1000;
-
-
-        // console.log(access_token, "access_token", refresh_token, "refresh_token", accessTokenMaxAge, "accessTokenMaxAge", refreshTokenMaxAge, "refreshTokenMaxAge")
-        return res.status(OK)
+      
+          return res.status(OK)
           .cookie('access_token', access_token, {
             maxAge: accessTokenMaxAge,
             httpOnly: true,
@@ -81,7 +79,6 @@ export class AdminController {
           .cookie('refresh_token', refresh_token, {
             maxAge: refreshTokenMaxAge,
             httpOnly: true,
-            // secure: process.env.NODE_ENV === 'production',
             secure: true,
             sameSite: 'none',
           })
@@ -97,21 +94,27 @@ export class AdminController {
 
   // ***************************admin logout***************************
 
-  async adminLogout(req: Request, res: Response): Promise<void> {
-    try {
-      res.clearCookie('access_token', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production'
-      });
-      res.clearCookie('refresh_token', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production'
-      });
-      res.status(200).json({ success: true, message: "Logged out successfully" });
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
+  
+    async adminLogout(req: Request, res: Response): Promise<void> {
+      try {
+          res.clearCookie('access_token', {
+              httpOnly: true,
+              secure: true, // Ensure this matches `secure` from res.cookie in login
+              sameSite: 'none', // Ensure this matches `sameSite` from res.cookie in login
+          });
+  
+          res.clearCookie('refresh_token', {
+              httpOnly: true,
+              secure: true, // Ensure this matches `secure` from res.cookie in login
+              sameSite: 'none', // Ensure this matches `sameSite` from res.cookie in login
+          });
+  
+          res.status(200).json({ success: true, message: "Logged out successfully" });
+      } catch (error) {
+          res.status(500).json({ message: "Internal server error" });
+      }
   }
+  
 
   // ******************************fetch users**************************
 

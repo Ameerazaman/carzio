@@ -248,25 +248,27 @@ export class ProviderController {
     }
 
     // **************************************provider Logout***********************
-    async providerLogout(req: Request, res: Response): Promise<void> {
-        try {
-
-            res.clearCookie('access_token', {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production'
-            });
-            res.clearCookie('refresh_token', {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production'
-            });
-
-            res.status(200).json({ success: true, message: "Logged out successfully" });
-        } catch (error) {
-
-            res.status(500).json({ message: "Internal server error" });
+   
+        async providerLogout(req: Request, res: Response): Promise<void> {
+            try {
+                res.clearCookie('access_token', {
+                    httpOnly: true,
+                    secure: true, // Ensure this matches `secure` from res.cookie in login
+                    sameSite: 'none', // Ensure this matches `sameSite` from res.cookie in login
+                });
+        
+                res.clearCookie('refresh_token', {
+                    httpOnly: true,
+                    secure: true, // Ensure this matches `secure` from res.cookie in login
+                    sameSite: 'none', // Ensure this matches `sameSite` from res.cookie in login
+                });
+        
+                res.status(200).json({ success: true, message: "Logged out successfully" });
+            } catch (error) {
+                res.status(500).json({ message: "Internal server error" });
+            }
         }
-    }
-
+        
     // ****************************check provider address exist or not******************
     async checkProviderAddrress(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
         try {

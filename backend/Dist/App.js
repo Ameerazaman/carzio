@@ -22,6 +22,7 @@ const server = http_1.default.createServer(app);
 const PORT = process.env.PORT || 3000;
 // Setup Socket.IO
 const io = (0, Socket_1.default)(server);
+console.log(io, "io");
 // Use the custom logger
 app.use(Logger_1.default);
 // Middlewares

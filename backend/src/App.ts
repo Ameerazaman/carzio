@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 3000;
 
 // Setup Socket.IO
 const io = setupSocket(server);
-
+console.log(io,"io")
 // Use the custom logger
 app.use(logger);
 
@@ -32,6 +32,7 @@ const corsOptions = {
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
+
 };
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));

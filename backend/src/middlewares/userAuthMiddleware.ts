@@ -27,7 +27,6 @@ const userAuth = async (req: Request, res: Response, next: NextFunction) => {
     try {
         let token = req.cookies.access_token;
         let refresh_token = req.cookies.refresh_token;
-           
         if (!refresh_token) {
             return res.status(401).json({ success: false, message: 'Refresh Token Expired' });
         }

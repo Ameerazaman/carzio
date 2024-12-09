@@ -17,9 +17,11 @@ const ChatModel_1 = __importDefault(require("./Model/User/ChatModel"));
 const setupSocket = (httpServer) => {
     const io = new socket_io_1.Server(httpServer, {
         cors: {
-            origin: ["http://localhost:3000", "https://carzio-frondend.vercel.app"],
+            origin: ["http://localhost:3000", "https://carzio-frondend.vercel.app"], // Ensure your client origin is allowed
             methods: ["GET", "POST"],
+            credentials: true,
         },
+        transports: ["websocket", "polling"],
     });
     const userSockets = {};
     io.on("connection", (socket) => {
@@ -28,6 +30,7 @@ const setupSocket = (httpServer) => {
         });
         socket.on("send_message", (data) => __awaiter(void 0, void 0, void 0, function* () {
             const { senderId, receiverId, message, username } = data;
+            console.log(data, "data");
             const chat = new ChatModel_1.default({ senderId, receiverId, message, username });
             const savedChat = yield chat.save();
             console.log(savedChat, "chat");
@@ -35,6 +38,7 @@ const setupSocket = (httpServer) => {
                 io.to(userSockets[receiverId]).emit("receive_message", data);
             }
             else {
+                console.log("receiverId is not get");
             }
         }));
         socket.on("disconnect", () => {

@@ -67,7 +67,6 @@ class AdminController {
                         ? parseInt(process.env.ACCESS_TOKEN_MAX_AGE, 10) : 5 * 60 * 1000;
                     const refreshTokenMaxAge = process.env.REFRESH_TOKEN_MAX_AGE
                         ? parseInt(process.env.REFRESH_TOKEN_MAX_AGE, 10) : 48 * 60 * 60 * 1000;
-                    // console.log(access_token, "access_token", refresh_token, "refresh_token", accessTokenMaxAge, "accessTokenMaxAge", refreshTokenMaxAge, "refreshTokenMaxAge")
                     return res.status(OK)
                         .cookie('access_token', access_token, {
                         maxAge: accessTokenMaxAge,
@@ -78,7 +77,6 @@ class AdminController {
                         .cookie('refresh_token', refresh_token, {
                         maxAge: refreshTokenMaxAge,
                         httpOnly: true,
-                        // secure: process.env.NODE_ENV === 'production',
                         secure: true,
                         sameSite: 'none',
                     })
@@ -99,11 +97,13 @@ class AdminController {
             try {
                 res.clearCookie('access_token', {
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production'
+                    secure: true, // Ensure this matches `secure` from res.cookie in login
+                    sameSite: 'none', // Ensure this matches `sameSite` from res.cookie in login
                 });
                 res.clearCookie('refresh_token', {
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production'
+                    secure: true, // Ensure this matches `secure` from res.cookie in login
+                    sameSite: 'none', // Ensure this matches `sameSite` from res.cookie in login
                 });
                 res.status(200).json({ success: true, message: "Logged out successfully" });
             }

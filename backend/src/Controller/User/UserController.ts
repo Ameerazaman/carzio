@@ -278,18 +278,22 @@ export class UserController {
         try {
             res.clearCookie('access_token', {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production'
+                secure: true, // Ensure this matches `secure` from res.cookie in login
+                sameSite: 'none', // Ensure this matches `sameSite` from res.cookie in login
             });
+    
             res.clearCookie('refresh_token', {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production'
+                secure: true, // Ensure this matches `secure` from res.cookie in login
+                sameSite: 'none', // Ensure this matches `sameSite` from res.cookie in login
             });
-
+    
             res.status(200).json({ success: true, message: "Logged out successfully" });
         } catch (error) {
             res.status(500).json({ message: "Internal server error" });
         }
     }
+    
 
     // ****************************fetch  car for card***************************
     async fetchCars(req: Request, res: Response): Promise<void> {
