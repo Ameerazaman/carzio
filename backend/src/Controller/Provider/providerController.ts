@@ -224,20 +224,35 @@ export class ProviderController {
                     ? parseInt(process.env.REFRESH_TOKEN_MAX_AGE, 10) : 48 * 60 * 60 * 1000;
 
 
-                return res.status(OK)
-                    .cookie('access_token', access_token, {
-                        maxAge: accessTokenMaxAge,
-                        httpOnly: true,
-                        secure: true,
-                        sameSite: 'none',
-                    })
-                    .cookie('refresh_token', refresh_token, {
-                        maxAge: refreshTokenMaxAge,
-                        httpOnly: true,
-                        secure: true,
-                        sameSite: 'none',
-                    })
-                    .json({ success: true, user: result.data, message: result.data.message });
+                // return res.status(OK)
+                //     .cookie('access_token', access_token, {
+                //         maxAge: accessTokenMaxAge,
+                //         httpOnly: true,
+                //         secure: true,
+                //         sameSite: 'none',
+                //     })
+                //     .cookie('refresh_token', refresh_token, {
+                //         maxAge: refreshTokenMaxAge,
+                //         httpOnly: true,
+                //         secure: true,
+                //         sameSite: 'none',
+                //     })
+                //     .json({ success: true, user: result.data, message: result.data.message });
+                return res.status(200)
+                .cookie('access_token', access_token, {
+                    maxAge: accessTokenMaxAge,
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: 'none',
+                })
+                .cookie('refresh_token', refresh_token, {
+                    maxAge: refreshTokenMaxAge,
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: 'none',
+                })
+                .json({ success: true, user: result.data, message: result.data.message });
+
             } else {
              
                 return res.status(BAD_REQUEST).json({ success: false, message: result?.data.message });
