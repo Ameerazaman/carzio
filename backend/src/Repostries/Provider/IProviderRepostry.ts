@@ -10,6 +10,10 @@ export interface IProviderRepository {
 
     emailExistCheck(email: string): Promise<ProviderInterface | null>,
 
+    deleteOtp(email: string): Promise<OtpDocument | null>
+
+    updateOtp(email: string, otp: string): Promise<OtpDocument | null>
+
     changePassword(email: string, password: string): Promise<ProviderInterface | null> ,
 
     createOtp(otp: number, email: string): Promise<OtpDocument | null>,
@@ -40,6 +44,8 @@ export interface IProviderRepository {
     
     getBookingHistory(providerId: string, page: number, limit: number): Promise<BookingInterface[] | null>
     
+    specificBookingDetails(bookingId: string): Promise<BookingInterface | null>
+   
     updateStatusOfBooking(bookingId: string, status: string): Promise<BookingInterface | null>
     
     fetchUsersChat(providerId: string): Promise<IChat[] | null>,

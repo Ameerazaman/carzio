@@ -10,6 +10,11 @@ import cookieParser from "cookie-parser";
 import logger from "./Logger"; // Import the logger
 import setupSocket from "./Socket";
 import dotenv from "dotenv";
+import { UserRepository } from "./Repostries/User/UserRepostries";
+import Encrypt from "./Utlis/ComparedPassword";
+import { CreateJWT } from "./Utlis/GenerateToken";
+import { UserServices } from "./Services/User/UserServices";
+import { UserController } from "./Controller/User/UserController";
 
 dotenv.config();
 connectDB();

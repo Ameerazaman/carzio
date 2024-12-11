@@ -16,6 +16,7 @@ import mongoose, { ObjectId } from "mongoose";
 import { BookingInterface } from "../../Interface/BookingInterface";
 import BookingModel from "../../Model/User/BookingModel";
 import { IAdminRepository } from "./IAdminRepostry";
+import { BaseRepository } from "../BaseRepostry";
 
 
 interface UserDocument extends Document {
@@ -26,7 +27,10 @@ interface UserDocument extends Document {
   isBlocked: boolean
 }
 
-export class AdminRepository implements IAdminRepository {
+export class AdminRepository extends BaseRepository <typeof adminModel> implements IAdminRepository {
+  constructor() {
+    super(adminModel);
+  }
 
   async emailExistCheck(email: string): Promise<adminInterface | null> {
     try {
@@ -485,7 +489,7 @@ export class AdminRepository implements IAdminRepository {
       return null;
     }
   }
-  // **************************add coupon*****************
+  // // **************************add coupon*****************
   async addCoupon(coupon: CouponInterface): Promise<CouponInterface | null> {
     try {
       const newCoupon = new Coupon({

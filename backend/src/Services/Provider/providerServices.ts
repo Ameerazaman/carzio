@@ -15,10 +15,11 @@ import { uploadImageToCloudinary } from '../../Utlis/Uploads';
 import { BookingAuthResponse } from '../../Interface/AuthServices/BookingAuthInterface';
 import { chatAuthInterface } from '../../Interface/AuthServices/ChatAuthResponse';
 import { DashboardAuthInterface } from '../../Interface/AuthServices/DashboardAuthInterface';
+import { IProviderRepository } from '../../Repostries/Provider/IProviderRepostry';
 
 export class ProviderServices {
     constructor(
-        private providerRepostry: ProviderRepository,
+        private providerRepostry: IProviderRepository,
         private encrypt: Encrypt,
         private createjwt: CreateJWT
     ) { }

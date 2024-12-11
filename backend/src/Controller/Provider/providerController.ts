@@ -5,6 +5,7 @@ import { ProviderServices } from '../../Services/Provider/ProviderServices';
 import { generateAndSendOTP } from '../../Utlis/GenerateAndSendOtp';
 import { StatusCodes } from 'http-status-codes';
 import { verifyRefreshToken } from '../../Utlis/VerifyTokens';
+import { IProviderServices } from '../../Services/Provider/IProviderServices';
 const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = StatusCodes;
 
 
@@ -12,7 +13,9 @@ const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = StatusCodes;
 export class ProviderController {
 
 
-    constructor(private providerServices: ProviderServices) { }
+    // constructor(private providerServices: ProviderServices) 
+    constructor(private providerServices: IProviderServices) 
+    { }
     milliseconds = (h: number, m: number, s: number) => ((h * 60 * 60 + m * 60 + s) * 1000);
 
     // ***********************refersh accesss token for provider*****************
@@ -33,7 +36,7 @@ export class ProviderController {
             const result = await this.providerServices.providerGetById(decoded.data);
 
             const accessTokenMaxAge = process.env.ACCESS_TOKEN_MAX_AGE
-          ? parseInt(process.env.ACCESS_TOKEN_MAX_AGE, 10) : 5 * 60 * 1000;
+                ? parseInt(process.env.ACCESS_TOKEN_MAX_AGE, 10) : 5 * 60 * 1000;
 
             const newAccessToken = result?.data?.token
             res.cookie('access_token', newAccessToken, {
@@ -224,37 +227,24 @@ export class ProviderController {
                     ? parseInt(process.env.REFRESH_TOKEN_MAX_AGE, 10) : 48 * 60 * 60 * 1000;
 
 
-                // return res.status(OK)
-                //     .cookie('access_token', access_token, {
-                //         maxAge: accessTokenMaxAge,
-                //         httpOnly: true,
-                //         secure: true,
-                //         sameSite: 'none',
-                //     })
-                //     .cookie('refresh_token', refresh_token, {
-                //         maxAge: refreshTokenMaxAge,
-                //         httpOnly: true,
-                //         secure: true,
-                //         sameSite: 'none',
-                //     })
-                //     .json({ success: true, user: result.data, message: result.data.message });
-                return res.status(200)
-                .cookie('access_token', access_token, {
-                    maxAge: accessTokenMaxAge,
-                    httpOnly: true,
-                    secure: true,
-                    sameSite: 'none',
-                })
-                .cookie('refresh_token', refresh_token, {
-                    maxAge: refreshTokenMaxAge,
-                    httpOnly: true,
-                    secure: true,
-                    sameSite: 'none',
-                })
-                .json({ success: true, user: result.data, message: result.data.message });
+                return res.status(OK)
+                    .cookie('access_token', access_token, {
+                        maxAge: accessTokenMaxAge,
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: 'none',
+                    })
+                    .cookie('refresh_token', refresh_token, {
+                        maxAge: refreshTokenMaxAge,
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: 'none',
+                    })
+                    .json({ success: true, user: result.data, message: result.data.message });
+                
 
             } else {
-             
+
                 return res.status(BAD_REQUEST).json({ success: false, message: result?.data.message });
             }
         } catch (error) {
@@ -263,27 +253,30 @@ export class ProviderController {
     }
 
     // **************************************provider Logout***********************
-   
-        async providerLogout(req: Request, res: Response): Promise<void> {
-            try {
-                res.clearCookie('access_token', {
-                    httpOnly: true,
-                    secure: true, // Ensure this matches `secure` from res.cookie in login
-                    sameSite: 'none', // Ensure this matches `sameSite` from res.cookie in login
-                });
-        
-                res.clearCookie('refresh_token', {
-                    httpOnly: true,
-                    secure: true, // Ensure this matches `secure` from res.cookie in login
-                    sameSite: 'none', // Ensure this matches `sameSite` from res.cookie in login
-                });
-        
-                res.status(200).json({ success: true, message: "Logged out successfully" });
-            } catch (error) {
-                res.status(500).json({ message: "Internal server error" });
-            }
+
+    async providerLogout(req: Request, res: Response): Promise<void> {
+        try {
+            res.clearCookie('access_token', {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+            
+            });
+            
+            res.clearCookie('refresh_token', {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+          
+            });
+            
+            console.log(req.cookies.refresh_token, "cookie")
+            res.status(200).json({ success: true, message: "Logged out successfully" });
+        } catch (error) {
+            res.status(500).json({ message: "Internal server error" });
         }
-        
+    }
+
     // ****************************check provider address exist or not******************
     async checkProviderAddrress(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
         try {

@@ -18,11 +18,13 @@ export interface IUserRepository {
 
     createOtp(otp: string, email: string): Promise<OtpDocument | null>
 
+    deleteOtp(email: string): Promise<OtpDocument | null> 
+
+    updateOtp(email: string, otp: string): Promise<OtpDocument | null> 
+
     saveUser(userData: UserInterface): Promise<UserInterface | null>
 
     userLogin(email: string): Promise<UserLoginResponse>
-
-    emailPasswordCheck(email: string): Promise<UserInterface | null>
 
     changePassword(email: string, password: string): Promise<UserInterface | null>
 

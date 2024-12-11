@@ -11,13 +11,15 @@ import Stripe from 'stripe';
 import { ReviewDataInterface } from '../../Interface/ReviewInterface';
 import dotenv from "dotenv";
 import { outputJson } from 'fs-extra';
+import { IUserServices } from '../../Services/User/IUserServices';
 
 dotenv.config();
 const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED, } = STATUS_CODES;
 
 export class UserController {
+    constructor(private userServices: IUserServices) {}
+  
 
-    constructor(private userServices: UserServices) { }
     milliseconds = (h: number, m: number, s: number) => ((h * 60 * 60 + m * 60 + s) * 1000);
 
 
@@ -234,7 +236,7 @@ export class UserController {
             const { email, password }: { email: string; password: string } = req.body;
 
             const result = await this.userServices.userSignIn({ email, password });
-
+            console.log(result, "result")
             if (result?.data.success) {
                 const access_token = result.data.token;
                 const refresh_token = result.data.refreshToken;
@@ -281,19 +283,19 @@ export class UserController {
                 secure: true, // Ensure this matches `secure` from res.cookie in login
                 sameSite: 'none', // Ensure this matches `sameSite` from res.cookie in login
             });
-    
+
             res.clearCookie('refresh_token', {
                 httpOnly: true,
                 secure: true, // Ensure this matches `secure` from res.cookie in login
                 sameSite: 'none', // Ensure this matches `sameSite` from res.cookie in login
             });
-    
+
             res.status(200).json({ success: true, message: "Logged out successfully" });
         } catch (error) {
             res.status(500).json({ message: "Internal server error" });
         }
     }
-    
+
 
     // ****************************fetch  car for card***************************
     async fetchCars(req: Request, res: Response): Promise<void> {

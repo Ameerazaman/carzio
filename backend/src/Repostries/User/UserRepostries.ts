@@ -21,23 +21,24 @@ import ReviewModel from '../../Model/User/ReviewModel';
 import ChatModel, { IChat } from '../../Model/User/ChatModel';
 import { Otp, OtpDocument } from '../../Model/User/OtpModel';
 import { IUserRepository } from './IUserRepostry';
-
+import { BaseRepository } from '../BaseRepostry';
 
 export interface UserLoginResponse {
     exists: boolean;
     userData?: any;
 }
 
-
-
-export class UserRepository implements IUserRepository {
-
+export class UserRepository extends BaseRepository<typeof userModel> implements IUserRepository {
+    constructor() {
+      super(userModel); 
+    }
     // *************************email Exist**************************
     async emailExistCheck(email: string): Promise<UserInterface | null> {
         try {
-            const existingUser = await userModel.findOne({ email });
-
-            return existingUser as UserInterface;
+            console.log(email,"email")
+            const existingUser = await userModel.find({email:email});
+            console.log(existingUser,"existingUser")
+            return existingUser[0] as UserInterface;
         } catch (error) {
             console.log("Error checking email existence:", error);
             return null;
@@ -113,16 +114,7 @@ export class UserRepository implements IUserRepository {
             return { exists: false };
         }
     }
-    //*****************check username and password for login*************
-    async emailPasswordCheck(email: string): Promise<UserInterface | null> {
-        try {
-            const existingUser = await userModel.findOne({ email });
-            return existingUser as UserInterface;
-        } catch (error) {
-            console.log("Error checking email and password:", error);
-            return null;
-        }
-    }
+   
     // **************************change password**********************
     async changePassword(email: string, password: string): Promise<UserInterface | null> {
         try {
@@ -166,12 +158,12 @@ export class UserRepository implements IUserRepository {
         try {
 
             const skip = (page - 1) * limit;
-            const carDocuments = await CarModel.find({ isBlocked: false }) 
-            .sort({ createdAt: -1 })
-            .skip(skip) 
-            .limit(limit)
-            .exec() as CarDataInterface[];
-        
+            const carDocuments = await CarModel.find({ isBlocked: false })
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .exec() as CarDataInterface[];
+
 
             const cars: CarDataInterface[] = carDocuments.map((car: CarDataInterface) => ({
                 car_name: car.car_name,

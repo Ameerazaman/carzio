@@ -12,10 +12,13 @@ import BookingModel from "../../Model/User/BookingModel";
 import { Otp, OtpDocument } from "../../Model/User/OtpModel";
 import ChatModel, { IChat } from "../../Model/User/ChatModel";
 import { IProviderRepository } from "./IProviderRepostry";
+import { BaseRepository } from "../BaseRepostry";
 
 
-export class ProviderRepository implements IProviderRepository {
-
+    export class ProviderRepository extends BaseRepository<typeof providerModel> implements IProviderRepository {
+        constructor() {
+          super(providerModel); 
+        }
     //*******************check provider for tooken validation*************
 
     async getProviderById(id: string): Promise<ProviderInterface | null> {

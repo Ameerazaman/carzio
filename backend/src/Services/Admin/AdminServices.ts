@@ -19,11 +19,12 @@ import { CouponInterface } from '../../Interface/CouponInterface';
 import { CouponAuthResponse } from '../../Interface/AuthServices/CouponAuthInterface';
 import { BookingAuthResponse } from '../../Interface/AuthServices/BookingAuthInterface';
 import { DashboardAuthInterface } from '../../Interface/AuthServices/DashboardAuthInterface';
+import { IAdminRepository } from '../../Repostries/Admin/IAdminRepostry';
 
 
 export class AdminServices {
   constructor(
-    private adminRepostry: AdminRepository,
+    private adminRepostry: IAdminRepository,
     private encrypt: Encrypt,
     private createjwt: CreateJWT
   ) { }
@@ -486,7 +487,7 @@ export class AdminServices {
   // ************************update Offer*************8888
   async updateOffer(offerData: OfferDataInterface, id: string): Promise<OfferAuthResponse | undefined> {
     try {
-      console.log("edit offer is services")
+     
       const provider = await this.adminRepostry.updateOffer(offerData, id);
 
 

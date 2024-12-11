@@ -4,13 +4,13 @@ import { AdminServices } from '../../Services/Admin/AdminServices';
 import { generateAndSendOTP } from '../../Utlis/GenerateAndSendOtp';
 import { StatusCodes } from 'http-status-codes';
 import { verifyRefreshToken } from '../../Utlis/VerifyTokens';
+import { IAdminServices } from '../../Services/Admin/IAdminServices';
 const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = StatusCodes;
 
 
 export class AdminController {
 
-
-  constructor(private adminServices: AdminServices) { }
+  constructor(private adminServices: IAdminServices) { }
 
   //  *******************************refresh access token for admin*************************
 

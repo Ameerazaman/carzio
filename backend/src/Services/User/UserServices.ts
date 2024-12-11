@@ -23,15 +23,17 @@ import { ReviewDataInterface } from '../../Interface/ReviewInterface';
 import { ReviewAuthInterface } from '../../Interface/AuthServices/ReviewAuthResponse';
 import { chatAuthInterface } from '../../Interface/AuthServices/ChatAuthResponse';
 import { OtpDocument } from '../../Model/User/OtpModel';
+import { IUserRepository } from '../../Repostries/User/IUserRepostry';
+import { IUserServices } from './IUserServices';
 
 
 
 
 const { OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED, BAD_REQUEST } = STATUS_CODES;
 
-export class UserServices {
+export class UserServices implements IUserServices {
     constructor(
-        private userRepository: UserRepository,
+        private userRepository: IUserRepository,
         private encrypt: Encrypt,
         private createjwt: CreateJWT
     ) { }
@@ -71,7 +73,10 @@ export class UserServices {
 
     async emailExistCheck(email: string): Promise<UserInterface | null> {
         try {
-            return await this.userRepository.emailExistCheck(email);
+            console.log("check services")
+            const data = await this.userRepository.emailExistCheck(email);
+            console.log(data, "data")
+            return data
         } catch (error) {
             console.log(error as Error);
             return null;
@@ -158,8 +163,8 @@ export class UserServices {
 
     async userSignIn(userData: UserInterface): Promise<UserAuthResponse | undefined> {
         try {
-            const user = await this.userRepository.emailPasswordCheck(userData.email);
-
+            const user = await this.userRepository.emailExistCheck(userData.email);
+            console.log(user, "user")
             if (!user) {
                 return {
                     status: UNAUTHORIZED,

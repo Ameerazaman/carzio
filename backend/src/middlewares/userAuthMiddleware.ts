@@ -6,8 +6,6 @@ import { STATUS_CODES } from '../Constants/HttpStatusCode';
 import { UserInterface } from '../Interface/UserInterface';
 import { UserRepository } from '../Repostries/User/UserRepostries';
 
-import { access } from 'fs';
-
 const { UNAUTHORIZED } = STATUS_CODES
 
 const jwt = new CreateJWT();
@@ -26,8 +24,11 @@ declare global {
 const userAuth = async (req: Request, res: Response, next: NextFunction) => {
     try {
         let token = req.cookies.access_token;
+        console.log(token,"token")
         let refresh_token = req.cookies.refresh_token;
+        console.log(refresh_token,"refresh_token")
         if (!refresh_token) {
+            console.log('Refresh Token Expired')
             return res.status(401).json({ success: false, message: 'Refresh Token Expired' });
         }
 

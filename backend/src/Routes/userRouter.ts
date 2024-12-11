@@ -5,13 +5,22 @@ import { UserRepository } from '../Repostries/User/UserRepostries';
 import Encrypt from '../Utlis/ComparedPassword';
 import { CreateJWT } from '../Utlis/GenerateToken';
 import userAuth from '../Middlewares/UserAuthMiddleware';
+import { IUserServices } from '../Services/User/IUserServices';
+import { IUserRepository } from '../Repostries/User/IUserRepostry';
 
 const userRouter: Router = express.Router();
-const userRepository = new UserRepository();
+
+// Instantiate dependencies
+const userRepository = new UserRepository(); // Using interface
 const encrypt = new Encrypt();
-const createJWT = new CreateJWT();
-const userServices = new UserServices(userRepository, encrypt, createJWT);
+const createJwt = new CreateJWT();
+
+// Instantiate the UserServices, passing in the UserRepository and other dependencies
+const userServices = new UserServices(userRepository, encrypt, createJwt); // Using interface
+
+// Instantiate the UserController with the UserServices
 const userController = new UserController(userServices);
+
 
 userRouter.post('/signup', (req, res) => userController.userSignup(req, res));
 userRouter.get('/resend-otp', (req, res) => userController.resendOtp(req, res));
@@ -44,9 +53,10 @@ userRouter.post('/booking_confirm', userAuth, async (req, res) => userController
 userRouter.post('/create-payment-intent', userAuth, async (req, res) => userController.paymentForStripe(req, res))
 userRouter.post('/userid_in_coupon/:coupon/:userId', userAuth, async (req, res) => userController.userIdInCoupon(req, res))
 userRouter.put('/check_update_wallet/:userId/:amount', userAuth, async (req, res) => userController.checkAndUpdateWallet(req, res));
-
-userRouter.get('/booking_history', userAuth, async (req, res) => userController.getBookingHistory(req, res))
-userRouter.get('/details_of_specifc_order/:id', userAuth, async (req, res) => userController.specificBookingDetails(req, res));
+userRouter.get('/booking_history', userAuth, async (req, res) => {
+    console.log("After userAuth middleware");
+    await userController.getBookingHistory(req, res);
+}); userRouter.get('/details_of_specifc_order/:id', userAuth, async (req, res) => userController.specificBookingDetails(req, res));
 
 userRouter.put('/cancel_booking', userAuth, async (req, res) => userController.cancelBookingByUser(req, res));
 userRouter.put('/credit_to_wallet', userAuth, async (req, res) => userController.creditToWallet(req, res));
