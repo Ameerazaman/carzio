@@ -220,6 +220,7 @@ class UserController {
             try {
                 const { email, password } = req.body;
                 const result = yield this.userServices.userSignIn({ email, password });
+                console.log(result, "result");
                 if (result === null || result === void 0 ? void 0 : result.data.success) {
                     const access_token = result.data.token;
                     const refresh_token = result.data.refreshToken;

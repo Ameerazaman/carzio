@@ -20,10 +20,13 @@ const ComparedPassword_1 = __importDefault(require("../Utlis/ComparedPassword"))
 const GenerateToken_1 = require("../Utlis/GenerateToken");
 const UserAuthMiddleware_1 = __importDefault(require("../Middlewares/UserAuthMiddleware"));
 const userRouter = express_1.default.Router();
-const userRepository = new UserRepostries_1.UserRepository();
+// Instantiate dependencies
+const userRepository = new UserRepostries_1.UserRepository(); // Using interface
 const encrypt = new ComparedPassword_1.default();
-const createJWT = new GenerateToken_1.CreateJWT();
-const userServices = new UserServices_1.UserServices(userRepository, encrypt, createJWT);
+const createJwt = new GenerateToken_1.CreateJWT();
+// Instantiate the UserServices, passing in the UserRepository and other dependencies
+const userServices = new UserServices_1.UserServices(userRepository, encrypt, createJwt); // Using interface
+// Instantiate the UserController with the UserServices
 const userController = new UserController_1.UserController(userServices);
 userRouter.post('/signup', (req, res) => userController.userSignup(req, res));
 userRouter.get('/resend-otp', (req, res) => userController.resendOtp(req, res));
@@ -52,7 +55,10 @@ userRouter.post('/booking_confirm', UserAuthMiddleware_1.default, (req, res) => 
 userRouter.post('/create-payment-intent', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.paymentForStripe(req, res); }));
 userRouter.post('/userid_in_coupon/:coupon/:userId', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.userIdInCoupon(req, res); }));
 userRouter.put('/check_update_wallet/:userId/:amount', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.checkAndUpdateWallet(req, res); }));
-userRouter.get('/booking_history', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.getBookingHistory(req, res); }));
+userRouter.get('/booking_history', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("After userAuth middleware");
+    yield userController.getBookingHistory(req, res);
+}));
 userRouter.get('/details_of_specifc_order/:id', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.specificBookingDetails(req, res); }));
 userRouter.put('/cancel_booking', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.cancelBookingByUser(req, res); }));
 userRouter.put('/credit_to_wallet', UserAuthMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () { return userController.creditToWallet(req, res); }));

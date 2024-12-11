@@ -25,13 +25,19 @@ const WalletModel_1 = __importDefault(require("../../Model/User/WalletModel"));
 const ReviewModel_1 = __importDefault(require("../../Model/User/ReviewModel"));
 const ChatModel_1 = __importDefault(require("../../Model/User/ChatModel"));
 const OtpModel_1 = require("../../Model/User/OtpModel");
-class UserRepository {
+const BaseRepostry_1 = require("../BaseRepostry");
+class UserRepository extends BaseRepostry_1.BaseRepository {
+    constructor() {
+        super(UserModel_1.default);
+    }
     // *************************email Exist**************************
     emailExistCheck(email) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const existingUser = yield UserModel_1.default.findOne({ email });
-                return existingUser;
+                console.log(email, "email");
+                const existingUser = yield UserModel_1.default.find({ email: email });
+                console.log(existingUser, "existingUser");
+                return existingUser[0];
             }
             catch (error) {
                 console.log("Error checking email existence:", error);
@@ -108,19 +114,6 @@ class UserRepository {
             catch (error) {
                 console.error("Error in user login:", error);
                 return { exists: false };
-            }
-        });
-    }
-    //*****************check username and password for login*************
-    emailPasswordCheck(email) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const existingUser = yield UserModel_1.default.findOne({ email });
-                return existingUser;
-            }
-            catch (error) {
-                console.log("Error checking email and password:", error);
-                return null;
             }
         });
     }

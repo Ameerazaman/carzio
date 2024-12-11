@@ -19,6 +19,7 @@ const http_status_codes_1 = require("http-status-codes");
 const VerifyTokens_1 = require("../../Utlis/VerifyTokens");
 const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = http_status_codes_1.StatusCodes;
 class ProviderController {
+    // constructor(private providerServices: ProviderServices) 
     constructor(providerServices) {
         this.providerServices = providerServices;
         this.milliseconds = (h, m, s) => ((h * 60 * 60 + m * 60 + s) * 1000);
@@ -221,21 +222,7 @@ class ProviderController {
                         ? parseInt(process.env.ACCESS_TOKEN_MAX_AGE, 10) : 5 * 60 * 1000;
                     const refreshTokenMaxAge = process.env.REFRESH_TOKEN_MAX_AGE
                         ? parseInt(process.env.REFRESH_TOKEN_MAX_AGE, 10) : 48 * 60 * 60 * 1000;
-                    // return res.status(OK)
-                    //     .cookie('access_token', access_token, {
-                    //         maxAge: accessTokenMaxAge,
-                    //         httpOnly: true,
-                    //         secure: true,
-                    //         sameSite: 'none',
-                    //     })
-                    //     .cookie('refresh_token', refresh_token, {
-                    //         maxAge: refreshTokenMaxAge,
-                    //         httpOnly: true,
-                    //         secure: true,
-                    //         sameSite: 'none',
-                    //     })
-                    //     .json({ success: true, user: result.data, message: result.data.message });
-                    return res.status(200)
+                    return res.status(OK)
                         .cookie('access_token', access_token, {
                         maxAge: accessTokenMaxAge,
                         httpOnly: true,
@@ -265,14 +252,15 @@ class ProviderController {
             try {
                 res.clearCookie('access_token', {
                     httpOnly: true,
-                    secure: true, // Ensure this matches `secure` from res.cookie in login
-                    sameSite: 'none', // Ensure this matches `sameSite` from res.cookie in login
+                    secure: true,
+                    sameSite: 'none',
                 });
                 res.clearCookie('refresh_token', {
                     httpOnly: true,
-                    secure: true, // Ensure this matches `secure` from res.cookie in login
-                    sameSite: 'none', // Ensure this matches `sameSite` from res.cookie in login
+                    secure: true,
+                    sameSite: 'none',
                 });
+                console.log(req.cookies.refresh_token, "cookie");
                 res.status(200).json({ success: true, message: "Logged out successfully" });
             }
             catch (error) {

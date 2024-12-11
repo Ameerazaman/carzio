@@ -24,8 +24,11 @@ dotenv_1.default.config();
 const userAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let token = req.cookies.access_token;
+        console.log(token, "token");
         let refresh_token = req.cookies.refresh_token;
+        console.log(refresh_token, "refresh_token");
         if (!refresh_token) {
+            console.log('Refresh Token Expired');
             return res.status(401).json({ success: false, message: 'Refresh Token Expired' });
         }
         const refreshTokenValid = (0, VerifyTokens_1.verifyRefreshToken)(refresh_token);

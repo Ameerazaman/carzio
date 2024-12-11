@@ -469,7 +469,6 @@ class AdminServices {
     updateOffer(offerData, id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("edit offer is services");
                 const provider = yield this.adminRepostry.updateOffer(offerData, id);
                 return {
                     status: 200,

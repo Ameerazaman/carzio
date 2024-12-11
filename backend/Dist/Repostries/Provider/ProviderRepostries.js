@@ -21,7 +21,11 @@ const ProviderModel_1 = __importDefault(require("../../Model/Provider/ProviderMo
 const BookingModel_1 = __importDefault(require("../../Model/User/BookingModel"));
 const OtpModel_1 = require("../../Model/User/OtpModel");
 const ChatModel_1 = __importDefault(require("../../Model/User/ChatModel"));
-class ProviderRepository {
+const BaseRepostry_1 = require("../BaseRepostry");
+class ProviderRepository extends BaseRepostry_1.BaseRepository {
+    constructor() {
+        super(ProviderModel_1.default);
+    }
     //*******************check provider for tooken validation*************
     getProviderById(id) {
         return __awaiter(this, void 0, void 0, function* () {

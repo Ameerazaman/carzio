@@ -22,7 +22,11 @@ const CarModel_1 = __importDefault(require("../../Model/Provider/CarModel"));
 const CouponModel_1 = __importDefault(require("../../Model/Admin/CouponModel"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const BookingModel_1 = __importDefault(require("../../Model/User/BookingModel"));
-class AdminRepository {
+const BaseRepostry_1 = require("../BaseRepostry");
+class AdminRepository extends BaseRepostry_1.BaseRepository {
+    constructor() {
+        super(AdminModel_1.default);
+    }
     emailExistCheck(email) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -438,7 +442,7 @@ class AdminRepository {
             }
         });
     }
-    // **************************add coupon*****************
+    // // **************************add coupon*****************
     addCoupon(coupon) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b, _c, _d, _e;

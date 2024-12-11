@@ -57,7 +57,10 @@ class UserServices {
     emailExistCheck(email) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.userRepository.emailExistCheck(email);
+                console.log("check services");
+                const data = yield this.userRepository.emailExistCheck(email);
+                console.log(data, "data");
+                return data;
             }
             catch (error) {
                 console.log(error);
@@ -150,7 +153,8 @@ class UserServices {
     userSignIn(userData) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const user = yield this.userRepository.emailPasswordCheck(userData.email);
+                const user = yield this.userRepository.emailExistCheck(userData.email);
+                console.log(user, "user");
                 if (!user) {
                     return {
                         status: UNAUTHORIZED,
