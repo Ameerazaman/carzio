@@ -17,8 +17,18 @@ const HttpStatusCode_1 = require("../../Constants/HttpStatusCode");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const { OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED, BAD_REQUEST } = HttpStatusCode_1.STATUS_CODES;
 class UserServices {
-    constructor(userRepository, encrypt, createjwt) {
+    constructor(userRepository, otpRepository, carRepository, bookingRepository, offerRepository, walletRepository, ReviewRepository, chatRepository, couponRepository, profileUserRepository, userAddressRepository, encrypt, createjwt) {
         this.userRepository = userRepository;
+        this.otpRepository = otpRepository;
+        this.carRepository = carRepository;
+        this.bookingRepository = bookingRepository;
+        this.offerRepository = offerRepository;
+        this.walletRepository = walletRepository;
+        this.ReviewRepository = ReviewRepository;
+        this.chatRepository = chatRepository;
+        this.couponRepository = couponRepository;
+        this.profileUserRepository = profileUserRepository;
+        this.userAddressRepository = userAddressRepository;
         this.encrypt = encrypt;
         this.createjwt = createjwt;
     }
@@ -84,7 +94,7 @@ class UserServices {
     createOtp(email, otp) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.userRepository.createOtp(otp, email);
+                return yield this.otpRepository.createOtp(otp, email);
             }
             catch (error) {
                 return null;
@@ -95,7 +105,7 @@ class UserServices {
     verifyOtp(email, otp) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.userRepository.findOtp(email, otp);
+                return yield this.otpRepository.findOtp(email, otp);
             }
             catch (error) {
                 return null;
@@ -106,7 +116,7 @@ class UserServices {
     deleteOtp(email) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.userRepository.deleteOtp(email);
+                return yield this.otpRepository.deleteOtp(email);
             }
             catch (error) {
                 return null;
@@ -117,7 +127,7 @@ class UserServices {
     updateOtp(email, otp) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.userRepository.updateOtp(email, otp);
+                return yield this.otpRepository.updateOtp(email, otp);
             }
             catch (error) {
                 return null;
@@ -214,8 +224,8 @@ class UserServices {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const carData = yield this.userRepository.fetchCars(page, limit);
-                const totalPage = yield this.userRepository.countsOfCar();
+                const carData = yield this.carRepository.fetchCarsForUser(page, limit);
+                const totalPage = yield this.carRepository.countsOfCarForUser();
                 if (carData && carData.length > 0 && totalPage) {
                     return {
                         status: OK,
@@ -252,7 +262,7 @@ class UserServices {
     carDetails(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const carDetails = yield this.userRepository.carDetails(id);
+                const carDetails = yield this.carRepository.carDetailsForUser(id);
                 if (!carDetails) {
                     return {
                         status: 400,
@@ -262,7 +272,7 @@ class UserServices {
                         },
                     };
                 }
-                const { averageRating, reviews } = yield this.userRepository.getReviewAndRatings(id);
+                const { averageRating, reviews } = yield this.ReviewRepository.getReviewAndRatings(id);
                 return {
                     status: 200,
                     data: {
@@ -282,7 +292,7 @@ class UserServices {
     carFilter(engineType, fuelType, sortPrice) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.userRepository.carFilter(engineType, fuelType, sortPrice);
+                return yield this.carRepository.carFilter(engineType, fuelType, sortPrice);
             }
             catch (error) {
                 return null;
@@ -293,7 +303,7 @@ class UserServices {
     searchCar(searchQuery) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.userRepository.searchCar(searchQuery);
+                return yield this.carRepository.searchCar(searchQuery);
             }
             catch (error) {
                 return null;
@@ -304,7 +314,7 @@ class UserServices {
     fetchOffer() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const offerData = yield this.userRepository.fetchOffer();
+                const offerData = yield this.offerRepository.fetchOfferForUser();
                 if (offerData && offerData.length > 0) {
                     return {
                         status: OK,
@@ -339,7 +349,7 @@ class UserServices {
     checkProfile(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.userRepository.checkProfile(id);
+                return yield this.profileUserRepository.checkProfile(id);
             }
             catch (error) {
                 return null;
@@ -350,7 +360,7 @@ class UserServices {
     saveProfile(profileData) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const provider = yield this.userRepository.saveProfile(profileData);
+                const provider = yield this.profileUserRepository.saveProfile(profileData);
                 return {
                     status: 200,
                     data: {
@@ -374,7 +384,7 @@ class UserServices {
     editProfile(profileData, id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const provider = yield this.userRepository.editProfile(profileData, id);
+                const provider = yield this.profileUserRepository.editProfile(profileData, id);
                 return {
                     status: 200,
                     data: {
@@ -398,7 +408,7 @@ class UserServices {
     checkAddress(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.userRepository.checkAddress(id);
+                return yield this.userAddressRepository.checkAddress(id);
             }
             catch (error) {
                 return null;
@@ -409,7 +419,7 @@ class UserServices {
     saveAddress(addressData) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const provider = yield this.userRepository.saveAddress(addressData);
+                const provider = yield this.userAddressRepository.saveAddress(addressData);
                 return {
                     status: 200,
                     data: {
@@ -433,7 +443,7 @@ class UserServices {
     editAddress(addressData, id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const provider = yield this.userRepository.editAddress(addressData, id);
+                const provider = yield this.userAddressRepository.editAddress(addressData, id);
                 return {
                     status: 200,
                     data: {
@@ -457,7 +467,7 @@ class UserServices {
     fetchCoupon(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const couponData = yield this.userRepository.fetchCoupon(userId);
+                const couponData = yield this.couponRepository.fetchCouponForUser(userId);
                 if (couponData && couponData.length > 0) {
                     return {
                         status: OK,
@@ -492,7 +502,7 @@ class UserServices {
     checkOfferForBookiing(carName) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const offerData = yield this.userRepository.checkOfferForBooking(carName);
+                const offerData = yield this.offerRepository.checkOfferForBooking(carName);
                 if (offerData) {
                     return {
                         status: OK,
@@ -527,7 +537,7 @@ class UserServices {
     saveBookingData(bookingData) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const savedBookingData = yield this.userRepository.saveBookingData(bookingData);
+                const savedBookingData = yield this.bookingRepository.saveBookingData(bookingData);
                 if (savedBookingData) {
                     return {
                         status: OK,
@@ -562,7 +572,7 @@ class UserServices {
     userIdInCoupon(coupon, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const updateCoupon = yield this.userRepository.userIdInCoupon(coupon, userId);
+                const updateCoupon = yield this.couponRepository.userIdInCoupon(coupon, userId);
                 if (updateCoupon) {
                     return {
                         status: OK,
@@ -597,8 +607,8 @@ class UserServices {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const bookingHistory = yield this.userRepository.getBookingHistory(userId, page, limit);
-                const historyDocuments = yield this.userRepository.countBookingHistory(userId);
+                const bookingHistory = yield this.bookingRepository.getBookingHistoryForUser(userId, page, limit);
+                const historyDocuments = yield this.bookingRepository.countBookingHistoryForUser(userId);
                 if (bookingHistory && historyDocuments) {
                     return {
                         status: OK,
@@ -635,7 +645,7 @@ class UserServices {
     specificBookingDetails(bookingId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const bookingHistory = yield this.userRepository.specificBookingDetails(bookingId);
+                const bookingHistory = yield this.bookingRepository.specificBookingDetails(bookingId);
                 if (bookingHistory) {
                     return {
                         status: OK,
@@ -670,7 +680,7 @@ class UserServices {
     cancelBookingByUser(bookingId, userId, amount) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const updateStatus = yield this.userRepository.cancelBookingByUser(bookingId);
+                const updateStatus = yield this.bookingRepository.cancelBookingByUser(bookingId);
                 if (updateStatus) {
                     return {
                         status: OK,
@@ -705,7 +715,7 @@ class UserServices {
     creditToWallet(userId, amount) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const updateWallet = yield this.userRepository.creditToWallet(userId, amount);
+                const updateWallet = yield this.walletRepository.creditToWallet(userId, amount);
                 if (updateWallet) {
                     return {
                         status: OK,
@@ -740,7 +750,7 @@ class UserServices {
     checkBookedOrNot(issueDate, returnDate, carId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const checkBooking = yield this.userRepository.checkBookedOrNot(carId);
+                const checkBooking = yield this.bookingRepository.checkBookedOrNot(carId);
                 if (!checkBooking) {
                     return {
                         status: BAD_REQUEST,
@@ -790,7 +800,7 @@ class UserServices {
     checkWalletAndUpdate(userId, amount) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let result = yield this.userRepository.checkBalanceAndUpdateWallet(userId, amount);
+                let result = yield this.walletRepository.checkBalanceAndUpdateWallet(userId, amount);
                 if (result) {
                     return {
                         status: OK,
@@ -827,8 +837,8 @@ class UserServices {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
             try {
-                const walletPage = yield this.userRepository.getWalletPage(userId, page, limit);
-                const walletDocuments = yield this.userRepository.countWalletDocuments(userId);
+                const walletPage = yield this.walletRepository.getWalletPage(userId, page, limit);
+                const walletDocuments = yield this.walletRepository.countWalletDocuments(userId);
                 if (walletPage && walletDocuments) {
                     const lastTransaction = walletPage[walletPage.length - 1];
                     let totalPrice = (_a = lastTransaction === null || lastTransaction === void 0 ? void 0 : lastTransaction.TotalAmt) !== null && _a !== void 0 ? _a : 0;
@@ -868,7 +878,7 @@ class UserServices {
     createReviewData(reviewData) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const reviewDocument = yield this.userRepository.createReviewData(reviewData);
+                const reviewDocument = yield this.ReviewRepository.createReviewData(reviewData);
                 if (reviewDocument) {
                     return {
                         status: OK,
@@ -904,7 +914,7 @@ class UserServices {
     checkBookidInReview(bookId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const reviewDocument = yield this.userRepository.checkBookidInReview(bookId);
+                const reviewDocument = yield this.ReviewRepository.checkBookidInReview(bookId);
                 if (reviewDocument) {
                     return {
                         status: OK,
@@ -936,11 +946,11 @@ class UserServices {
             }
         });
     }
-    // ********************************fetch chat history***********************
+    // // ********************************fetch chat history***********************
     fetchChatHistory(userId, providerId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const reviewDocument = yield this.userRepository.fetchChatHistory(userId, providerId);
+                const reviewDocument = yield this.chatRepository.fetchChatHistoryForUser(userId, providerId);
                 if (reviewDocument) {
                     return {
                         status: OK,
@@ -972,37 +982,15 @@ class UserServices {
         });
     }
     // ******************************check car availabilty****************************
-    searchCarAvailability(issueDate, returnDate) {
+    searchCarAvailability(startDate, endDate) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const carData = yield this.userRepository.searchCarAvailability(issueDate, returnDate);
-                if (carData) {
-                    return {
-                        status: OK,
-                        data: {
-                            success: true,
-                            data: carData,
-                        },
-                    };
-                }
-                else {
-                    return {
-                        status: BAD_REQUEST,
-                        data: {
-                            success: false,
-                            message: 'No cars found',
-                        },
-                    };
-                }
+                const bookedCarIds = yield this.bookingRepository.findBookedCarIds(startDate, endDate);
+                const availableCars = yield this.carRepository.findAvailableCars(bookedCarIds);
+                return availableCars;
             }
             catch (error) {
-                return {
-                    status: INTERNAL_SERVER_ERROR,
-                    data: {
-                        success: false,
-                        message: 'Internal server error',
-                    },
-                };
+                throw new Error('Error fetching car availability');
             }
         });
     }

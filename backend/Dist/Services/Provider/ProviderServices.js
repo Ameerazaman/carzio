@@ -18,8 +18,14 @@ const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = http_status_cod
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const Uploads_1 = require("../../Utlis/Uploads");
 class ProviderServices {
-    constructor(providerRepostry, encrypt, createjwt) {
+    constructor(providerRepostry, profileRepository, otpRepository, carRepository, carNotificationRepository, bookingRepository, chatRepository, encrypt, createjwt) {
         this.providerRepostry = providerRepostry;
+        this.profileRepository = profileRepository;
+        this.otpRepository = otpRepository;
+        this.carRepository = carRepository;
+        this.carNotificationRepository = carNotificationRepository;
+        this.bookingRepository = bookingRepository;
+        this.chatRepository = chatRepository;
         this.encrypt = encrypt;
         this.createjwt = createjwt;
     }
@@ -80,40 +86,40 @@ class ProviderServices {
     createOtp(email, otp) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.providerRepostry.createOtp(otp, email);
+                return yield this.otpRepository.createOtp(otp, email);
             }
             catch (error) {
                 return null;
             }
         });
     }
-    //    ***********************************Verify otp******************************
+    // //    ***********************************Verify otp******************************
     verifyOtp(email, otp) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.providerRepostry.findOtp(email, otp);
+                return yield this.otpRepository.findOtp(email, otp);
             }
             catch (error) {
                 return null;
             }
         });
     }
-    // *************************************Delete Otp***************************
+    // // *************************************Delete Otp***************************
     deleteOtp(email) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.providerRepostry.deleteOtp(email);
+                return yield this.otpRepository.deleteOtp(email);
             }
             catch (error) {
                 return null;
             }
         });
     }
-    // **********************************update Otp**************************
+    // // **********************************update Otp**************************
     updateOtp(email, otp) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.providerRepostry.updateOtp(email, otp);
+                return yield this.otpRepository.updateOtp(email, otp);
             }
             catch (error) {
                 return null;
@@ -209,7 +215,7 @@ class ProviderServices {
     checkProviderAddress(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.providerRepostry.checkProviderAddress(id);
+                return yield this.profileRepository.checkProviderAddress(id);
             }
             catch (error) {
                 return null;
@@ -220,7 +226,7 @@ class ProviderServices {
     saveProfile(providerData) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const provider = yield this.providerRepostry.saveProfile(providerData);
+                const provider = yield this.profileRepository.saveProfile(providerData);
                 return {
                     status: 200,
                     data: {
@@ -244,7 +250,7 @@ class ProviderServices {
     editProfile(providerData, id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const provider = yield this.providerRepostry.editProfile(providerData, id);
+                const provider = yield this.profileRepository.editProfile(providerData, id);
                 return {
                     status: 200,
                     data: {
@@ -288,7 +294,7 @@ class ProviderServices {
                         },
                     };
                 }
-                const provider = yield this.providerRepostry.updateprofileImage(imageUrl, id);
+                const provider = yield this.profileRepository.updateprofileImage(imageUrl, id);
                 if (!provider) {
                     return {
                         status: 404,
@@ -322,36 +328,59 @@ class ProviderServices {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
+                // Check if the car already exists
+                const carExist = yield this.carRepository.checkCarExist(carData);
+                if (carExist) {
+                    return {
+                        status: 400,
+                        data: {
+                            success: false,
+                            message: "Car already exists",
+                        },
+                    };
+                }
+                // Upload images to Cloudinary
                 const result = yield (0, Uploads_1.uploadImageToCloudinary)(files);
                 if (!result.success) {
                     return {
                         status: 400,
                         data: {
                             success: false,
-                            message: 'Image upload failed',
+                            message: "Image upload failed",
                         },
                     };
                 }
+                // Extract image URLs
                 const images = ((_a = result === null || result === void 0 ? void 0 : result.results) === null || _a === void 0 ? void 0 : _a.map((obj) => obj === null || obj === void 0 ? void 0 : obj.url)) || [];
                 carData.images = images;
-                const saveCar = yield this.providerRepostry.addCarDetails(carData);
+                // Save car details in the repository
+                const saveCar = yield this.carNotificationRepository.addCarDetails(carData);
                 if (saveCar) {
                     return {
                         status: 200,
                         data: {
                             success: true,
-                            message: 'Car data saved successfully',
+                            message: "Car data saved successfully",
                             data: saveCar,
                         },
                     };
                 }
-            }
-            catch (error) {
+                // Handle unexpected save failure
                 return {
                     status: 500,
                     data: {
                         success: false,
-                        message: 'Internal server error',
+                        message: "Failed to save car data",
+                    },
+                };
+            }
+            catch (error) {
+                // Handle unexpected errors
+                return {
+                    status: 500,
+                    data: {
+                        success: false,
+                        message: "Internal server error",
                     },
                 };
             }
@@ -362,8 +391,8 @@ class ProviderServices {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const carData = yield this.providerRepostry.fetchCars(providerId, page, limit);
-                const totalPage = yield this.providerRepostry.countCars(providerId);
+                const carData = yield this.carRepository.fetchCarsForProvider(providerId, page, limit);
+                const totalPage = yield this.carRepository.countCarsForProvider(providerId);
                 if (carData && carData.length > 0 && totalPage) {
                     return {
                         status: OK,
@@ -400,7 +429,7 @@ class ProviderServices {
     updateStatusCar(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.providerRepostry.updateStatusCar(id);
+                return yield this.carRepository.updateStatusCarForProvider(id);
             }
             catch (error) {
                 return null;
@@ -411,7 +440,7 @@ class ProviderServices {
     editCar(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.providerRepostry.editCar(id);
+                return yield this.carRepository.editCarForProvider(id);
             }
             catch (error) {
                 return null;
@@ -422,7 +451,7 @@ class ProviderServices {
     updateCar(carData, id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const provider = yield this.providerRepostry.updateCar(carData, id);
+                const provider = yield this.carRepository.updateCarForProvider(carData, id);
                 return {
                     status: 200,
                     data: {
@@ -458,7 +487,7 @@ class ProviderServices {
                     };
                 }
                 const images = ((_a = result === null || result === void 0 ? void 0 : result.results) === null || _a === void 0 ? void 0 : _a.map((obj) => obj === null || obj === void 0 ? void 0 : obj.url)) || [];
-                const provider = yield this.providerRepostry.updateCarImage(images, id);
+                const provider = yield this.carRepository.updateCarImageForProvider(images, id);
                 return {
                     status: 200,
                     data: {
@@ -482,8 +511,8 @@ class ProviderServices {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const bookingHistory = yield this.providerRepostry.getBookingHistory(providerId, page, limit);
-                const historyDocuments = yield this.providerRepostry.countBooking(providerId);
+                const bookingHistory = yield this.bookingRepository.getBookingHistoryForProvider(providerId, page, limit);
+                const historyDocuments = yield this.bookingRepository.countBookingForProvider(providerId);
                 if (bookingHistory && historyDocuments) {
                     return {
                         status: OK,
@@ -520,7 +549,7 @@ class ProviderServices {
     specificBookingDetails(bookingId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const bookingHistory = yield this.providerRepostry.specificBookingDetails(bookingId);
+                const bookingHistory = yield this.bookingRepository.specificBookingDetailsForProvider(bookingId);
                 if (bookingHistory) {
                     return {
                         status: OK,
@@ -555,7 +584,7 @@ class ProviderServices {
     updateStatusOfBooking(bookingId, status) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const updateStatus = yield this.providerRepostry.updateStatusOfBooking(bookingId, status);
+                const updateStatus = yield this.bookingRepository.updateStatusOfBookingForProvider(bookingId, status);
                 if (updateStatus) {
                     return {
                         status: OK,
@@ -590,7 +619,7 @@ class ProviderServices {
     fetchUsersChat(providerId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const usersChat = yield this.providerRepostry.fetchUsersChat(providerId);
+                const usersChat = yield this.chatRepository.fetchUsersChat(providerId);
                 if (usersChat) {
                     return {
                         status: OK,
@@ -625,7 +654,7 @@ class ProviderServices {
     fetchChatHistory(userId, providerId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const reviewDocument = yield this.providerRepostry.fetchChatHistory(userId, providerId);
+                const reviewDocument = yield this.chatRepository.fetchChatHistory(userId, providerId);
                 if (reviewDocument) {
                     return {
                         status: OK,
@@ -662,11 +691,11 @@ class ProviderServices {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b, _c;
             try {
-                const totalCars = (yield this.providerRepostry.countCars(providerId)) || 0;
-                const totalBookingCount = (yield this.providerRepostry.CountBookingCar(providerId)) || [];
-                const revenue = (_a = (yield this.providerRepostry.totalRevenue(providerId))) !== null && _a !== void 0 ? _a : 0;
-                const totalBooking = (_b = (yield this.providerRepostry.countBooking(providerId))) !== null && _b !== void 0 ? _b : 0;
-                const revenueByCar = (_c = (yield this.providerRepostry.revenueByCar(providerId))) !== null && _c !== void 0 ? _c : 0;
+                const totalCars = (yield this.carRepository.countCarsForProvider(providerId)) || 0;
+                const totalBookingCount = (yield this.bookingRepository.CountBookingCarForProvider(providerId)) || [];
+                const revenue = (_a = (yield this.bookingRepository.totalRevenueForProvider(providerId))) !== null && _a !== void 0 ? _a : 0;
+                const totalBooking = (_b = (yield this.bookingRepository.countBookingForProvider(providerId))) !== null && _b !== void 0 ? _b : 0;
+                const revenueByCar = (_c = (yield this.bookingRepository.revenueByCarForProvider(providerId))) !== null && _c !== void 0 ? _c : 0;
                 return {
                     status: 200,
                     data: {
@@ -690,7 +719,7 @@ class ProviderServices {
     fetchSalesReport(page, limit, providerId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const salesReport = yield this.providerRepostry.fetchSalesReport(page, limit, providerId);
+                const salesReport = yield this.bookingRepository.fetchSalesReportForProvider(page, limit, providerId);
                 if (salesReport && salesReport.length > 0) {
                     return {
                         status: OK,

@@ -20,12 +20,24 @@ const ComparedPassword_1 = __importDefault(require("../Utlis/ComparedPassword"))
 const GenerateToken_1 = require("../Utlis/GenerateToken"); // Importing the CreateJWT utility
 const ProviderAuthMiddleware_1 = __importDefault(require("../Middlewares/ProviderAuthMiddleware"));
 const ImgAuthMiddleware_1 = __importDefault(require("../Middlewares/ImgAuthMiddleware"));
+const ProviderProfile_1 = require("../Repostries/ProviderProfile/ProviderProfile");
+const OtpRepository_1 = require("../Repostries/Otp/OtpRepository");
+const CarRepository_1 = require("../Repostries/Car/CarRepository");
+const CarNotification_1 = require("../Repostries/CarNotification/CarNotification");
+const BookingRepository_1 = require("../Repostries/BookingRepository/BookingRepository");
+const ChatRepository_1 = require("../Repostries/Chat/ChatRepository");
 const providerRouter = express_1.default.Router();
 const providerRepository = new ProviderRepostries_1.ProviderRepository();
-const encrypt = new ComparedPassword_1.default(); // Creating an instance of Encrypt
+const profileRepository = new ProviderProfile_1.ProviderProfileRepository();
+const otpRepository = new OtpRepository_1.OtpRepository();
+const carRepository = new CarRepository_1.CarRepository();
+const carNotificationRepository = new CarNotification_1.CarNotificationRepository();
+const bookingRepository = new BookingRepository_1.BookingRepository();
+const chatRepository = new ChatRepository_1.ChatRepository();
+const encrypt = new ComparedPassword_1.default();
 const createJWT = new GenerateToken_1.CreateJWT();
 // Passing all required dependencies to UserServices
-const providerServices = new ProviderServices_1.ProviderServices(providerRepository, encrypt, createJWT);
+const providerServices = new ProviderServices_1.ProviderServices(providerRepository, profileRepository, otpRepository, carRepository, carNotificationRepository, bookingRepository, chatRepository, encrypt, createJWT);
 // Pass the instance of UserServices to the UserController
 const providerController = new ProviderController_1.ProviderController(providerServices);
 providerRouter.post('/signup', (req, res) => providerController.ProviderSignup(req, res));

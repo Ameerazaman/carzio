@@ -12,8 +12,6 @@ const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = StatusCodes;
 
 export class ProviderController {
 
-
-    // constructor(private providerServices: ProviderServices) 
     constructor(private providerServices: IProviderServices) 
     { }
     milliseconds = (h: number, m: number, s: number) => ((h * 60 * 60 + m * 60 + s) * 1000);
@@ -68,7 +66,7 @@ export class ProviderController {
                 req.app.locals.providerEmail = req.body.email;
                 const otp = await generateAndSendOTP(req.body.email);
 
-                const otpData = await this.providerServices.createOtp(req.body.email, Number(otp))
+                const otpData = await this.providerServices.createOtp(req.body.email, otp)
 
 
                 res.status(OK).json({ providerId: null, success: true, message: 'OTP sent for verification...' });
@@ -160,7 +158,7 @@ export class ProviderController {
             } else {
 
                 const otp = await generateAndSendOTP(req.body.email);
-                const otpData = await this.providerServices.createOtp(req.body.email, Number(otp))
+                const otpData = await this.providerServices.createOtp(req.body.email, otp)
                 res.status(OK).json({ userId: null, success: true, message: 'OTP sent for verification...' });
             }
         } catch (error) {

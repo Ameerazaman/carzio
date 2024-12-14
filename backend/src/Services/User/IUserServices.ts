@@ -86,5 +86,5 @@ export interface IUserServices {
 
     fetchChatHistory(userId: string, providerId: string): Promise<chatAuthInterface | undefined> 
 
-    searchCarAvailability(issueDate: string, returnDate: string): Promise<CarAuthResponse | undefined>
+    searchCarAvailability(startDate: string, endDate: string): Promise<CarDataInterface[]>
 }

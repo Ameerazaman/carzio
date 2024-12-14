@@ -1,4 +1,3 @@
-
 export interface BookingInterface {
     IssueDate: string;
     ReturnDate: string;
@@ -8,13 +7,17 @@ export interface BookingInterface {
     UserId: string;
     CarsId: string;
     UserAddressId: string;
-    Coupon?: string;
-    PickUpTime: string;
-    TotalOffersDeduction?: number;
-    CouponDeduction?: number;
-    AmtOnDays: number,
-    status?: string,
-    providerId?: string
-    }
-    
-    
+    Coupon?: string; // Optional
+    PickUpTime?: string; // Optional, based on schema
+    TotalOffersDeduction?: number; // Optional
+    CouponDeduction?: number; // Optional
+    AmtOnDays: number; // Required
+    rentDays: number; // Required
+    total_Amt: number; // Required
+    offerAmt?: number; // Optional
+    providerId: string; // Required
+    status: string; // Required
+    createdAt?: Date; // Added for timestamps
+    updatedAt?: Date; // Added for timestamps
+  }
+  

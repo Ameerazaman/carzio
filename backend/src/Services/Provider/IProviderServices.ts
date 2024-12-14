@@ -15,7 +15,7 @@ export interface IProviderServices {
 
     changePassword(email: string, password: string): Promise<ProviderInterface | null>
 
-    createOtp(email: string, otp: number): Promise<OtpDocument | null> 
+    createOtp(email: string, otp: string): Promise<OtpDocument | null> 
 
     verifyOtp(email: string, otp: string): Promise<OtpDocument | null>
 

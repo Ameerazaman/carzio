@@ -19,7 +19,6 @@ const http_status_codes_1 = require("http-status-codes");
 const VerifyTokens_1 = require("../../Utlis/VerifyTokens");
 const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = http_status_codes_1.StatusCodes;
 class ProviderController {
-    // constructor(private providerServices: ProviderServices) 
     constructor(providerServices) {
         this.providerServices = providerServices;
         this.milliseconds = (h, m, s) => ((h * 60 * 60 + m * 60 + s) * 1000);
@@ -68,7 +67,7 @@ class ProviderController {
                     req.app.locals.newProvider = true;
                     req.app.locals.providerEmail = req.body.email;
                     const otp = yield (0, GenerateAndSendOtp_1.generateAndSendOTP)(req.body.email);
-                    const otpData = yield this.providerServices.createOtp(req.body.email, Number(otp));
+                    const otpData = yield this.providerServices.createOtp(req.body.email, otp);
                     res.status(OK).json({ providerId: null, success: true, message: 'OTP sent for verification...' });
                 }
             }
@@ -155,7 +154,7 @@ class ProviderController {
                 }
                 else {
                     const otp = yield (0, GenerateAndSendOtp_1.generateAndSendOTP)(req.body.email);
-                    const otpData = yield this.providerServices.createOtp(req.body.email, Number(otp));
+                    const otpData = yield this.providerServices.createOtp(req.body.email, otp);
                     res.status(OK).json({ userId: null, success: true, message: 'OTP sent for verification...' });
                 }
             }

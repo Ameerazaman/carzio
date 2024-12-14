@@ -840,7 +840,7 @@ class UserController {
                 if (issueDate && returnDate) {
                     const result = yield this.userServices.searchCarAvailability(issueDate, returnDate);
                     if (result) {
-                        res.status(200).json(result.data);
+                        res.status(200).json(result);
                     }
                     else {
                         res.status(500).json({ message: "Internal server error" });

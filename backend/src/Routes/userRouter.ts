@@ -7,16 +7,49 @@ import { CreateJWT } from '../Utlis/GenerateToken';
 import userAuth from '../Middlewares/UserAuthMiddleware';
 import { IUserServices } from '../Services/User/IUserServices';
 import { IUserRepository } from '../Repostries/User/IUserRepostry';
+import { OtpRepository } from '../Repostries/Otp/OtpRepository';
+import { CarRepository } from '../Repostries/Car/CarRepository';
+import { BookingRepository } from '../Repostries/BookingRepository/BookingRepository';
+import { OfferRepository } from '../Repostries/Offer/OfferRepository';
+import { WalletRepository } from '../Repostries/Wallet/WalletRepository';
+import { ReviewRepository } from '../Repostries/Review/ReviewRepository';
+import { ChatRepository } from '../Repostries/Chat/ChatRepository';
+import { CouponRepository } from '../Repostries/Coupon/CouponRepository';
+import { ProfileUserRepository } from '../Repostries/ProfileUser/ProfileUser';
+import { UserAddressRepository } from '../Repostries/UserAddress/UserAddress';
 
 const userRouter: Router = express.Router();
 
 // Instantiate dependencies
 const userRepository = new UserRepository(); // Using interface
+const otpRepository = new OtpRepository()
+const carRepository = new CarRepository()
+const bookingRepository = new BookingRepository()
+const offerRepository = new OfferRepository();
+const walletRepository = new WalletRepository()
+const reviewRepository = new ReviewRepository()
+const chatRepository = new ChatRepository()
+const couponRepository = new CouponRepository()
+const profileUserRepository = new ProfileUserRepository()
+const  userAddressRepository=new UserAddressRepository()
 const encrypt = new Encrypt();
 const createJwt = new CreateJWT();
 
 // Instantiate the UserServices, passing in the UserRepository and other dependencies
-const userServices = new UserServices(userRepository, encrypt, createJwt); // Using interface
+const userServices = new UserServices(
+    userRepository,
+    otpRepository,
+    carRepository,
+    bookingRepository,
+    offerRepository,
+    walletRepository,
+    reviewRepository,
+    chatRepository,
+    couponRepository,
+    profileUserRepository,
+    userAddressRepository,
+    encrypt, 
+    createJwt); // Using interface
 
 // Instantiate the UserController with the UserServices
 const userController = new UserController(userServices);

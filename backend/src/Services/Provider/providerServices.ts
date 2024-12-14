@@ -3,12 +3,10 @@ import { ProviderRepository } from '../../Repostries/Provider/ProviderRepostries
 import { OtpDocument } from '../../Model/User/OtpModel';
 import Encrypt from '../../Utlis/ComparedPassword';
 import { CreateJWT } from '../../Utlis/GenerateToken';
-import { UserRepository } from '../../Repostries/User/UserRepostries';
 import { ProviderAuthResponse } from '../../Interface/AuthServices/ProviderAuthServices';
 import { StatusCodes } from 'http-status-codes';
 const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = StatusCodes;
 import bcrypt from 'bcrypt'
-import providerAddress from '../../Model/Provider/ProviderAddressModel';
 import { CarDataInterface } from '../../Interface/CarInterface';
 import { CarAuthResponse } from '../../Interface/AuthServices/CarAuthInterface';
 import { uploadImageToCloudinary } from '../../Utlis/Uploads';
@@ -16,12 +14,26 @@ import { BookingAuthResponse } from '../../Interface/AuthServices/BookingAuthInt
 import { chatAuthInterface } from '../../Interface/AuthServices/ChatAuthResponse';
 import { DashboardAuthInterface } from '../../Interface/AuthServices/DashboardAuthInterface';
 import { IProviderRepository } from '../../Repostries/Provider/IProviderRepostry';
+import { IProviderServices } from './IProviderServices';
+import { IProviderProfileRepository } from '../../Repostries/ProviderProfile/IProviderProfile';
+import { IOtpRepository } from '../../Repostries/Otp/IOtpRepository';
+import { ICarRepository } from '../../Repostries/Car/ICarRepository';
+import { ICarNotificationRepository } from '../../Repostries/CarNotification/ICarNotification';
+import { IBookingRepository } from '../../Repostries/BookingRepository/IBookingRepository';
+import { IChatRepository } from '../../Repostries/Chat/IChatRepository';
 
-export class ProviderServices {
+export class ProviderServices implements IProviderServices {
     constructor(
         private providerRepostry: IProviderRepository,
+        private profileRepository: IProviderProfileRepository,
+        private otpRepository: IOtpRepository,
+        private carRepository: ICarRepository,
+        private carNotificationRepository: ICarNotificationRepository,
+        private bookingRepository:IBookingRepository,
+        private chatRepository:IChatRepository,
         private encrypt: Encrypt,
         private createjwt: CreateJWT
+
     ) { }
     // refresh access token
     async providerGetById(id: string): Promise<ProviderAuthResponse | null> {
@@ -78,37 +90,37 @@ export class ProviderServices {
 
 
     //********************************8 */ OTP creation logic**************************
-    async createOtp(email: string, otp: number): Promise<OtpDocument | null> {
+    async createOtp(email: string, otp: string): Promise<OtpDocument | null> {
         try {
-            return await this.providerRepostry.createOtp(otp, email);
+            return await this.otpRepository.createOtp(otp, email);
         } catch (error) {
             return null;
         }
     }
 
-    //    ***********************************Verify otp******************************
+    // //    ***********************************Verify otp******************************
     async verifyOtp(email: string, otp: string): Promise<OtpDocument | null> {
         try {
-            return await this.providerRepostry.findOtp(email, otp)
+            return await this.otpRepository.findOtp(email, otp)
         }
         catch (error) {
 
             return null;
         }
     }
-    // *************************************Delete Otp***************************
+    // // *************************************Delete Otp***************************
     async deleteOtp(email: string): Promise<OtpDocument | null> {
         try {
-            return await this.providerRepostry.deleteOtp(email)
+            return await this.otpRepository.deleteOtp(email)
         }
         catch (error) {
             return null;
         }
     }
-    // **********************************update Otp**************************
+    // // **********************************update Otp**************************
     async updateOtp(email: string, otp: string): Promise<OtpDocument | null> {
         try {
-            return await this.providerRepostry.updateOtp(email, otp)
+            return await this.otpRepository.updateOtp(email, otp)
         }
         catch (error) {
             return null;
@@ -203,7 +215,7 @@ export class ProviderServices {
     // ************************************check provider Address********************
     async checkProviderAddress(id: string): Promise<ProviderAdressInterface | null> {
         try {
-            return await this.providerRepostry.checkProviderAddress(id);
+            return await this.profileRepository.checkProviderAddress(id);
         } catch (error) {
             return null;
         }
@@ -214,7 +226,7 @@ export class ProviderServices {
     async saveProfile(providerData: ProviderAdressInterface): Promise<ProviderAuthResponse | undefined> {
         try {
 
-            const provider = await this.providerRepostry.saveProfile(providerData);
+            const provider = await this.profileRepository.saveProfile(providerData);
             return {
                 status: 200,
                 data: {
@@ -239,7 +251,7 @@ export class ProviderServices {
     async editProfile(providerData: ProviderAdressInterface, id: string): Promise<ProviderAuthResponse | undefined> {
         try {
 
-            const provider = await this.providerRepostry.editProfile(providerData, id);
+            const provider = await this.profileRepository.editProfile(providerData, id);
             return {
                 status: 200,
                 data: {
@@ -287,7 +299,7 @@ export class ProviderServices {
                 };
             }
 
-            const provider = await this.providerRepostry.updateprofileImage(imageUrl, id);
+            const provider = await this.profileRepository.updateprofileImage(imageUrl, id);
 
             if (!provider) {
                 return {
@@ -321,52 +333,73 @@ export class ProviderServices {
     // **********************************add car details***********************
     async addCarDetails<T>(files: T, carData: CarDataInterface): Promise<CarAuthResponse | undefined> {
         try {
+            // Check if the car already exists
+            const carExist = await this.carRepository.checkCarExist(carData);
+            if (carExist) {
+                return {
+                    status: 400,
+                    data: {
+                        success: false,
+                        message: "Car already exists",
+                    },
+                };
+            }
 
+            // Upload images to Cloudinary
             const result = await uploadImageToCloudinary(files);
             if (!result.success) {
                 return {
                     status: 400,
                     data: {
                         success: false,
-                        message: 'Image upload failed',
+                        message: "Image upload failed",
                     },
                 };
             }
 
+            // Extract image URLs
             const images = result?.results?.map((obj: any) => obj?.url) || [];
+            carData.images = images;
 
-
-            carData.images = images
-            const saveCar = await this.providerRepostry.addCarDetails(
-                carData,
-            );
+            // Save car details in the repository
+            const saveCar = await this.carNotificationRepository.addCarDetails(carData);
 
             if (saveCar) {
                 return {
                     status: 200,
                     data: {
                         success: true,
-                        message: 'Car data saved successfully',
+                        message: "Car data saved successfully",
                         data: saveCar,
                     },
                 };
             }
-        } catch (error) {
 
+            // Handle unexpected save failure
             return {
                 status: 500,
                 data: {
                     success: false,
-                    message: 'Internal server error',
+                    message: "Failed to save car data",
+                },
+            };
+        } catch (error) {
+            // Handle unexpected errors
+            return {
+                status: 500,
+                data: {
+                    success: false,
+                    message: "Internal server error",
                 },
             };
         }
     }
+
     // **************************fetch car for car managementa****************************
     async fetchCars(providerId: string, page: number, limit: number): Promise<CarAuthResponse | undefined> {
         try {
-            const carData = await this.providerRepostry.fetchCars(providerId, page, limit);
-            const totalPage = await this.providerRepostry.countCars(providerId)
+            const carData = await this.carRepository.fetchCarsForProvider(providerId, page, limit);
+            const totalPage = await this.carRepository.countCarsForProvider(providerId)
             if (carData && carData.length > 0 && totalPage) {
                 return {
                     status: OK,
@@ -402,7 +435,7 @@ export class ProviderServices {
     async updateStatusCar(id: string): Promise<CarDataInterface | null> {
         try {
 
-            return await this.providerRepostry.updateStatusCar(id);
+            return await this.carRepository.updateStatusCarForProvider(id);
         } catch (error) {
 
             return null;
@@ -411,7 +444,7 @@ export class ProviderServices {
     // *************************fetch car for edit in  car mgt*********************
     async editCar(id: string): Promise<CarDataInterface | null> {
         try {
-            return await this.providerRepostry.editCar(id);
+            return await this.carRepository.editCarForProvider(id);
         } catch (error) {
             return null;
         }
@@ -420,7 +453,7 @@ export class ProviderServices {
     async updateCar(carData: CarDataInterface, id: string): Promise<CarAuthResponse | undefined> {
         try {
 
-            const provider = await this.providerRepostry.updateCar(carData, id);
+            const provider = await this.carRepository.updateCarForProvider(carData, id);
             return {
                 status: 200,
                 data: {
@@ -457,7 +490,7 @@ export class ProviderServices {
 
             const images = result?.results?.map((obj: any) => obj?.url) || [];
 
-            const provider = await this.providerRepostry.updateCarImage(images, id);
+            const provider = await this.carRepository.updateCarImageForProvider(images, id);
 
             return {
                 status: 200,
@@ -484,9 +517,9 @@ export class ProviderServices {
     async getBookingHistory(providerId: string, page: number, limit: number): Promise<BookingAuthResponse | undefined> {
         try {
 
-            const bookingHistory = await this.providerRepostry.getBookingHistory(providerId, page, limit);
+            const bookingHistory = await this.bookingRepository.getBookingHistoryForProvider(providerId, page, limit);
 
-            const historyDocuments = await this.providerRepostry.countBooking(providerId)
+            const historyDocuments = await this.bookingRepository.countBookingForProvider(providerId)
 
             if (bookingHistory && historyDocuments) {
                 return {
@@ -523,7 +556,7 @@ export class ProviderServices {
     async specificBookingDetails(bookingId: string): Promise<BookingAuthResponse | undefined> {
         try {
 
-            const bookingHistory = await this.providerRepostry.specificBookingDetails(bookingId);
+            const bookingHistory = await this.bookingRepository.specificBookingDetailsForProvider(bookingId);
             if (bookingHistory) {
                 return {
                     status: OK,
@@ -557,7 +590,7 @@ export class ProviderServices {
     async updateStatusOfBooking(bookingId: string, status: string): Promise<BookingAuthResponse | undefined> {
         try {
 
-            const updateStatus = await this.providerRepostry.updateStatusOfBooking(bookingId, status);
+            const updateStatus = await this.bookingRepository.updateStatusOfBookingForProvider(bookingId, status);
             if (updateStatus) {
                 return {
                     status: OK,
@@ -590,7 +623,7 @@ export class ProviderServices {
     async fetchUsersChat(providerId: string): Promise<chatAuthInterface> {
         try {
 
-            const usersChat = await this.providerRepostry.fetchUsersChat(providerId);
+            const usersChat = await this.chatRepository.fetchUsersChat(providerId);
 
             if (usersChat) {
                 return {
@@ -624,7 +657,7 @@ export class ProviderServices {
     // ********************************fetch chat history***********************
     async fetchChatHistory(userId: string, providerId: string): Promise<chatAuthInterface | undefined> {
         try {
-            const reviewDocument = await this.providerRepostry.fetchChatHistory(userId, providerId);
+            const reviewDocument = await this.chatRepository.fetchChatHistory(userId, providerId);
 
             if (reviewDocument) {
                 return {
@@ -659,11 +692,11 @@ export class ProviderServices {
     // *****************************get dashboard const data******************88
     async getConstDashboardData(providerId: string): Promise<DashboardAuthInterface | null> {
         try {
-            const totalCars = (await this.providerRepostry.countCars(providerId)) || 0;
-            const totalBookingCount = (await this.providerRepostry.CountBookingCar(providerId)) || [];
-            const revenue = (await this.providerRepostry.totalRevenue(providerId)) ?? 0;
-            const totalBooking = (await this.providerRepostry.countBooking(providerId)) ?? 0;
-            const revenueByCar = (await this.providerRepostry.revenueByCar(providerId)) ?? 0;
+            const totalCars = (await this.carRepository.countCarsForProvider(providerId)) || 0;
+            const totalBookingCount = (await this.bookingRepository.CountBookingCarForProvider(providerId)) || [];
+            const revenue = (await this.bookingRepository.totalRevenueForProvider(providerId)) ?? 0;
+            const totalBooking = (await this.bookingRepository.countBookingForProvider(providerId)) ?? 0;
+            const revenueByCar = (await this.bookingRepository.revenueByCarForProvider(providerId)) ?? 0;
             return {
                 status: 200,
                 data: {
@@ -687,7 +720,7 @@ export class ProviderServices {
     async fetchSalesReport(page: number, limit: number, providerId: string): Promise<BookingAuthResponse | undefined> {
         try {
 
-            const salesReport = await this.providerRepostry.fetchSalesReport(page, limit, providerId);
+            const salesReport = await this.bookingRepository.fetchSalesReportForProvider(page, limit, providerId);
 
             if (salesReport && salesReport.length > 0) {
                 return {

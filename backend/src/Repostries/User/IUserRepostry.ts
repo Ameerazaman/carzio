@@ -16,11 +16,21 @@ export interface IUserRepository {
 
     emailExistCheck(email: string): Promise<UserInterface | null>
 
-    createOtp(otp: string, email: string): Promise<OtpDocument | null>
+    fetchUsers(page: number, limit: number): Promise<UserInterface[] | null>,
 
-    deleteOtp(email: string): Promise<OtpDocument | null> 
+    editUser(userId: string): Promise<UserInterface | null>
 
-    updateOtp(email: string, otp: string): Promise<OtpDocument | null> 
+    updateUser(userData: UserInterface, id: string): Promise<UserInterface | null>
+
+    updateStatus(userId: string): Promise<UserInterface | null>
+
+    countUsers(): Promise<number | null>
+
+    // createOtp(otp: string, email: string): Promise<OtpDocument | null>
+
+    // deleteOtp(email: string): Promise<OtpDocument | null> 
+
+    // updateOtp(email: string, otp: string): Promise<OtpDocument | null> 
 
     saveUser(userData: UserInterface): Promise<UserInterface | null>
 
@@ -28,69 +38,69 @@ export interface IUserRepository {
 
     changePassword(email: string, password: string): Promise<UserInterface | null>
 
-    findOtp(email: string, otp: string): Promise<OtpDocument | null>
+    // findOtp(email: string, otp: string): Promise<OtpDocument | null>
 
     getUserById(id: string): Promise<UserInterface | null>
 
-    fetchCars(page: number, limit: number): Promise<CarDataInterface[] | null>
+    // fetchCarsForUser(page: number, limit: number): Promise<CarDataInterface[] | null>
 
-    countsOfCar(): Promise<number | null>
+    // countsOfCarForUser(): Promise<number | null>
 
-    carDetails(carId: string): Promise<CarDataInterface | null>
+    // carDetailsForUser(carId: string): Promise<CarDataInterface | null>
 
-    getReviewAndRatings(carId: string): Promise<{ averageRating: number | null; reviews: string[] }>
+    // getReviewAndRatings(carId: string): Promise<{ averageRating: number | null; reviews: string[] }>
 
-    carFilter(engineType?: string[], fuelType?: string[], sortPrice?: string): Promise<CarDataInterface[] | null>
+    // carFilter(engineType?: string[], fuelType?: string[], sortPrice?: string): Promise<CarDataInterface[] | null>
 
-    searchCar(searchQuery: string): Promise<CarDataInterface[] | null>
+    // searchCar(searchQuery: string): Promise<CarDataInterface[] | null>
 
-    fetchOffer(): Promise<OfferDataInterface[] | null>
+    // fetchOfferForUser(): Promise<OfferDataInterface[] | null>
 
-    checkProfile(userId: string): Promise<ProfileInterface | null>
+    // checkProfile(userId: string): Promise<ProfileInterface | null>
 
-    saveProfile(profileData: ProfileInterface): Promise<ProfileInterface | null>
+    // saveProfile(profileData: ProfileInterface): Promise<ProfileInterface | null>
 
-    editProfile(profileData: ProfileInterface, profileId: string): Promise<ProfileInterface | null>
+    // editProfile(profileData: ProfileInterface, profileId: string): Promise<ProfileInterface | null>
 
-    checkAddress(userId: string): Promise<UserAddressInterface | null>
+    // checkAddress(userId: string): Promise<UserAddressInterface | null>
 
-    saveAddress(addressData: UserAddressInterface): Promise<UserAddressInterface | null>
+    // saveAddress(addressData: UserAddressInterface): Promise<UserAddressInterface | null>
 
-    editAddress(addressData: UserAddressInterface, addressId: string): Promise<UserAddressInterface | null>
+    // editAddress(addressData: UserAddressInterface, addressId: string): Promise<UserAddressInterface | null>
 
-    fetchCoupon(userId: string): Promise<CouponInterface[] | null>
+    // fetchCoupon(userId: string): Promise<CouponInterface[] | null>
 
-    checkOfferForBooking(carName: string): Promise<OfferDataInterface | null>
+    // checkOfferForBooking(carName: string): Promise<OfferDataInterface | null>
 
-    saveBookingData(bookingData: BookingInterface): Promise<BookingInterface | null>
+    // saveBookingData(bookingData: BookingInterface): Promise<BookingInterface | null>
 
-    userIdInCoupon(couponCode: string, userId: string): Promise<CouponInterface | null>
+    // userIdInCoupon(couponCode: string, userId: string): Promise<CouponInterface | null>
 
-    getBookingHistory(userId: string, page: number, limit: number): Promise<BookingInterface[] | null>
+    // getBookingHistory(userId: string, page: number, limit: number): Promise<BookingInterface[] | null>
 
-    countBookingHistory(userId: string): Promise<number | null>
+    // countBookingHistory(userId: string): Promise<number | null>
 
-    specificBookingDetails(bookingId: string): Promise<BookingInterface | null>
+    // specificBookingDetails(bookingId: string): Promise<BookingInterface | null>
 
-    cancelBookingByUser(bookingId: string): Promise<BookingInterface | null>
+    // cancelBookingByUser(bookingId: string): Promise<BookingInterface | null>
 
-    creditToWallet(userId: string, amount: number): Promise<WalletInterface | null>
+    // creditToWallet(userId: string, amount: number): Promise<WalletInterface | null>
 
-    checkBookedOrNot(carId: string): Promise<BookingDateInterface[] | null>
+    // checkBookedOrNot(carId: string): Promise<BookingDateInterface[] | null>
 
-    checkBalanceAndUpdateWallet(userId: string, amount: number): Promise<WalletInterface | null>
+    // checkBalanceAndUpdateWallet(userId: string, amount: number): Promise<WalletInterface | null>
 
-    getWalletPage(userId: string, page: number, limit: number): Promise<WalletInterface[] | null>
+    // getWalletPage(userId: string, page: number, limit: number): Promise<WalletInterface[] | null>
 
-    countWalletDocuments(userId: string): Promise<number | null>
+    // countWalletDocuments(userId: string): Promise<number | null>
 
-    createReviewData(reviewData: ReviewDataInterface): Promise<ReviewDataInterface | null>
+    // createReviewData(reviewData: ReviewDataInterface): Promise<ReviewDataInterface | null>
 
-    checkBookidInReview(bookId: string): Promise<ReviewDataInterface | null>
+    // checkBookidInReview(bookId: string): Promise<ReviewDataInterface | null>
 
-    fetchChatHistory(userId: string, providerId: string): Promise<IChat[] | null>
+    // fetchChatHistory(userId: string, providerId: string): Promise<IChat[] | null>
 
-    searchCarAvailability(startDate: string, endDate: string): Promise<CarDataInterface[]>
+    // searchCarAvailability(startDate: string, endDate: string): Promise<CarDataInterface[]>
 
 
 }

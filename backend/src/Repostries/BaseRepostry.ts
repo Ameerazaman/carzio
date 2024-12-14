@@ -4,7 +4,7 @@ import { BaseRepositoryInterface } from "../Interface/BaseRepostryInterface";
 
 
 export class BaseRepository<T> implements BaseRepositoryInterface<T> {
-  private model: any; // Define your ORM model (like mongoose, Sequelize, etc.)
+  protected  model: any;
 
   constructor(model: any) {
     this.model = model;

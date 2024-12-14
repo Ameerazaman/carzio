@@ -870,7 +870,7 @@ export class UserController {
 
                 if (result) {
 
-                    res.status(200).json(result.data);
+                    res.status(200).json(result);
                 } else {
                     res.status(500).json({ message: "Internal server error" });
                 }

@@ -19,13 +19,33 @@ const UserRepostries_1 = require("../Repostries/User/UserRepostries");
 const ComparedPassword_1 = __importDefault(require("../Utlis/ComparedPassword"));
 const GenerateToken_1 = require("../Utlis/GenerateToken");
 const UserAuthMiddleware_1 = __importDefault(require("../Middlewares/UserAuthMiddleware"));
+const OtpRepository_1 = require("../Repostries/Otp/OtpRepository");
+const CarRepository_1 = require("../Repostries/Car/CarRepository");
+const BookingRepository_1 = require("../Repostries/BookingRepository/BookingRepository");
+const OfferRepository_1 = require("../Repostries/Offer/OfferRepository");
+const WalletRepository_1 = require("../Repostries/Wallet/WalletRepository");
+const ReviewRepository_1 = require("../Repostries/Review/ReviewRepository");
+const ChatRepository_1 = require("../Repostries/Chat/ChatRepository");
+const CouponRepository_1 = require("../Repostries/Coupon/CouponRepository");
+const ProfileUser_1 = require("../Repostries/ProfileUser/ProfileUser");
+const UserAddress_1 = require("../Repostries/UserAddress/UserAddress");
 const userRouter = express_1.default.Router();
 // Instantiate dependencies
 const userRepository = new UserRepostries_1.UserRepository(); // Using interface
+const otpRepository = new OtpRepository_1.OtpRepository();
+const carRepository = new CarRepository_1.CarRepository();
+const bookingRepository = new BookingRepository_1.BookingRepository();
+const offerRepository = new OfferRepository_1.OfferRepository();
+const walletRepository = new WalletRepository_1.WalletRepository();
+const reviewRepository = new ReviewRepository_1.ReviewRepository();
+const chatRepository = new ChatRepository_1.ChatRepository();
+const couponRepository = new CouponRepository_1.CouponRepository();
+const profileUserRepository = new ProfileUser_1.ProfileUserRepository();
+const userAddressRepository = new UserAddress_1.UserAddressRepository();
 const encrypt = new ComparedPassword_1.default();
 const createJwt = new GenerateToken_1.CreateJWT();
 // Instantiate the UserServices, passing in the UserRepository and other dependencies
-const userServices = new UserServices_1.UserServices(userRepository, encrypt, createJwt); // Using interface
+const userServices = new UserServices_1.UserServices(userRepository, otpRepository, carRepository, bookingRepository, offerRepository, walletRepository, reviewRepository, chatRepository, couponRepository, profileUserRepository, userAddressRepository, encrypt, createJwt); // Using interface
 // Instantiate the UserController with the UserServices
 const userController = new UserController_1.UserController(userServices);
 userRouter.post('/signup', (req, res) => userController.userSignup(req, res));

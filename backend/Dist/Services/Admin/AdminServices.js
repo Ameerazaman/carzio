@@ -18,8 +18,15 @@ const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = http_status_cod
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const CouponGenerator_1 = require("../../Utlis/CouponGenerator");
 class AdminServices {
-    constructor(adminRepostry, encrypt, createjwt) {
+    constructor(adminRepostry, couponRepository, offerRepository, carRepository, carNotificationRepostry, bookingRepository, userRepostry, providerRepository, encrypt, createjwt) {
         this.adminRepostry = adminRepostry;
+        this.couponRepository = couponRepository;
+        this.offerRepository = offerRepository;
+        this.carRepository = carRepository;
+        this.carNotificationRepostry = carNotificationRepostry;
+        this.bookingRepository = bookingRepository;
+        this.userRepostry = userRepostry;
+        this.providerRepository = providerRepository;
         this.encrypt = encrypt;
         this.createjwt = createjwt;
     }
@@ -107,8 +114,8 @@ class AdminServices {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const userData = yield this.adminRepostry.fetchUsers(page, limit);
-                const totalPage = (yield this.adminRepostry.countUsers()) || 0;
+                const userData = yield this.userRepostry.fetchUsers(page, limit);
+                const totalPage = (yield this.userRepostry.countUsers()) || 0;
                 if (userData && userData.length > 0) {
                     return {
                         status: OK,
@@ -145,7 +152,7 @@ class AdminServices {
     editUser(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.adminRepostry.editUser(id);
+                return yield this.userRepostry.editUser(id);
             }
             catch (error) {
                 return null;
@@ -156,7 +163,7 @@ class AdminServices {
     updateUser(userData, id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const provider = yield this.adminRepostry.updateUser(userData, id);
+                const provider = yield this.userRepostry.updateUser(userData, id);
                 return {
                     status: 200,
                     data: {
@@ -180,7 +187,7 @@ class AdminServices {
     updateStatus(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.adminRepostry.updateStatus(id);
+                return yield this.userRepostry.updateStatus(id);
             }
             catch (error) {
                 return null;
@@ -192,8 +199,8 @@ class AdminServices {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const providerData = yield this.adminRepostry.fetchProviders(page, limit);
-                const totalPage = (yield this.adminRepostry.countProviders()) || 0;
+                const providerData = yield this.providerRepository.fetchProviders(page, limit);
+                const totalPage = (yield this.providerRepository.countProviders()) || 0;
                 if (providerData && providerData.length > 0) {
                     return {
                         status: OK,
@@ -230,7 +237,7 @@ class AdminServices {
     editProvider(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.adminRepostry.editProvider(id);
+                return yield this.providerRepository.editProvider(id);
             }
             catch (error) {
                 return null;
@@ -241,7 +248,7 @@ class AdminServices {
     updateProvider(providerData, id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const provider = yield this.adminRepostry.updateProvider(providerData, id);
+                const provider = yield this.providerRepository.updateProvider(providerData, id);
                 return {
                     status: 200,
                     data: {
@@ -265,7 +272,7 @@ class AdminServices {
     updateStatusProvider(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.adminRepostry.updateStatusprovider(id);
+                return yield this.providerRepository.updateStatusprovider(id);
             }
             catch (error) {
                 return null;
@@ -276,7 +283,7 @@ class AdminServices {
     fetchNotification() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const carNotificationData = yield this.adminRepostry.fetchNotification();
+                const carNotificationData = yield this.carNotificationRepostry.fetchNotification();
                 if (carNotificationData && carNotificationData.length > 0) {
                     return {
                         status: OK,
@@ -311,7 +318,7 @@ class AdminServices {
     notificationDetails(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.adminRepostry.carNotificationById(id);
+                return yield this.carNotificationRepostry.carNotificationById(id);
             }
             catch (error) {
                 return null;
@@ -322,9 +329,25 @@ class AdminServices {
     verifynotification(id, value) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.adminRepostry.verifyNotification(id, value);
+                const carNotification = yield this.carNotificationRepostry.verifyNotification(id, value);
+                if (!carNotification) {
+                    throw new Error("Notification not found or failed to process");
+                }
+                if (value === "Accept") {
+                    const addedCar = yield this.carRepository.addCarFromNotification(carNotification);
+                    if (!addedCar) {
+                        throw new Error("Failed to add car from notification");
+                    }
+                    return addedCar;
+                }
+                const isDeleted = yield this.carNotificationRepostry.deleteNotification(id);
+                if (!isDeleted) {
+                    throw new Error("Failed to delete notification");
+                }
+                return null;
             }
             catch (error) {
+                console.error("Error verifying notification:", error);
                 return null;
             }
         });
@@ -334,9 +357,9 @@ class AdminServices {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const carData = yield this.adminRepostry.fetchCars(page, limit);
+                const carData = yield this.carRepository.fetchCars(page, limit);
                 console.log(carData, "cardata services");
-                const totalPage = (yield this.adminRepostry.countCars()) || 0;
+                const totalPage = (yield this.carRepository.countCars()) || 0;
                 if (carData && carData.length > 0) {
                     return {
                         status: OK,
@@ -373,7 +396,7 @@ class AdminServices {
     updateStatusCar(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.adminRepostry.updateStatusCar(id);
+                return yield this.carRepository.updateStatusCar(id);
             }
             catch (error) {
                 return null;
@@ -384,7 +407,7 @@ class AdminServices {
     addOffer(offer) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const offerData = yield this.adminRepostry.addOffer(offer);
+                const offerData = yield this.offerRepository.addOffer(offer);
                 if (offerData) {
                     return {
                         status: OK,
@@ -420,8 +443,8 @@ class AdminServices {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const offerData = yield this.adminRepostry.fetchOffer(page, limit);
-                const totalPage = (yield this.adminRepostry.countOffers()) || 0;
+                const offerData = yield this.offerRepository.fetchOffer(page, limit);
+                const totalPage = (yield this.offerRepository.countOffers()) || 0;
                 if (offerData && offerData.length > 0) {
                     return {
                         status: OK,
@@ -458,7 +481,7 @@ class AdminServices {
     editOffer(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.adminRepostry.editOffer(id);
+                return yield this.offerRepository.editOffer(id);
             }
             catch (error) {
                 return null;
@@ -469,7 +492,7 @@ class AdminServices {
     updateOffer(offerData, id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const provider = yield this.adminRepostry.updateOffer(offerData, id);
+                const provider = yield this.offerRepository.updateOffer(offerData, id);
                 return {
                     status: 200,
                     data: {
@@ -493,7 +516,7 @@ class AdminServices {
     updateStatusOffer(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.adminRepostry.updateStatusOffer(id);
+                return yield this.offerRepository.updateStatusOffer(id);
             }
             catch (error) {
                 return null;
@@ -505,7 +528,7 @@ class AdminServices {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 coupon.code = (0, CouponGenerator_1.generateRandomCouponCode)(8);
-                const offerData = yield this.adminRepostry.addCoupon(coupon);
+                const offerData = yield this.couponRepository.addCoupon(coupon);
                 if (offerData) {
                     return {
                         status: OK,
@@ -541,8 +564,8 @@ class AdminServices {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const couponData = yield this.adminRepostry.fetchCoupon(page, limit);
-                const totalPage = (yield this.adminRepostry.countCoupon()) || 0;
+                const couponData = yield this.couponRepository.fetchCoupon(page, limit);
+                const totalPage = (yield this.couponRepository.countCoupon()) || 0;
                 if (couponData && couponData.length > 0) {
                     return {
                         status: OK,
@@ -579,7 +602,7 @@ class AdminServices {
     editCoupon(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.adminRepostry.editCoupon(id);
+                return yield this.couponRepository.editCoupon(id);
             }
             catch (error) {
                 return null;
@@ -590,7 +613,7 @@ class AdminServices {
     updateCoupon(couponData, id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const updatedCoupon = yield this.adminRepostry.updateCoupon(couponData, id);
+                const updatedCoupon = yield this.couponRepository.updateCoupon(couponData, id);
                 return {
                     status: 200,
                     data: {
@@ -615,7 +638,7 @@ class AdminServices {
     updateStatusCoupon(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.adminRepostry.updateStatusCoupon(id);
+                return yield this.couponRepository.updateStatusCoupon(id);
             }
             catch (error) {
                 return null;
@@ -627,8 +650,8 @@ class AdminServices {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const bookingHistory = yield this.adminRepostry.getBookingHistory(page, limit);
-                const totalPage = (yield this.adminRepostry.countBooking()) || 0;
+                const bookingHistory = yield this.bookingRepository.getBookingHistory(page, limit);
+                const totalPage = (yield this.bookingRepository.countBooking()) || 0;
                 if (bookingHistory && bookingHistory.length > 0) {
                     return {
                         status: OK,
@@ -665,7 +688,7 @@ class AdminServices {
     specificBookingDetails(bookingId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const bookingHistory = yield this.adminRepostry.specificBookingDetails(bookingId);
+                const bookingHistory = yield this.bookingRepository.specificBookingDetails(bookingId);
                 if (bookingHistory) {
                     return {
                         status: OK,
@@ -700,7 +723,7 @@ class AdminServices {
     updateStatusOfBooking(bookingId, status) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const updateStatus = yield this.adminRepostry.updateStatusOfBooking(bookingId, status);
+                const updateStatus = yield this.bookingRepository.updateStatusOfBooking(bookingId, status);
                 if (updateStatus) {
                     return {
                         status: OK,
@@ -736,13 +759,13 @@ class AdminServices {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b, _c;
             try {
-                const totalCars = (yield this.adminRepostry.countCars()) || 0;
-                const totalProviders = (yield this.adminRepostry.countProviders()) || 0;
-                const totalUsers = (yield this.adminRepostry.countUsers()) || 0;
-                const totalBookingCount = yield this.adminRepostry.CountBookingCar();
-                const revenue = (_a = (yield this.adminRepostry.totalRevenue())) !== null && _a !== void 0 ? _a : 0;
-                const totalBooking = (_b = (yield this.adminRepostry.countBooking())) !== null && _b !== void 0 ? _b : 0;
-                const revenueByCar = (_c = (yield this.adminRepostry.revenueByCar())) !== null && _c !== void 0 ? _c : 0;
+                const totalCars = (yield this.carRepository.countCars()) || 0;
+                const totalProviders = (yield this.providerRepository.countProviders()) || 0;
+                const totalUsers = (yield this.userRepostry.countUsers()) || 0;
+                const totalBookingCount = yield this.bookingRepository.CountBookingCar();
+                const revenue = (_a = (yield this.bookingRepository.totalRevenue())) !== null && _a !== void 0 ? _a : 0;
+                const totalBooking = (_b = (yield this.bookingRepository.countBooking())) !== null && _b !== void 0 ? _b : 0;
+                const revenueByCar = (_c = (yield this.bookingRepository.revenueByCar())) !== null && _c !== void 0 ? _c : 0;
                 return {
                     status: 200,
                     data: {
@@ -768,7 +791,7 @@ class AdminServices {
     fetchSalesReport(page, limit) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const salesReport = yield this.adminRepostry.fetchSalesReport(page, limit);
+                const salesReport = yield this.bookingRepository.fetchSalesReport(page, limit);
                 if (salesReport && salesReport.length > 0) {
                     return {
                         status: OK,
