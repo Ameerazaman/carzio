@@ -12,8 +12,8 @@ import { signOutAdmin } from "../App/Slice/AdminSlice";
 // **********************************Axios instance for User********************
 export { }
 const userApi: AxiosInstance = axios.create({
-  // baseURL: "http://localhost:5000/api/users",
-  baseURL: "https://carzio.store/api/users",
+  baseURL: "http://localhost:5000/api/users",
+  // baseURL: "https://carzio.store/api/users",
   withCredentials: true
 });
 
@@ -66,8 +66,8 @@ userApi.interceptors.response.use(
 // **********************************Axios instance for Provider********************
 
 const providerAPI: AxiosInstance = axios.create({
-  // baseURL: "http://localhost:5000/api",
-  baseURL: "https://carzio.store/api",
+  baseURL: "http://localhost:5000/api",
+  // baseURL: "https://carzio.store/api",
   withCredentials: true
 });
 
@@ -115,8 +115,8 @@ providerAPI.interceptors.response.use(
 // **********************************Axios instance for Admin********************
 
 const adminAPI: AxiosInstance = axios.create({
-  // baseURL: "http://localhost:5000/api",
-  baseURL: "https://carzio.store/api",
+  baseURL: "http://localhost:5000/api",
+  // baseURL: "https://carzio.store/api",
 
   withCredentials: true
 });
